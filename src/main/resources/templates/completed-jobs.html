@@ -1,0 +1,54 @@
+<!-- src/main/resources/templates/completed-jobs.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tamamlanan İşler</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Tamamlanan İşlerim</h1>
+
+    <a th:href="@{|/employees/${employeeId}/dashboard|}" class="btn btn-secondary">Geri Dön</a>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>İş ID</th>
+            <th>Tür</th>
+            <th>Duvar Montajı</th>
+            <th>İş Adresi</th>
+            <th>Tanımı</th>
+            <th>Tarih</th>
+            <th>Ücret</th>
+            <th>Ücret Tahsil Tipi</th>
+            <th>Süre (Saat)</th>
+            <th>Bahşiş</th>
+            <th>Kart Verildi</th>
+            <th>Yorum Kartı</th>
+            <th>Foto Atıldı</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="job : ${jobs}">
+            <td th:text="${job.id}"></td>
+            <td th:text="${job.tur}"></td>
+            <td th:text="${job.duvarMontaji} ? 'Evet' : 'Hayır'"></td>
+            <td th:text="${job.isAdresi}"></td>
+            <td th:text="${job.tanimi}"></td>
+            <td th:text="${job.tarih}"></td>
+            <td th:text="${job.ucret}"></td>
+            <td th:text="${job.ucretTahsilTipi}"></td>
+            <td th:text="${job.sure}"></td>
+            <td th:text="${job.bahsis}"></td>
+            <td th:text="${job.kartVerildi} ? 'Evet' : 'Hayır'"></td>
+            <td th:text="${job.yorumKartiVerildi} ? 'Evet' : 'Hayır'"></td>
+            <td th:text="${job.fotoAtildi} ? 'Evet' : 'Hayır'"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!-- src/main/resources/templates/edit-current-job.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mevcut İş Düzenle</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Mevcut İş Düzenle</h1>
+
+    <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn btn-secondary">Geri Dön</a>
+
+    <form th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/edit|}"
+          method="post" class="form">
+
+        <div class="form-group">
+            <label for="sure">Süre (Saat)</label>
+            <input type="number" step="0.1" id="sure" name="sure"
+                   th:value="${job.sure}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="bahsis">Bahşiş</label>
+            <input type="number" id="bahsis" name="bahsis"
+                   th:value="${job.bahsis}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Kart Verildi mi?</label>
+            <div>
+                <label>
+                    <input type="radio" name="kartVerildi" value="true"
+                           th:checked="${job.kartVerildi == true}" required> Evet
+                </label>
+                <label>
+                    <input type="radio" name="kartVerildi" value="false"
+                           th:checked="${job.kartVerildi == false}"> Hayır
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Yorum Kartı Verildi mi?</label>
+            <div>
+                <label>
+                    <input type="radio" name="yorumKartiVerildi" value="true"
+                           th:checked="${job.yorumKartiVerildi == true}" required> Evet
+                </label>
+                <label>
+                    <input type="radio" name="yorumKartiVerildi" value="false"
+                           th:checked="${job.yorumKartiVerildi == false}"> Hayır
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Fotoğraf Atıldı mı?</label>
+            <div>
+                <label>
+                    <input type="radio" name="fotoAtildi" value="true"
+                           th:checked="${job.fotoAtildi == true}" required> Evet
+                </label>
+                <label>
+                    <input type="radio" name="fotoAtildi" value="false"
+                           th:checked="${job.fotoAtildi == false}"> Hayır
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+    </form>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

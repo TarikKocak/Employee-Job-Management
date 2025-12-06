@@ -1,0 +1,65 @@
+<!-- src/main/resources/templates/current-jobs.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Mevcut İşler</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Mevcut İşlerim</h1>
+
+    <a th:href="@{|/employees/${employeeId}/dashboard|}" class="btn btn-secondary">Geri Dön</a>
+
+    <!-- Hata mesajı varsa küçük popup (alert) -->
+    <div th:if="${errorMessage != null && !#strings.isEmpty(errorMessage)}">
+        <script th:inline="javascript">
+            alert([[${errorMessage}]]);
+        </script>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Tür</th>
+            <th>Duvar Montajı</th>
+            <th>İsim</th>
+            <th>İş Adresi</th>
+            <th>Tel</th>
+            <th>İş Tanımı</th>
+            <th>Tarih</th>
+            <th>Ücret</th>
+            <th>Ücret Tahsil Tipi</th>
+            <th>Tahmini Süre</th>
+            <th>İşlem</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="job : ${jobs}">
+            <td th:text="${job.tur}"></td>
+            <td th:text="${job.duvarMontaji} ? 'Evet' : 'Hayır'"></td>
+            <td th:text="${job.isim}"></td>
+            <td th:text="${job.isAdresi}"></td>
+            <td th:text="${job.telNo}"></td>
+            <td th:text="${job.isTanimi}"></td>
+            <td th:text="${job.tarih}"></td>
+            <td th:text="${job.ucret}"></td>
+            <td th:text="${job.ucretTahsilTipi}"></td>
+            <td th:text="${job.tahminiSure}"></td>
+            <td>
+                <a th:href="@{|/employees/${employeeId}/current-jobs/${job.id}/edit|}"
+                   class="btn btn-small">Edit</a>
+
+                <form th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/submit|}"
+                      method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-small btn-success">Submit</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>
