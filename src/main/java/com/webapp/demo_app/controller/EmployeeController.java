@@ -22,7 +22,6 @@ public class EmployeeController {
         this.jobService = jobService;
     }
 
-    // Basit: şimdilik employeeId = 1 üzerinden gidelim
     @GetMapping("/home")
     public String homeRedirect(@RequestParam Long employeeId) {
         return "redirect:/employees/" + employeeId + "/home-dashboard";

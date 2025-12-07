@@ -19,32 +19,30 @@ public class MevcutIs {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Hangi employee'ye ait
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
-    // READONLY alanlar
+    // READONLY
     @Enumerated(EnumType.STRING)
-    private Tur tur;                   // BERABER / YALNIZ
+    private Tur tur;
 
-    private Boolean duvarMontaji;      // true: evet, false: hayır
-
-    private String isim;               // İşin adı / müşteri ismi
+    private Boolean duvarMontaji;
+    private String isim;
     private String isAdresi;
-    private String telNo;              // varsa Tel
+    private String telNo;
     private String isTanimi;
     private LocalDate tarih;
-
     private Double ucret;
 
     @Enumerated(EnumType.STRING)
     private UcretTahsilTipi ucretTahsilTipi; // CASH, BANK
 
-    private Double tahminiSure;        // tahmini süre (saat)
+    private Double tahminiSure;
 
-    // WRITEONLY alanlar (başta null)
-    private Double sure;               // gerçek süre (saat)
+    // WRITEONLY  (All null)
+    private Double sure;
     private Integer bahsis;
     private Boolean kartVerildi;
     private Boolean yorumKartiVerildi;

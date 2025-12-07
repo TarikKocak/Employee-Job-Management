@@ -57,12 +57,13 @@ public class JobService {
     public void submitJob(Long employeeId, Long jobId) {
         MevcutIs mevcutIs = getMevcutIsById(jobId);
 
-        // Employee kontrolü (başkasının işini submit edemesin)
+        // Employee Controller (başkasının işini submit edemesin)
         if (!mevcutIs.getEmployee().getId().equals(employeeId)) {
             throw new RuntimeException("Bu iş bu employee'e ait değil");
         }
 
-        // Gerekli write-only alanlar dolu mu?
+        // check for write-only fields whether they are filled
+
         if (mevcutIs.getSure() == null ||
                 mevcutIs.getBahsis() == null ||
                 mevcutIs.getKartVerildi() == null ||
@@ -71,7 +72,7 @@ public class JobService {
             throw new IncompleteJobException("Lütfen tüm alanları doldurunuz.");
         }
 
-        // TamamlananIs oluştur ve kaydet
+        // Create data for TamamlananIs
         TamamlananIs tamamlananIs = new TamamlananIs();
         tamamlananIs.setEmployee(mevcutIs.getEmployee());
         tamamlananIs.setTur(mevcutIs.getTur());
@@ -89,7 +90,7 @@ public class JobService {
 
         tamamlananIsRepository.save(tamamlananIs);
 
-        // Mevcut işlerden sil
+        // delete mevcutIs
         mevcutIsRepository.delete(mevcutIs);
     }
 

@@ -17,7 +17,7 @@ public class TamamlananIs {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // İş ID (readonly görülecek)
+    private Long id; // İş ID (readonly )
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")

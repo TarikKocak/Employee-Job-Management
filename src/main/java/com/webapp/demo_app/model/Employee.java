@@ -21,8 +21,10 @@ public class Employee {
 
     //<----------------------------------->
 
-    private String name;       // login için username
-    private String password;   // login için password
+    // for login page
+
+    private String name;
+    private String password;
 
     //<----------------------------------->
 
