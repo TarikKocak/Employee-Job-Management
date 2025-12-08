@@ -29,7 +29,7 @@ public class JobService {
     }
 
     public List<MevcutIs> getMevcutIsler(Long employeeId) {
-        return mevcutIsRepository.findByEmployeeId(employeeId);
+        return mevcutIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId);
     }
 
     public List<TamamlananIs> getTamamlananIsler(Long employeeId) {
