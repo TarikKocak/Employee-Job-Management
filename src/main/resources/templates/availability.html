@@ -36,7 +36,7 @@
                         th:with="dateStr=${#temporals.format(d,'yyyy-MM-dd')},
                                  key=${dateStr + '_' + hour},
                                  status=${week1StatusMap[key] != null ? week1StatusMap[key] : 0}"
-                        th:class="'cell status-' + ${status}"
+                        th:class="${'cell status-' + status}"
                         th:data-date="${dateStr}"
                         th:data-hour="${hour}"
                         onclick="toggleCell(this)">
@@ -61,7 +61,7 @@
                         th:with="dateStr=${#temporals.format(d,'yyyy-MM-dd')},
                                  key=${dateStr + '_' + hour},
                                  status=${week2StatusMap[key] != null ? week2StatusMap[key] : 0}"
-                        th:class="'cell status-' + ${status}"
+                        th:class="${'cell status-' + status}"
                         th:data-date="${dateStr}"
                         th:data-hour="${hour}"
                         onclick="toggleCell(this)">

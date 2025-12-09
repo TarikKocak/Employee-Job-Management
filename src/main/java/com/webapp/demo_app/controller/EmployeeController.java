@@ -103,8 +103,11 @@ public class EmployeeController {
     @GetMapping("/{employeeId}/availability")
     public String availability(@PathVariable Long employeeId, Model model) {
 
+        //DEBUG
+        System.out.println("TODAY = " + LocalDate.now());
+
         // NEW: Haftalar kaydıysa eski kayıtları ileri taşı
-        availabilityService.rollWeeksIfNeeded(employeeId);
+        //availabilityService.rollWeeksIfNeeded(employeeId);
 
         // NEW: 1. hafta (haftaya) ve 2. hafta (ondan sonraki hafta) için tarihleri hesapla
         LocalDate week1Monday = availabilityService.getNextWeekMonday();       // 1. hafta (haftaya)

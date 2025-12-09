@@ -30,8 +30,10 @@ public class AvailabilityService {
     //Find the first day of the week (Monday). Here we use next(DayOfWeek.MONDAY) for the Monday of the "week."
     public LocalDate getNextWeekMonday() {
         LocalDate today = LocalDate.now();
-        return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        LocalDate thisMonday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        return thisMonday.plusWeeks(1);
     }
+
 
     // week(7 days) from given monday
     public List<LocalDate> getWeekDates(LocalDate monday) {
@@ -93,6 +95,7 @@ public class AvailabilityService {
      * Thus, the green cells in week 3 will move to the position of week 2 one week later.
      */
 
+    /*
     @Transactional
     public void rollWeeksIfNeeded(Long employeeId) {
         LocalDate today = LocalDate.now();
@@ -113,7 +116,7 @@ public class AvailabilityService {
             availabilitySlotRepository.saveAll(slots);
         }
     }
-
+    */
 
     // Hour row (7..16)
     public List<Integer> getHours() {

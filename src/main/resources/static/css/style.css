@@ -72,6 +72,25 @@ h1 {
     margin-bottom: 4px;
 }
 
+/* NEW: Availability layout */
+.availability-container h1 {
+    margin-bottom: 10px;
+}
+
+.availability-layout {
+    display: flex;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.availability-sidebar {
+    width: 180px;
+}
+
+.availability-table-wrapper {
+    flex: 1;
+}
+
 /* NEW: Hücre görünümleri */
 .cell {
     width: 40px;
@@ -96,6 +115,10 @@ h1 {
     color: #ffffff;
 }
 
+/* NEW: aktif buton görünümü */
+.btn.active {
+    box-shadow: 0 0 0 2px #333;
+}
 /* NEW: aktif buton görünümü */
 .btn.active {
     box-shadow: 0 0 0 2px #333;
