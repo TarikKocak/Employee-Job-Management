@@ -2,39 +2,55 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f7f7f7;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
-    width: 90%;
+    width: 95%;
     max-width: 1100px;
     margin: 20px auto;
     background: #ffffff;
     padding: 20px;
     border-radius: 8px;
+    box-sizing: border-box;
 }
 
 h1 {
     margin-bottom: 20px;
+    font-size: 1.8rem;
 }
 
 .button-group {
     margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 .btn {
     display: inline-block;
     padding: 8px 16px;
-    margin-right: 10px;
     text-decoration: none;
     border-radius: 4px;
     border: 1px solid #007bff;
     background-color: #007bff;
     color: #fff;
+    transition: 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
 }
 
 .btn-secondary {
-    border-color: #6c757d;
-    background-color: #6c757d;
+    border-color: #28a745;
+    background-color: #28a745;
+}
+.btn-secondary:hover {
+    border-color: #1e7c33;
+    background-color: #1e7c33;
 }
 
 .btn-small {
@@ -47,6 +63,11 @@ h1 {
     border-color: #28a745;
 }
 
+.btn.active {
+    box-shadow: 0 0 0 2px #333;
+}
+
+/* TABLE GENERAL */
 .table {
     width: 100%;
     border-collapse: collapse;
@@ -59,6 +80,38 @@ h1 {
     text-align: left;
 }
 
+/* Availability table adjustments */
+.availability-table td:first-child,
+.availability-table th:first-child {
+    width: 70px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.cell {
+    width: 40px;
+    height: 30px;
+    cursor: pointer;
+}
+
+/* 0: gray */
+.status-0 {
+    background-color: #cccccc;
+}
+
+/* 1: green */
+.status-1 {
+    background-color: #2b8122;
+    color: #ffffff;
+}
+
+/* 2: red */
+.status-2 {
+    background-color: #e61a0b;
+    color: #ffffff;
+}
+
+/* FORM */
 .form {
     margin-top: 15px;
 }
@@ -72,42 +125,74 @@ h1 {
     margin-bottom: 4px;
 }
 
-.availability-table td:first-child,
-.availability-table th:first-child {
-    width: 70px;
-    text-align: center;
-    font-weight: bold;
+
+
+/* --------------------------------------------- */
+/* ✅ RESPONSIVE DESIGN FOR MOBILE DEVICES */
+/* --------------------------------------------- */
+
+@media (max-width: 768px) {
+
+    /* Container padding */
+    .container {
+        padding: 15px;
+    }
+
+    /* Smaller heading */
+    h1 {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    /* Buttons become full width */
+    .button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px;
+    }
+
+    /* Table scrollable on mobile */
+    .table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    /* Make availability cells bigger for touch screens */
+    .cell {
+        width: 30px;
+        height: 28px;
+    }
 }
 
-/* NEW: Hücre görünümleri */
-.cell {
-    width: 40px;
-    height: 30px;
-    cursor: pointer;
-}
+@media (max-width: 480px) {
 
-/* 0: gri (müsait değil) */
-.status-0 {
-    background-color: #cccccc;
-}
+    .container {
+        padding: 10px;
+    }
 
-/* 1: yeşil (müsait) */
-.status-1 {
-    background-color: #4caf50;
-    color: #ffffff;
-}
+    h1 {
+        font-size: 1.3rem;
+    }
 
-/* 2: kırmızı (dolu - admin) */
-.status-2 {
-    background-color: #f44336;
-    color: #ffffff;
-}
+    /* Make cells easier to click */
+    .cell {
+        width: 28px;
+        height: 26px;
+    }
 
-/* NEW: aktif buton görünümü */
-.btn.active {
-    box-shadow: 0 0 0 2px #333;
-}
-/* NEW: aktif buton görünümü */
-.btn.active {
-    box-shadow: 0 0 0 2px #333;
+    .table th, .table td {
+        padding: 6px;
+        font-size: 0.9rem;
+    }
+
+    .btn-small {
+        font-size: 0.85rem;
+        padding: 3px 6px;
+    }
 }
