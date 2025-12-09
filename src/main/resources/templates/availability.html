@@ -1,4 +1,3 @@
-<!-- NEW: src/main/resources/templates/availability.html -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -6,6 +5,7 @@
     <title>Availability</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
+
 <body>
 <div class="container availability-container">
     <h1>Availability</h1>
@@ -20,7 +20,10 @@
         </div>
 
         <div class="availability-table-wrapper">
-            <!-- WEEK 1 TABLE -->
+
+            <!-- ===================== -->
+            <!--       WEEK 1 TABLE    -->
+            <!-- ===================== -->
             <table id="week1-table" class="table availability-table">
                 <thead>
                 <tr>
@@ -29,23 +32,31 @@
                         th:text="${#temporals.format(d, 'EEE dd.MM')}"></th>
                 </tr>
                 </thead>
+
                 <tbody>
                 <tr th:each="hour : ${hours}">
                     <td th:text="${hour + ':00'}"></td>
+
                     <td th:each="d : ${week1Dates}"
-                        th:with="dateStr=${#temporals.format(d,'yyyy-MM-dd')},
-                                 key=${dateStr + '_' + hour},
-                                 status=${week1StatusMap[key] != null ? week1StatusMap[key] : 0}"
-                        th:class="${'cell status-' + status}"
+                        th:with="
+                            dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                            key=${dateStr + '_' + hour},
+                            status=${week1StatusMap.get(key) != null ? week1StatusMap.get(key) : 0}
+                        "
+                        th:class="'cell status-' + ${status}"
                         th:data-date="${dateStr}"
                         th:data-hour="${hour}"
                         onclick="toggleCell(this)">
                     </td>
+
                 </tr>
                 </tbody>
             </table>
 
-            <!-- WEEK 2 TABLE (başlangıçta gizli) -->
+
+            <!-- ===================== -->
+            <!--       WEEK 2 TABLE    -->
+            <!-- ===================== -->
             <table id="week2-table" class="table availability-table" style="display:none;">
                 <thead>
                 <tr>
@@ -54,63 +65,87 @@
                         th:text="${#temporals.format(d, 'EEE dd.MM')}"></th>
                 </tr>
                 </thead>
+
                 <tbody>
                 <tr th:each="hour : ${hours}">
                     <td th:text="${hour + ':00'}"></td>
+
                     <td th:each="d : ${week2Dates}"
-                        th:with="dateStr=${#temporals.format(d,'yyyy-MM-dd')},
-                                 key=${dateStr + '_' + hour},
-                                 status=${week2StatusMap[key] != null ? week2StatusMap[key] : 0}"
-                        th:class="${'cell status-' + status}"
+                        th:with="
+                            dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                            key=${dateStr + '_' + hour},
+                            status=${week2StatusMap.get(key) != null ? week2StatusMap.get(key) : 0}
+                        "
+                        th:class="'cell status-' + ${status}"
                         th:data-date="${dateStr}"
                         th:data-hour="${hour}"
                         onclick="toggleCell(this)">
                     </td>
+
                 </tr>
                 </tbody>
             </table>
+
         </div>
     </div>
 </div>
 
-<!-- NEW: JS - week switch ve cell toggle -->
+<!-- ============= -->
+<!--   JAVASCRIPT  -->
+<!-- ============= -->
 <script th:inline="javascript">
     /*<![CDATA[*/
     var employeeId = [[${employeeId}]];
 
     function showWeek(week) {
-        var week1Table = document.getElementById('week1-table');
-        var week2Table = document.getElementById('week2-table');
-        var btn1 = document.getElementById('btn-week1');
-        var btn2 = document.getElementById('btn-week2');
+        const week1 = document.getElementById("week1-table");
+        const week2 = document.getElementById("week2-table");
+        const btn1 = document.getElementById("btn-week1");
+        const btn2 = document.getElementById("btn-week2");
 
         if (week === 1) {
-            week1Table.style.display = '';
-            week2Table.style.display = 'none';
-            btn1.classList.add('active');
-            btn2.classList.remove('active');
+            week1.style.display = "";
+            week2.style.display = "none";
+            btn1.classList.add("active");
+            btn2.classList.remove("active");
         } else {
-            week1Table.style.display = 'none';
-            week2Table.style.display = '';
-            btn1.classList.remove('active');
-            btn2.classList.add('active');
+            week1.style.display = "none";
+            week2.style.display = "";
+            btn1.classList.remove("active");
+            btn2.classList.add("active");
         }
     }
 
     function toggleCell(td) {
-        var date = td.getAttribute('data-date');
-        var hour = td.getAttribute('data-hour');
+        var date = td.getAttribute("data-date");
+        var hour = td.getAttribute("data-hour");
 
         fetch('/employees/' + employeeId + '/availability/toggle?date=' + date + '&hour=' + hour, {
             method: 'POST'
-        }).then(function () {
-            // Basit çözüm: sayfayı tazele
-            window.location.reload();
+        }).then(r => r.text()).then(result => {
+
+            // Eğer hücre kırmızı ise asla değişemez
+            if (td.classList.contains("status-2")) {
+                return;
+            }
+
+            // Yeşil -> Gri
+            if (td.classList.contains("status-1")) {
+                td.classList.remove("status-1");
+                td.classList.add("status-0");
+            }
+            // Gri -> Yeşil
+            else if (td.classList.contains("status-0")) {
+                td.classList.remove("status-0");
+                td.classList.add("status-1");
+            }
         });
     }
+
     /*]]>*/
 </script>
 
 <script th:src="@{/js/main.js}"></script>
+
 </body>
 </html>
