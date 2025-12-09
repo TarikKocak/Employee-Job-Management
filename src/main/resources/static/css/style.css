@@ -71,3 +71,32 @@ h1 {
     display: block;
     margin-bottom: 4px;
 }
+
+/* NEW: Hücre görünümleri */
+.cell {
+    width: 40px;
+    height: 30px;
+    cursor: pointer;
+}
+
+/* 0: gri (müsait değil) */
+.status-0 {
+    background-color: #cccccc;
+}
+
+/* 1: yeşil (müsait) */
+.status-1 {
+    background-color: #4caf50;
+    color: #ffffff;
+}
+
+/* 2: kırmızı (dolu - admin) */
+.status-2 {
+    background-color: #f44336;
+    color: #ffffff;
+}
+
+/* NEW: aktif buton görünümü */
+.btn.active {
+    box-shadow: 0 0 0 2px #333;
+}

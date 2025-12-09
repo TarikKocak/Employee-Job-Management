@@ -1,0 +1,116 @@
+<!-- NEW: src/main/resources/templates/availability.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Availability</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="container availability-container">
+    <h1>Availability</h1>
+
+    <a th:href="@{|/employees/${employeeId}/dashboard|}" class="btn btn-secondary">Geri Dön</a>
+
+    <div class="availability-layout">
+        <div class="availability-sidebar">
+            <h3>Hafta Seç</h3>
+            <button id="btn-week1" class="btn btn-small active" onclick="showWeek(1)">Haftaya (1. Hafta)</button>
+            <button id="btn-week2" class="btn btn-small" onclick="showWeek(2)">Ondan Sonraki (2. Hafta)</button>
+        </div>
+
+        <div class="availability-table-wrapper">
+            <!-- WEEK 1 TABLE -->
+            <table id="week1-table" class="table availability-table">
+                <thead>
+                <tr>
+                    <th>Saat \ Tarih</th>
+                    <th th:each="d : ${week1Dates}"
+                        th:text="${#temporals.format(d, 'EEE dd.MM')}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="hour : ${hours}">
+                    <td th:text="${hour + ':00'}"></td>
+                    <td th:each="d : ${week1Dates}"
+                        th:with="dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                                 key=${dateStr + '_' + hour},
+                                 status=${week1StatusMap[key] != null ? week1StatusMap[key] : 0}"
+                        th:class="'cell status-' + ${status}"
+                        th:data-date="${dateStr}"
+                        th:data-hour="${hour}"
+                        onclick="toggleCell(this)">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- WEEK 2 TABLE (başlangıçta gizli) -->
+            <table id="week2-table" class="table availability-table" style="display:none;">
+                <thead>
+                <tr>
+                    <th>Saat \ Tarih</th>
+                    <th th:each="d : ${week2Dates}"
+                        th:text="${#temporals.format(d, 'EEE dd.MM')}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="hour : ${hours}">
+                    <td th:text="${hour + ':00'}"></td>
+                    <td th:each="d : ${week2Dates}"
+                        th:with="dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                                 key=${dateStr + '_' + hour},
+                                 status=${week2StatusMap[key] != null ? week2StatusMap[key] : 0}"
+                        th:class="'cell status-' + ${status}"
+                        th:data-date="${dateStr}"
+                        th:data-hour="${hour}"
+                        onclick="toggleCell(this)">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- NEW: JS - week switch ve cell toggle -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var employeeId = [[${employeeId}]];
+
+    function showWeek(week) {
+        var week1Table = document.getElementById('week1-table');
+        var week2Table = document.getElementById('week2-table');
+        var btn1 = document.getElementById('btn-week1');
+        var btn2 = document.getElementById('btn-week2');
+
+        if (week === 1) {
+            week1Table.style.display = '';
+            week2Table.style.display = 'none';
+            btn1.classList.add('active');
+            btn2.classList.remove('active');
+        } else {
+            week1Table.style.display = 'none';
+            week2Table.style.display = '';
+            btn1.classList.remove('active');
+            btn2.classList.add('active');
+        }
+    }
+
+    function toggleCell(td) {
+        var date = td.getAttribute('data-date');
+        var hour = td.getAttribute('data-hour');
+
+        fetch('/employees/' + employeeId + '/availability/toggle?date=' + date + '&hour=' + hour, {
+            method: 'POST'
+        }).then(function () {
+            // Basit çözüm: sayfayı tazele
+            window.location.reload();
+        });
+    }
+    /*]]>*/
+</script>
+
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>
