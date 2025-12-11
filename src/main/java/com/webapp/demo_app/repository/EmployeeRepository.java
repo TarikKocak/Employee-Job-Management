@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    Employee findByName(String name); // ileride login için
+    Employee findByName(String name); // for futer login implemntation
 }

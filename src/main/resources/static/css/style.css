@@ -196,3 +196,157 @@ h1 {
         padding: 3px 6px;
     }
 }
+
+/* ========================================================= */
+/* --- ADMIN SECTION (NEW) --- */
+/* ========================================================= */
+
+/* Admin container */
+.admin-container {
+    width: 95%;
+    max-width: 1100px;
+    margin: 25px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+/* Admin button styling */
+.admin-btn {
+    display: inline-block;
+    padding: 10px 16px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    transition: background 0.25s ease;
+}
+
+.admin-btn:hover {
+    background-color: #1e7c33;
+}
+
+/* Section box (collapsible wrapper) */
+.section-box {
+    margin-top: 25px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+/* Section header (click to expand/collapse)
+.section-header {
+    padding: 12px;
+    background: #e6e6e6;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 6px 6px 0 0;
+    transition: background 0.2s ease;
+}
+
+.section-header:hover {
+    background: #d6d6d6;
+}
+
+ Section body (initially hidden)
+.section-body {
+    display: none;
+    padding: 15px;
+}
+
+.section-body.active {
+    display: block;
+}
+*/
+/* =============================== */
+/*   Modern Collapsible Sections   */
+/* =============================== */
+
+/* Section container */
+.section-box {
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden; /* NEW: animasyon için gerekli */
+    border: 1px solid #ddd;
+}
+
+/* Section header */
+.section-header {
+    background: #ececec;
+    padding: 14px 18px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;  /* NEW */
+    align-items: center;             /* NEW */
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease; /* NEW */
+}
+
+.section-header:hover {
+    background: #dcdcdc; /* NEW */
+}
+
+/* Arrow animation */
+.section-header .arrow {
+    font-size: 18px;
+    transition: transform 0.3s ease; /* NEW */
+}
+
+/* Header açıkken değişen görünüm */
+.section-header.open {
+    background: #d6d6d6;  /* NEW */
+}
+
+.section-header.open .arrow {
+    transform: rotate(180deg);  /* NEW */
+}
+
+/* Section body - animasyonlu aç/kapa */
+.section-body {
+    max-height: 0;                 /* NEW: kapalı halde */
+    overflow: hidden;              /* NEW */
+    transition: max-height 0.35s ease; /* NEW: animasyon */
+    background: #fafafa;
+    padding: 0 18px;               /* NEW but invisible when closed */
+}
+
+/* İçerik görünürken padding gelsin */
+.section-body.open {
+    padding: 18px; /* NEW */
+    max-height: 1000px; /* NEW: yeterince büyük bir değer */
+}
+
+/* Tablo uyumu */
+.section-body table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Admin tables */
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.admin-table th,
+.admin-table td {
+    border: 1px solid #bbb;
+    padding: 10px;
+    text-align: left;
+}
+
+.admin-table th {
+    background: #f2f2f2;
+    font-weight: bold;
+}
+
+/* ========================================================= */
+/* --- END OF ADMIN SECTION --- */
+/* ========================================================= */
+

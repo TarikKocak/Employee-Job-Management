@@ -15,27 +15,28 @@
 
     <!-- CURRENT JOBS SECTION -->
     <div class="section-box">
-        <div class="section-header" onclick="toggleSection('current')">
+        <div class="section-header" onclick="toggleSection(this)">
             Current Jobs
+            <span class="arrow">▼</span>
         </div>
-        <div id="current" class="section-body">
+        <div class="section-body">
 
             <table class="admin-table">
                 <thead>
                 <tr>
-                    <th>Job Name</th>
+                    <th>Job Description</th>
                     <th>Date</th>
+                    <th>Address</th>
                     <th>Price</th>
-                    <th>Type</th>
                 </tr>
                 </thead>
 
                 <tbody>
                 <tr th:each="job : ${currentJobs}">
-                    <td th:text="${job.isim}">Job Name</td>
+                    <td th:text="${job.isTanimi}">Job Name</td>
                     <td th:text="${job.tarih}">2025-01-01</td>
-                    <td th:text="${job.ucreti}">100</td>
-                    <td th:text="${job.tur}">Type</td>
+                    <td th:text="${job.isAdresi}">Address</td>
+                    <td th:text="${job.ucret}">100</td>
                 </tr>
                 </tbody>
 
@@ -46,27 +47,28 @@
 
     <!-- COMPLETED JOBS SECTION -->
     <div class="section-box">
-        <div class="section-header" onclick="toggleSection('completed')">
+        <div class="section-header" onclick="toggleSection(this)">
             Completed Jobs
+            <span class="arrow">▼</span>
         </div>
-        <div id="completed" class="section-body">
+        <div class="section-body">
 
             <table class="admin-table">
                 <thead>
                 <tr>
-                    <th>Job Name</th>
+                    <th>Job Description</th>
                     <th>Date</th>
+                    <th>Address</th>
                     <th>Price</th>
-                    <th>Type</th>
                 </tr>
                 </thead>
 
                 <tbody>
                 <tr th:each="job : ${completedJobs}">
-                    <td th:text="${job.isim}">Job Name</td>
+                    <td th:text="${job.tanimi}">Job Name</td>
                     <td th:text="${job.tarih}">2025-01-01</td>
-                    <td th:text="${job.ucreti}">100</td>
-                    <td th:text="${job.tur}">Type</td>
+                    <td th:text="${job.isAdresi}">address</td>
+                    <td th:text="${job.ucret}">100</td>
                 </tr>
                 </tbody>
 
@@ -78,9 +80,11 @@
 </div>
 
 <script>
-    function toggleSection(id) {
-        const body = document.getElementById(id);
-        body.classList.toggle("active");
+    function toggleSection(header) {
+        const body = header.nextElementSibling;
+
+        header.classList.toggle("open");
+        body.classList.toggle("open");
     }
 </script>
 
