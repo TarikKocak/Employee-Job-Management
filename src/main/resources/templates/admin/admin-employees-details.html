@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<div class="admin-container">
+
+    <h1 th:text="'Employee: ' + ${employee.name}"></h1>
+
+    <a th:href="@{/admin/employees}" class="admin-btn">Back to List</a>
+
+    <!-- CURRENT JOBS SECTION -->
+    <div class="section-box">
+        <div class="section-header" onclick="toggleSection('current')">
+            Current Jobs
+        </div>
+        <div id="current" class="section-body">
+
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>Job Name</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="job : ${currentJobs}">
+                    <td th:text="${job.isim}">Job Name</td>
+                    <td th:text="${job.tarih}">2025-01-01</td>
+                    <td th:text="${job.ucreti}">100</td>
+                    <td th:text="${job.tur}">Type</td>
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!-- COMPLETED JOBS SECTION -->
+    <div class="section-box">
+        <div class="section-header" onclick="toggleSection('completed')">
+            Completed Jobs
+        </div>
+        <div id="completed" class="section-body">
+
+            <table class="admin-table">
+                <thead>
+                <tr>
+                    <th>Job Name</th>
+                    <th>Date</th>
+                    <th>Price</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="job : ${completedJobs}">
+                    <td th:text="${job.isim}">Job Name</td>
+                    <td th:text="${job.tarih}">2025-01-01</td>
+                    <td th:text="${job.ucreti}">100</td>
+                    <td th:text="${job.tur}">Type</td>
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function toggleSection(id) {
+        const body = document.getElementById(id);
+        body.classList.toggle("active");
+    }
+</script>
+
+</body>
+</html>

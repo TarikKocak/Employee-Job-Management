@@ -1,0 +1,125 @@
+/* src/main/resources/static/css/admin-style.css */
+
+/* ======== GLOBAL ADMIN THEME ======== */
+
+body {
+    background-color: #eef1f5;
+    font-family: Arial, sans-serif;
+}
+
+.admin-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* ======== ADMIN BUTTONS ======== */
+
+.admin-btn {
+    padding: 10px 18px;
+    background-color: #333;
+    border-radius: 6px;
+    color: white;
+    display: inline-block;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.admin-btn:hover {
+    background-color: #111;
+}
+
+.admin-btn-success {
+    background-color: #28a745;
+}
+
+.admin-btn-warning {
+    background-color: #f0ad4e;
+}
+
+/* ======== EMPLOYEE LIST ======== */
+
+.employee-list {
+    margin-top: 20px;
+}
+
+.employee-card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.employee-card span {
+    font-size: 16px;
+}
+
+.employee-card button {
+    padding: 6px 12px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+.employee-card button.view-btn {
+    background-color: #007bff;
+    color: white;
+}
+
+/* ======== ACCORDION (EMPLOYEE DETAILS) ======== */
+
+.section-box {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #ffffff;
+}
+
+.section-header {
+    padding: 12px;
+    background: #f0f0f0;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.section-body {
+    display: none;
+    padding: 15px;
+}
+
+.section-body.active {
+    display: block;
+}
+
+/* ======== TABLE ======== */
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.admin-table th, .admin-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.admin-table th {
+    background: #f7f7f7;
+}
+
