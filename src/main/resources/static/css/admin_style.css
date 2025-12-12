@@ -1,0 +1,338 @@
+/* ===================================== */
+/*           ADMIN GLOBAL STYLE           */
+/* ===================================== */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f5f7;
+    margin: 0;
+    padding: 0;
+}
+
+/* Ana admin container */
+.admin-container {
+    width: 95%;
+    max-width: 1400px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+/* Başlıklar */
+.admin-container h1 {
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+}
+
+.admin-container h2 {
+    margin: 10px 0;
+    font-size: 1.4rem;
+}
+
+.admin-container h3 {
+    margin-bottom: 10px;
+}
+
+/* ===================================== */
+/*              ADMIN BUTTONS             */
+/* ===================================== */
+
+.admin-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-bottom: 15px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: none;
+    background-color: #007bff;
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.admin-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Yeşil (success) */
+.admin-btn.btn-success {
+    background-color: #28a745;
+}
+
+.admin-btn.btn-success:hover {
+    background-color: #1e7c33;
+}
+
+/* Küçük buton */
+.btn-small {
+    padding: 4px 8px;
+    font-size: 0.85rem;
+}
+
+/* Aktif buton (week seçimi vs) */
+.btn.active {
+    box-shadow: 0 0 0 2px #333;
+}
+
+/* ===================================== */
+/*               ADMIN TABLE              */
+/* ===================================== */
+
+.admin-table,
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.admin-table th,
+.admin-table td,
+.table th,
+.table td {
+    padding: 8px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.admin-table th {
+    background-color: #f0f0f0;
+}
+
+/* ===================================== */
+/*               FORMS                    */
+/* ===================================== */
+
+.form {
+    margin-top: 10px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* ===================================== */
+/*      ASSIGN JOB PAGE – FLEX LAYOUT     */
+/* ===================================== */
+
+.admin-assign-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* Sol taraf: Job assign form */
+.assign-form {
+    flex: 0 0 380px;
+}
+
+/* Sağ taraf: Availability preview */
+.assign-availability-preview {
+    flex: 1;
+    background-color: #fafafa;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* ===================================== */
+/*          AVAILABILITY PREVIEW          */
+/* ===================================== */
+
+.availability-layout {
+    display: flex;
+    gap: 15px;
+}
+
+/* Sol: hafta seçimi */
+.availability-sidebar {
+    width: 140px;
+}
+
+.availability-sidebar h4 {
+    margin-bottom: 8px;
+}
+
+/* Sağ: tablolar */
+.availability-table-wrapper {
+    flex: 1;
+}
+
+/* Saat sütunu */
+.availability-table th:first-child,
+.availability-table td:first-child {
+    width: 60px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Hücreler */
+.cell {
+    width: 32px;
+    height: 26px;
+}
+
+/* Status renkleri */
+.status-0 {
+    background-color: #cccccc; /* gri */
+}
+
+.status-1 {
+    background-color: #2b8122; /* yeşil */
+    color: #ffffff;
+}
+
+.status-2 {
+    background-color: #e61a0b; /* kırmızı */
+    color: #ffffff;
+}
+
+/* Admin preview: tıklanamaz */
+.assign-availability-preview .cell {
+    cursor: default;
+}
+
+/* ===================================== */
+/*      WEEK SELECTION SIDEBAR (ADMIN)   */
+/* ===================================== */
+
+.availability-sidebar {
+    background-color: #f5f6f8;     /* NEW */
+    border: 1px solid #ddd;        /* NEW */
+    border-radius: 6px;            /* NEW */
+    padding: 12px;                 /* NEW */
+    width: 140px;
+}
+
+.availability-sidebar h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1rem;
+    text-align: center;
+    color: #333;
+}
+
+
+.availability-sidebar .btn {
+    display: block;           /* NEW: inline-block yerine */
+    width: 100%;              /* NEW: hepsi aynı genişlik */
+    padding: 8px 16px;
+    margin-bottom: 10px;      /* NEW: aralık */
+    text-decoration: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    border-color: #007bff ;
+    color: #fff;
+    transition: 0.3s ease;
+    text-align: center;       /* NEW */
+    box-sizing: border-box;   /* NEW: padding genişliği bozmaz */
+}
+
+
+/* Aktif hafta vurgusu */
+.availability-sidebar .btn.active {
+    background-color: #28a745;     /* NEW */
+    border-color: #28a745;         /* NEW */
+    box-shadow: none;              /* NEW */
+}
+
+/* Hover efekti */
+.availability-sidebar .btn:hover {
+    opacity: 0.9;                  /* NEW */
+}
+
+/* Son butonda boşluk olmasın */
+
+
+
+/* ===================================== */
+/*       COLLAPSIBLE SECTIONS (DETAIL)    */
+/* ===================================== */
+
+.section-box {
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.section-header {
+    padding: 10px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Ok ikonları */
+.section-header::after {
+    content: "▼";
+    font-size: 0.9rem;
+}
+
+.section-header.active::after {
+    content: "▲";
+}
+
+/* İçerik */
+.section-body {
+    display: none;
+    padding: 10px;
+}
+
+.section-body.active {
+    display: block;
+}
+
+/* ===================================== */
+/*              RESPONSIVE               */
+/* ===================================== */
+
+@media (max-width: 1024px) {
+    .admin-assign-layout {
+        flex-direction: column;
+    }
+
+    .assign-form {
+        width: 100%;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .admin-container {
+        padding: 15px;
+    }
+
+    .admin-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .availability-layout {
+        flex-direction: column;
+    }
+
+    .availability-sidebar {
+        width: 100%;
+    }
+}

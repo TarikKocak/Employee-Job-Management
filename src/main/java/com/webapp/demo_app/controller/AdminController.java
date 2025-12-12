@@ -1,15 +1,17 @@
 package com.webapp.demo_app.controller;
 
 
-import com.webapp.demo_app.model.Employee;
-import com.webapp.demo_app.model.MevcutIs;
-import com.webapp.demo_app.model.Tur;
-import com.webapp.demo_app.model.UcretTahsilTipi;
+import com.webapp.demo_app.model.*;
 import com.webapp.demo_app.repository.EmployeeRepository;
+import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.JobService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/admin")
@@ -17,10 +19,14 @@ public class AdminController {
 
     private final EmployeeRepository employeeRepository;
     private final JobService jobService;
+    private final AvailabilityService availabilityService;
 
-    public AdminController(EmployeeRepository employeeRepository, JobService jobService) {
+    public AdminController(EmployeeRepository employeeRepository,
+                           JobService jobService,
+                           AvailabilityService availabilityService) {
         this.employeeRepository = employeeRepository;
         this.jobService = jobService;
+        this.availabilityService = availabilityService;
     }
 
     // Admin dashboard
@@ -64,15 +70,47 @@ public class AdminController {
 
     @GetMapping("/employees/{id}/assign-job")
     public String showAssignJob(@PathVariable Long id, Model model) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(null);
+        Employee employee = employeeRepository.findById(id).
+                orElseThrow(() -> new RuntimeException("Employee not found"));
 
+        // ==========
+        //  JOB FORM
+        // ==========
         MevcutIs job = new MevcutIs();
         job.setEmployee(employee);
+
+        // ==========================
+        //  AVAILABILITY (READ ONLY)
+        // ==========================
+        LocalDate week1Monday = availabilityService.getNextWeekMonday();
+        LocalDate week2Monday = week1Monday.plusWeeks(1);
+
+        List<LocalDate> week1Dates = availabilityService.getWeekDates(week1Monday);
+        List<LocalDate> week2Dates = availabilityService.getWeekDates(week2Monday);
+
+        List<AvailabilitySlot> week1Slots =
+                availabilityService.getWeekSlots(id, week1Monday);
+
+        List<AvailabilitySlot> week2Slots =
+                availabilityService.getWeekSlots(id, week2Monday);
+
+        Map<String, Integer> week1StatusMap =
+                availabilityService.buildStatusMap(week1Slots);
+
+        Map<String, Integer> week2StatusMap =
+                availabilityService.buildStatusMap(week2Slots);
 
         model.addAttribute("employee", employee);
         model.addAttribute("job", job);
         model.addAttribute("turler", Tur.values());
         model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
+
+
+        model.addAttribute("hours", availabilityService.getHours());
+        model.addAttribute("week1Dates", week1Dates);
+        model.addAttribute("week2Dates", week2Dates);
+        model.addAttribute("week1StatusMap", week1StatusMap);
+        model.addAttribute("week2StatusMap", week2StatusMap);
 
         return "admin/admin-assign-job";
     }

@@ -3,109 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <title>Assign Job</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- ADMIN tarafı için adminstyle.css kullanman daha doğru olur -->
+    <link rel="stylesheet" th:href="@{/css/admin_style.css}">
 </head>
+
 <body>
 
 <div class="admin-container">
 
     <h1 th:text="'Assign Job to ' + ${employee.name}"></h1>
 
-    <a th:href="@{|/admin/employees/${employee.id}|}" class="admin-btn">
+    <a th:href="@{|/admin/employees/${employee.id}|}" class="admin-btn btn-success">
         Back
     </a>
 
-    <form th:action="@{|/admin/employees/${employee.id}/assign-job|}"
-          th:object="${job}"
-          method="post"
-          class="form">
+    <!-- ================================= -->
+    <!-- NEW: FLEX LAYOUT (YAN YANA) -->
+    <!-- ================================= -->
+    <div class="admin-assign-layout">
 
-        <!-- TUR -->
-        <div class="form-group">
-            <label>Type</label>
-            <select th:field="*{tur}" required>
-                <option th:each="t : ${turler}"
-                        th:value="${t}"
-                        th:text="${t}">
-                </option>
-            </select>
+        <!-- =============================== -->
+        <!-- LEFT: JOB ASSIGN FORM -->
+        <!-- =============================== -->
+        <div class="assign-form">
+
+            <form th:action="@{|/admin/employees/${employee.id}/assign-job|}"
+                  th:object="${job}"
+                  method="post"
+                  class="form">
+
+                <div class="form-group">
+                    <label>Type</label>
+                    <select th:field="*{tur}" required>
+                        <option th:each="t : ${turler}"
+                                th:value="${t}"
+                                th:text="${t}">
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Wall Mounting</label>
+                    <select th:field="*{duvarMontaji}">
+                        <option th:value="true">Yes</option>
+                        <option th:value="false">No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Job Name</label>
+                    <input type="text" th:field="*{isim}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Address</label>
+                    <input type="text" th:field="*{isAdresi}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="text" th:field="*{telNo}">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea th:field="*{isTanimi}" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" th:field="*{tarih}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Start Time</label>
+                    <input type="time" th:field="*{baslangicSaati}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Estimated Duration (hours)</label>
+                    <input type="number" step="0.5" th:field="*{tahminiSure}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="number" step="0.01" th:field="*{ucret}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Type</label>
+                    <select th:field="*{ucretTahsilTipi}">
+                        <option th:each="u : ${ucretTipleri}"
+                                th:value="${u}"
+                                th:text="${u}">
+                        </option>
+                    </select>
+                </div>
+
+                <button type="submit" class="admin-btn btn-success">
+                    Assign Job
+                </button>
+
+            </form>
         </div>
+        <!-- END LEFT -->
 
-        <!-- DUVAR MONTAJI -->
-        <div class="form-group">
-            <label>Wall Mounting</label>
-            <select th:field="*{duvarMontaji}">
-                <option th:value="true">Yes</option>
-                <option th:value="false">No</option>
-            </select>
+        <!-- =============================== -->
+        <!-- RIGHT: AVAILABILITY PREVIEW -->
+        <!-- =============================== -->
+        <div class="assign-availability-preview">
+
+            <h3>Employee Availability</h3>
+
+            <div class="availability-layout">
+
+                <!-- WEEK SELECT -->
+                <div class="availability-sidebar">
+                    <h4>Week</h4>
+                    <button id="btn-week1" class="btn btn-small active"
+                            onclick="showWeek(1)">Next Week</button>
+
+                    <button id="btn-week2" class="btn btn-small"
+                            onclick="showWeek(2)">Following Week</button>
+                </div>
+
+                <!-- TABLES -->
+                <div class="availability-table-wrapper">
+
+                    <!-- WEEK 1 -->
+                    <table id="week1-table" class="table availability-table">
+                        <thead>
+                        <tr>
+                            <th>Hour</th>
+                            <th th:each="d : ${week1Dates}"
+                                th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="hour : ${hours}">
+                            <td th:text="${hour + ':00'}"></td>
+                            <td th:each="d : ${week1Dates}"
+                                th:with="
+                                    dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                                    key=${dateStr + '_' + hour},
+                                    status=${week1StatusMap.get(key) != null ? week1StatusMap.get(key) : 0}
+                                "
+                                th:class="'cell status-' + ${status}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- WEEK 2 -->
+                    <table id="week2-table" class="table availability-table" style="display:none;">
+                        <thead>
+                        <tr>
+                            <th>Hour</th>
+                            <th th:each="d : ${week2Dates}"
+                                th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="hour : ${hours}">
+                            <td th:text="${hour + ':00'}"></td>
+                            <td th:each="d : ${week2Dates}"
+                                th:with="
+                                    dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                                    key=${dateStr + '_' + hour},
+                                    status=${week2StatusMap.get(key) != null ? week2StatusMap.get(key) : 0}
+                                "
+                                th:class="'cell status-' + ${status}">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
         </div>
+        <!-- END RIGHT -->
 
-        <!-- JOB NAME -->
-        <div class="form-group">
-            <label>Job Name</label>
-            <input type="text" th:field="*{isim}" required>
-        </div>
-
-        <!-- ADDRESS -->
-        <div class="form-group">
-            <label>Address</label>
-            <input type="text" th:field="*{isAdresi}" required>
-        </div>
-
-        <!-- PHONE -->
-        <div class="form-group">
-            <label>Phone</label>
-            <input type="text" th:field="*{telNo}">
-        </div>
-
-        <!-- DESCRIPTION -->
-        <div class="form-group">
-            <label>Description</label>
-            <textarea th:field="*{isTanimi}" required></textarea>
-        </div>
-
-        <!-- DATE -->
-        <div class="form-group">
-            <label>Date</label>
-            <input type="date" th:field="*{tarih}" required>
-        </div>
-
-        <!-- START TIME -->
-        <div class="form-group">
-            <label>Start Time</label>
-            <input type="time" th:field="*{baslangicSaati}" required>
-        </div>
-
-        <!-- ESTIMATED DURATION -->
-        <div class="form-group">
-            <label>Estimated Duration (hours)</label>
-            <input type="number" step="0.5" th:field="*{tahminiSure}" required>
-        </div>
-
-        <!-- PRICE -->
-        <div class="form-group">
-            <label>Price</label>
-            <input type="number" step="0.01" th:field="*{ucret}" required>
-        </div>
-
-        <!-- PAYMENT TYPE -->
-        <div class="form-group">
-            <label>Payment Type</label>
-            <select th:field="*{ucretTahsilTipi}">
-                <option th:each="u : ${ucretTipleri}"
-                        th:value="${u}"
-                        th:text="${u}">
-                </option>
-            </select>
-        </div>
-
-        <button type="submit" class="admin-btn btn-success">
-            Assign Job
-        </button>
-
-    </form>
+    </div>
+    <!-- END admin-assign-layout -->
 
 </div>
+
+<script>
+    function showWeek(week) {
+        const week1 = document.getElementById("week1-table");
+        const week2 = document.getElementById("week2-table");
+        const btn1 = document.getElementById("btn-week1");
+        const btn2 = document.getElementById("btn-week2");
+
+        if (week === 1) {
+            week1.style.display = "";
+            week2.style.display = "none";
+            btn1.classList.add("active");
+            btn2.classList.remove("active");
+        } else {
+            week1.style.display = "none";
+            week2.style.display = "";
+            btn1.classList.remove("active");
+            btn2.classList.add("active");
+        }
+    }
+</script>
 
 </body>
 </html>
