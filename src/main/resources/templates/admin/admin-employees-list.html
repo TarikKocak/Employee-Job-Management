@@ -29,6 +29,11 @@
                     <a th:href="@{'/admin/employees/' + ${emp.id}}" class="btn btn-small btn-primary">
                         Detay
                     </a>
+
+                    <a th:href="@{|/admin/employees/${emp.id}/assign-job|}"
+                       class="admin-btn btn-success">
+                        Assign Job
+                    </a>
                 </td>
             </tr>
             </tbody>

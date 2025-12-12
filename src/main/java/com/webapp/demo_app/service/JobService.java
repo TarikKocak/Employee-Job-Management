@@ -19,13 +19,16 @@ public class JobService {
     private final MevcutIsRepository mevcutIsRepository;
     private final TamamlananIsRepository tamamlananIsRepository;
     private final EmployeeRepository employeeRepository;
+    private final AvailabilityService availabilityService;
 
     public JobService(MevcutIsRepository mevcutIsRepository,
                       TamamlananIsRepository tamamlananIsRepository,
-                      EmployeeRepository employeeRepository) {
+                      EmployeeRepository employeeRepository,
+                      AvailabilityService availabilityService) {
         this.mevcutIsRepository = mevcutIsRepository;
         this.tamamlananIsRepository = tamamlananIsRepository;
         this.employeeRepository = employeeRepository;
+        this.availabilityService = availabilityService;
     }
 
     public List<MevcutIs> getMevcutIsler(Long employeeId) {
@@ -94,4 +97,27 @@ public class JobService {
         mevcutIsRepository.delete(mevcutIs);
     }
 
+    @Transactional
+    public void assignJobToEmployee(Long employeeId, MevcutIs job) {
+
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow();
+
+        job.setEmployee(employee);
+
+        //Writenoly fields should be null for employee
+        job.setSure(null);
+        job.setBahsis(null);
+        job.setKartVerildi(null);
+        job.setYorumKartiVerildi(null);
+        job.setFotoAtildi(null);
+
+        mevcutIsRepository.save(job);
+
+        availabilityService.blockAvailabilityForJob(
+                employeeId,
+                job.getTarih(),
+                job.getBaslangicSaati(),
+                job.getTahminiSure()
+        );
+    }
 }

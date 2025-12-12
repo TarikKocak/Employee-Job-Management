@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "mevcut_isler")
@@ -34,6 +35,8 @@ public class MevcutIs {
     private String telNo;
     private String isTanimi;
     private LocalDate tarih;
+
+    private LocalTime baslangicSaati;
     private Double ucret;
 
     @Enumerated(EnumType.STRING)

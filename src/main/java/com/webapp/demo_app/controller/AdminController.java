@@ -2,7 +2,11 @@ package com.webapp.demo_app.controller;
 
 
 import com.webapp.demo_app.model.Employee;
+import com.webapp.demo_app.model.MevcutIs;
+import com.webapp.demo_app.model.Tur;
+import com.webapp.demo_app.model.UcretTahsilTipi;
 import com.webapp.demo_app.repository.EmployeeRepository;
+import com.webapp.demo_app.service.JobService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +16,11 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     private final EmployeeRepository employeeRepository;
+    private final JobService jobService;
 
-    public AdminController(EmployeeRepository employeeRepository) {
+    public AdminController(EmployeeRepository employeeRepository, JobService jobService) {
         this.employeeRepository = employeeRepository;
+        this.jobService = jobService;
     }
 
     // Admin dashboard
@@ -54,6 +60,29 @@ public class AdminController {
         model.addAttribute("completedJobs", employee.getTamamlananIsler());
 
         return "admin/admin-employees-details";
+    }
+
+    @GetMapping("/employees/{id}/assign-job")
+    public String showAssignJob(@PathVariable Long id, Model model) {
+        Employee employee = employeeRepository.findById(id).orElseThrow(null);
+
+        MevcutIs job = new MevcutIs();
+        job.setEmployee(employee);
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("job", job);
+        model.addAttribute("turler", Tur.values());
+        model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
+
+        return "admin/admin-assign-job";
+    }
+
+    @PostMapping("/employees/{id}/assign-job")
+    public String assignJob(@PathVariable Long id, @ModelAttribute("job") MevcutIs job) {
+
+        jobService.assignJobToEmployee(id, job);
+
+        return "redirect:/admin/employees/" + id;
     }
 
 }

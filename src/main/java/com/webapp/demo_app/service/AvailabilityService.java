@@ -124,4 +124,41 @@ public class AvailabilityService {
                 .boxed()
                 .collect(Collectors.toList());
     }
+
+
+    public List<Integer> calculateBlockedHours(LocalTime startTime, double duration) {
+
+        LocalTime endTime = startTime.plusMinutes((long) (duration * 60));
+
+        int startHour = startTime.getHour(); // floor
+        int endHour = endTime.getHour();     // floor
+
+        List<Integer> hours = new ArrayList<>();
+        for (int h = startHour; h <= endHour; h++) {
+            hours.add(h);
+        }
+
+        return hours;
+    }
+
+    @Transactional
+    public void blockAvailabilityForJob(Long employeeId, LocalDate date, LocalTime startTime, double duration){
+        List<Integer> hours = calculateBlockedHours(startTime, duration);
+
+        for(Integer hour : hours){
+            AvailabilitySlot slot = availabilitySlotRepository.findByEmployeeIdAndDateAndHour(employeeId, date, hour);
+
+            if(slot==null){
+                slot  = new AvailabilitySlot();
+                slot.setEmployee(employeeRepository.getReferenceById(employeeId));
+                slot.setDate(date);
+                slot.setHour(hour);
+            }
+
+            slot.setStatus(2);
+            availabilitySlotRepository.save(slot);
+        }
+
+    }
+
 }
