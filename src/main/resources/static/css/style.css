@@ -47,6 +47,7 @@ h1 {
 .btn-secondary {
     border-color: #28a745;
     background-color: #28a745;
+    margin-top: 10px;
 }
 .btn-secondary:hover {
     border-color: #1e7c33;
@@ -223,6 +224,10 @@ h1 {
     border-radius: 6px;
     margin-bottom: 15px;
     transition: background 0.25s ease;
+}
+.admin-btn.btn-success{
+    padding: 4px 8px;
+    font-size: 0.9em;
 }
 
 .admin-btn:hover {
