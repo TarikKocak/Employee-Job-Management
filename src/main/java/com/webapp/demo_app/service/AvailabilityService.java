@@ -35,6 +35,10 @@ public class AvailabilityService {
     }
 
 
+    public LocalDate getWeekMonday(LocalDate date) {
+        return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+    }
+
     // week(7 days) from given monday
     public List<LocalDate> getWeekDates(LocalDate monday) {
         return IntStream.range(0, 7)
@@ -57,6 +61,7 @@ public class AvailabilityService {
         }
         return map;
     }
+
 
 
     @Transactional
@@ -89,7 +94,34 @@ public class AvailabilityService {
     // VALIDATION
     // =========================
 
-    public boolean validateMinimumAvailability(Collection<String> slotKeys) {
+    public boolean validateMinimumAvailabilityPerWeek(Collection<String> slotKeys) {
+
+        // 🔹 slotları haftalara ayır
+        Map<LocalDate, List<String>> slotsByWeek = new HashMap<>();
+
+        for (String key : slotKeys) {
+            String[] parts = key.split("_");
+            LocalDate date = LocalDate.parse(parts[0]);
+
+            LocalDate monday = getWeekMonday(date);
+
+            slotsByWeek
+                    .computeIfAbsent(monday, d -> new ArrayList<>())
+                    .add(key);
+        }
+
+        // 🔹 her hafta için kural kontrolü
+        for (List<String> weekSlots : slotsByWeek.values()) {
+
+            if (!validateSingleWeek(weekSlots)) {
+                return false; // herhangi bir hafta kuralı bozarsa → FAIL
+            }
+        }
+
+        return true;
+    }
+
+    private boolean validateSingleWeek(Collection<String> slotKeys) {
 
         Map<LocalDate, List<Integer>> byDate = new HashMap<>();
 
@@ -98,7 +130,9 @@ public class AvailabilityService {
             LocalDate date = LocalDate.parse(parts[0]);
             Integer hour = Integer.parseInt(parts[1]);
 
-            byDate.computeIfAbsent(date, d -> new ArrayList<>()).add(hour);
+            byDate
+                    .computeIfAbsent(date, d -> new ArrayList<>())
+                    .add(hour);
         }
 
         int validDayCount = 0;
@@ -106,19 +140,19 @@ public class AvailabilityService {
         for (List<Integer> hours : byDate.values()) {
             Collections.sort(hours);
 
-            int currentBlock = 1;
-            int maxBlock = 1;
+            int current = 1;
+            int max = 1;
 
             for (int i = 1; i < hours.size(); i++) {
                 if (hours.get(i) == hours.get(i - 1) + 1) {
-                    currentBlock++;
-                    maxBlock = Math.max(maxBlock, currentBlock);
+                    current++;
+                    max = Math.max(max, current);
                 } else {
-                    currentBlock = 1;
+                    current = 1;
                 }
             }
 
-            if (maxBlock >= 5) {
+            if (max >= 5) {
                 validDayCount++;
             }
 
@@ -129,6 +163,7 @@ public class AvailabilityService {
 
         return false;
     }
+
 
 
 

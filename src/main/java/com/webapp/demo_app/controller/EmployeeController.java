@@ -134,12 +134,12 @@ public class EmployeeController {
                     .collect(Collectors.toSet());
 
             boolean valid =
-                    availabilityService.validateMinimumAvailability(selectedSlots);
+                    availabilityService.validateMinimumAvailabilityPerWeek(selectedSlots);
 
             if (!valid) {
                 redirectAttributes.addFlashAttribute(
                         "availabilityError",
-                        "Minimum 4 gün ve her gün 5 saat arka arkaya seçmelisiniz."
+                        "Her hafta Minimum 4 gün ve her gün Minimum 5'er saat arka arkaya seçmelisiniz."
                 );
                 return "redirect:/employees/" + employeeId + "/availability";
             }
