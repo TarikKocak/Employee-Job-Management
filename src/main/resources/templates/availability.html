@@ -10,142 +10,156 @@
 <div class="container availability-container">
     <h1>Availability</h1>
 
-    <a th:href="@{|/employees/${employeeId}/dashboard|}" class="btn btn-secondary">Geri Dön</a>
-
-    <div class="availability-layout">
-        <div class="availability-sidebar">
-            <h3>Hafta Seç</h3>
-            <button id="btn-week1" class="btn btn-small active" onclick="showWeek(1)">Haftaya (1. Hafta)</button>
-            <button id="btn-week2" class="btn btn-small" onclick="showWeek(2)">Ondan Sonraki (2. Hafta)</button>
-        </div>
-
-        <div class="availability-table-wrapper">
-
-            <!-- ===================== -->
-            <!--       WEEK 1 TABLE    -->
-            <!-- ===================== -->
-            <table id="week1-table" class="table availability-table">
-                <thead>
-                <tr>
-                    <th>Saat \ Tarih</th>
-                    <th th:each="d : ${week1Dates}"
-                        th:text="${#temporals.format(d, 'EEE dd.MM')}"></th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr th:each="hour : ${hours}">
-                    <td th:text="${hour + ':00'}"></td>
-
-                    <td th:each="d : ${week1Dates}"
-                        th:with="
-                            dateStr=${#temporals.format(d,'yyyy-MM-dd')},
-                            key=${dateStr + '_' + hour},
-                            status=${week1StatusMap.get(key) != null ? week1StatusMap.get(key) : 0}
-                        "
-                        th:class="'cell status-' + ${status}"
-                        th:data-date="${dateStr}"
-                        th:data-hour="${hour}"
-                        onclick="toggleCell(this)">
-                    </td>
-
-                </tr>
-                </tbody>
-            </table>
-
-
-            <!-- ===================== -->
-            <!--       WEEK 2 TABLE    -->
-            <!-- ===================== -->
-            <table id="week2-table" class="table availability-table" style="display:none;">
-                <thead>
-                <tr>
-                    <th>Saat \ Tarih</th>
-                    <th th:each="d : ${week2Dates}"
-                        th:text="${#temporals.format(d, 'EEE dd.MM')}"></th>
-                </tr>
-                </thead>
-
-                <tbody>
-                <tr th:each="hour : ${hours}">
-                    <td th:text="${hour + ':00'}"></td>
-
-                    <td th:each="d : ${week2Dates}"
-                        th:with="
-                            dateStr=${#temporals.format(d,'yyyy-MM-dd')},
-                            key=${dateStr + '_' + hour},
-                            status=${week2StatusMap.get(key) != null ? week2StatusMap.get(key) : 0}
-                        "
-                        th:class="'cell status-' + ${status}"
-                        th:data-date="${dateStr}"
-                        th:data-hour="${hour}"
-                        onclick="toggleCell(this)">
-                    </td>
-
-                </tr>
-                </tbody>
-            </table>
-
-        </div>
+    <!-- Geri dön -->
+    <div class="availability-actions">
+        <a th:href="@{|/employees/${employeeId}/dashboard|}"
+           class="btn btn-secondary">
+            Geri Dön
+        </a>
     </div>
+
+    <!-- Hata mesajı -->
+    <div class="availability-warning"
+         th:if="${availabilityError != null}"
+         th:text="${availabilityError}">
+    </div>
+
+    <form th:action="@{|/employees/${employeeId}/availability/submit|}"
+          method="post"
+          onsubmit="prepareSubmit()">
+
+        <!-- FINAL SELECTION -->
+        <input type="hidden" name="slots" id="slotsInput">
+
+        <div class="availability-layout">
+
+            <!-- WEEK SELECT -->
+            <div class="availability-sidebar">
+                <button type="button"
+                        id="btn-week1"
+                        class="btn btn-small active"
+                        onclick="showWeek(1)">
+                    1. Hafta
+                </button>
+
+                <button type="button"
+                        id="btn-week2"
+                        class="btn btn-small"
+                        onclick="showWeek(2)">
+                    2. Hafta
+                </button>
+            </div>
+
+            <!-- TABLES -->
+            <div class="availability-table-wrapper">
+
+                <!-- WEEK 1 -->
+                <table id="week1-table" class="table availability-table">
+                    <thead>
+                    <tr>
+                        <th>Saat \ Tarih</th>
+                        <th th:each="d : ${week1Dates}"
+                            th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="hour : ${hours}">
+                        <td th:text="${hour + ':00'}"></td>
+
+                        <td th:each="d : ${week1Dates}"
+                            th:with="
+                                dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                                key=${dateStr + '_' + hour},
+                                status=${week1StatusMap.get(key) != null ? week1StatusMap.get(key) : 0}
+                            "
+                            th:class="'cell status-' + ${status}"
+                            th:data-key="${key}"
+                            onclick="toggleCell(this)">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- WEEK 2 -->
+                <table id="week2-table" class="table availability-table" style="display:none;">
+                    <thead>
+                    <tr>
+                        <th>Saat \ Tarih</th>
+                        <th th:each="d : ${week2Dates}"
+                            th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="hour : ${hours}">
+                        <td th:text="${hour + ':00'}"></td>
+
+                        <td th:each="d : ${week2Dates}"
+                            th:with="
+                                dateStr=${#temporals.format(d,'yyyy-MM-dd')},
+                                key=${dateStr + '_' + hour},
+                                status=${week2StatusMap.get(key) != null ? week2StatusMap.get(key) : 0}
+                            "
+                            th:class="'cell status-' + ${status}"
+                            th:data-key="${key}"
+                            onclick="toggleCell(this)">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">
+            Availability Kaydet
+        </button>
+    </form>
 </div>
 
-<!-- ============= -->
-<!--   JAVASCRIPT  -->
-<!-- ============= -->
 <script th:inline="javascript">
     /*<![CDATA[*/
-    var employeeId = [[${employeeId}]];
+
+    // FINAL STATE
+    let selectedSlots = new Set();
+
+    // SAYFA AÇILIRKEN DB'DEN YEŞİL OLANLARI SET'E AL
+    document.querySelectorAll(".cell.status-1").forEach(td => {
+        selectedSlots.add(td.dataset.key);
+    });
 
     function showWeek(week) {
-        const week1 = document.getElementById("week1-table");
-        const week2 = document.getElementById("week2-table");
-        const btn1 = document.getElementById("btn-week1");
-        const btn2 = document.getElementById("btn-week2");
+        document.getElementById("week1-table").style.display = week === 1 ? "" : "none";
+        document.getElementById("week2-table").style.display = week === 2 ? "" : "none";
 
-        if (week === 1) {
-            week1.style.display = "";
-            week2.style.display = "none";
-            btn1.classList.add("active");
-            btn2.classList.remove("active");
-        } else {
-            week1.style.display = "none";
-            week2.style.display = "";
-            btn1.classList.remove("active");
-            btn2.classList.add("active");
-        }
+        document.getElementById("btn-week1").classList.toggle("active", week === 1);
+        document.getElementById("btn-week2").classList.toggle("active", week === 2);
     }
 
     function toggleCell(td) {
-        var date = td.getAttribute("data-date");
-        var hour = td.getAttribute("data-hour");
+        if (td.classList.contains("status-2")) return;
 
-        fetch('/employees/' + employeeId + '/availability/toggle?date=' + date + '&hour=' + hour, {
-            method: 'POST'
-        }).then(r => r.text()).then(result => {
+        const key = td.dataset.key;
 
-            // Eğer hücre kırmızı ise asla değişemez
-            if (td.classList.contains("status-2")) {
-                return;
-            }
+        if (selectedSlots.has(key)) {
+            selectedSlots.delete(key);
+            td.classList.remove("status-1");
+            td.classList.add("status-0");
+        } else {
+            selectedSlots.add(key);
+            td.classList.remove("status-0");
+            td.classList.add("status-1");
+        }
+    }
 
-            // Yeşil -> Gri
-            if (td.classList.contains("status-1")) {
-                td.classList.remove("status-1");
-                td.classList.add("status-0");
-            }
-            // Gri -> Yeşil
-            else if (td.classList.contains("status-0")) {
-                td.classList.remove("status-0");
-                td.classList.add("status-1");
-            }
-        });
+    function prepareSubmit() {
+        document.getElementById("slotsInput").value =
+            Array.from(selectedSlots).join(",");
     }
 
     /*]]>*/
 </script>
-
-<script th:src="@{/js/main.js}"></script>
 
 </body>
 </html>

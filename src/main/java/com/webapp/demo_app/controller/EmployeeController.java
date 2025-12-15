@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -99,49 +99,63 @@ public class EmployeeController {
     // ======================
     // NEW: AVAILABILITY PART
     // ======================
-
     @GetMapping("/{employeeId}/availability")
     public String availability(@PathVariable Long employeeId, Model model) {
 
-        //DEBUG
-        System.out.println("TODAY = " + LocalDate.now());
-
-        // NEW: Haftalar kaydıysa eski kayıtları ileri taşı
-        //availabilityService.rollWeeksIfNeeded(employeeId);
-
-        // NEW: 1. hafta (haftaya) ve 2. hafta (ondan sonraki hafta) için tarihleri hesapla
-        LocalDate week1Monday = availabilityService.getNextWeekMonday();       // 1. hafta (haftaya)
-        LocalDate week2Monday = week1Monday.plusWeeks(1);                      // 2. hafta
-
-        List<LocalDate> week1Dates = availabilityService.getWeekDates(week1Monday);
-        List<LocalDate> week2Dates = availabilityService.getWeekDates(week2Monday);
-
-        List<AvailabilitySlot> week1Slots = availabilityService.getWeekSlots(employeeId, week1Monday);
-        List<AvailabilitySlot> week2Slots = availabilityService.getWeekSlots(employeeId, week2Monday);
-
-        Map<String, Integer> week1StatusMap = availabilityService.buildStatusMap(week1Slots);
-        Map<String, Integer> week2StatusMap = availabilityService.buildStatusMap(week2Slots);
+        LocalDate week1 = availabilityService.getNextWeekMonday();
+        LocalDate week2 = week1.plusWeeks(1);
 
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("hours", availabilityService.getHours());
 
-        model.addAttribute("week1Dates", week1Dates);
-        model.addAttribute("week2Dates", week2Dates);
-        model.addAttribute("week1StatusMap", week1StatusMap);
-        model.addAttribute("week2StatusMap", week2StatusMap);
+        model.addAttribute("week1Dates", availabilityService.getWeekDates(week1));
+        model.addAttribute("week2Dates", availabilityService.getWeekDates(week2));
 
-        return "availability"; // NEW: availability.html
+        model.addAttribute("week1StatusMap",
+                availabilityService.buildStatusMap(
+                        availabilityService.getWeekSlots(employeeId, week1)));
+
+        model.addAttribute("week2StatusMap",
+                availabilityService.buildStatusMap(
+                        availabilityService.getWeekSlots(employeeId, week2)));
+
+        return "availability";
+    }
+
+    @PostMapping("/{employeeId}/availability/submit")
+    public String submitAvailability(
+            @PathVariable Long employeeId,
+            @RequestParam("slots") String slotsRaw,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            Set<String> selectedSlots = Arrays.stream(slotsRaw.split(","))
+                    .filter(s -> !s.isBlank())
+                    .collect(Collectors.toSet());
+
+            boolean valid =
+                    availabilityService.validateMinimumAvailability(selectedSlots);
+
+            if (!valid) {
+                redirectAttributes.addFlashAttribute(
+                        "availabilityError",
+                        "Minimum 4 gün ve her gün 5 saat arka arkaya seçmelisiniz."
+                );
+                return "redirect:/employees/" + employeeId + "/availability";
+            }
+
+            availabilityService.saveAvailabilityForWeek(employeeId, selectedSlots);
+
+            return "redirect:/employees/" + employeeId + "/dashboard";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "availabilityError",
+                    "Beklenmeyen bir hata oluştu."
+            );
+            return "redirect:/employees/" + employeeId + "/availability";
+        }
     }
 
 
-    // NEW: Endpoint that toggles availability when the cell is clicked (AJAX)
-    @PostMapping("/{employeeId}/availability/toggle")
-    @ResponseBody
-    public ResponseEntity<String> toggleAvailability(@PathVariable Long employeeId,
-                                                     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                     LocalDate date,
-                                                     @RequestParam Integer hour) {
-        availabilityService.toggleSlot(employeeId, date, hour);
-        return ResponseEntity.ok("OK");
-    }
 }

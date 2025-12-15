@@ -60,63 +60,77 @@ public class AvailabilityService {
 
 
     @Transactional
-    public void toggleSlot(Long employeeId, LocalDate date, Integer hour) {
-        AvailabilitySlot slot =
-                availabilitySlotRepository.findByEmployeeIdAndDateAndHour(employeeId, date, hour);
+    public void saveAvailabilityForWeek(
+            Long employeeId,
+            Set<String> selectedSlots
+    ) {
+        Employee employee = employeeRepository.getReferenceById(employeeId);
 
-        if (slot == null) {
-            AvailabilitySlot newSlot = new AvailabilitySlot();
-            newSlot.setEmployee(employeeRepository.getReferenceById(employeeId));
-            newSlot.setDate(date);
-            newSlot.setHour(hour);
-            newSlot.setStatus(1); // yeşil
-            availabilitySlotRepository.save(newSlot);
-            return;
-        }
+        // SADECE YEŞİL SLOT'LARI TEMİZLE
+        availabilitySlotRepository.deleteByEmployeeIdAndStatus(employeeId, 1);
 
-        // Eğer kırmızıysa employee değiştiremez!
-        if (slot.getStatus() == 2) {
-            return;   // hiçbir şey yapma!
-        }
+        for (String key : selectedSlots) {
+            String[] parts = key.split("_");
+            LocalDate date = LocalDate.parse(parts[0]);
+            Integer hour = Integer.parseInt(parts[1]);
 
-        // Eğer yeşil ise → gri (DELETE)
-        if (slot.getStatus() == 1) {
-            availabilitySlotRepository.delete(slot); // kayıt silinir = gri
+            AvailabilitySlot slot = new AvailabilitySlot();
+            slot.setEmployee(employee);
+            slot.setDate(date);
+            slot.setHour(hour);
+            slot.setStatus(1);
+
+            availabilitySlotRepository.save(slot);
         }
     }
 
 
+    // =========================
+    // VALIDATION
+    // =========================
 
-    /**
-     * Shifting records as weeks advance:
-     * For example, when the week "next week" becomes the current week,
-     * shift the availability dates in the past by +1 week.
-     *
-     * Thus, the green cells in week 3 will move to the position of week 2 one week later.
-     */
+    public boolean validateMinimumAvailability(Collection<String> slotKeys) {
 
-    /*
-    @Transactional
-    public void rollWeeksIfNeeded(Long employeeId) {
-        LocalDate today = LocalDate.now();
-        LocalDate nextWeekMonday = today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+        Map<LocalDate, List<Integer>> byDate = new HashMap<>();
 
-        List<AvailabilitySlot> slots = availabilitySlotRepository.findByEmployeeId(employeeId);
-        boolean changed = false;
+        for (String key : slotKeys) {
+            String[] parts = key.split("_");
+            LocalDate date = LocalDate.parse(parts[0]);
+            Integer hour = Integer.parseInt(parts[1]);
 
-        for (AvailabilitySlot slot : slots) {
-            // If the slot date is before "nextWeekMonday" (that is, too far in the past to be displayed anymore) -> Move forward 1 week.
-            while (slot.getDate().isBefore(nextWeekMonday)) {
-                slot.setDate(slot.getDate().plusWeeks(1));
-                changed = true;
+            byDate.computeIfAbsent(date, d -> new ArrayList<>()).add(hour);
+        }
+
+        int validDayCount = 0;
+
+        for (List<Integer> hours : byDate.values()) {
+            Collections.sort(hours);
+
+            int currentBlock = 1;
+            int maxBlock = 1;
+
+            for (int i = 1; i < hours.size(); i++) {
+                if (hours.get(i) == hours.get(i - 1) + 1) {
+                    currentBlock++;
+                    maxBlock = Math.max(maxBlock, currentBlock);
+                } else {
+                    currentBlock = 1;
+                }
+            }
+
+            if (maxBlock >= 5) {
+                validDayCount++;
+            }
+
+            if (validDayCount >= 4) {
+                return true;
             }
         }
 
-        if (changed) {
-            availabilitySlotRepository.saveAll(slots);
-        }
+        return false;
     }
-    */
+
+
 
     // Hour row (7..16)
     public List<Integer> getHours() {
@@ -160,5 +174,7 @@ public class AvailabilityService {
         }
 
     }
+
+    //
 
 }
