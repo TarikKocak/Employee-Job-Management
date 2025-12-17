@@ -7,6 +7,7 @@ import com.webapp.demo_app.service.IncompleteJobException;
 import com.webapp.demo_app.service.JobService;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -123,10 +124,10 @@ public class EmployeeController {
     }
 
     @PostMapping("/{employeeId}/availability/submit")
-    public String submitAvailability(
+    @ResponseBody
+    public ResponseEntity<?> submitAvailability(
             @PathVariable Long employeeId,
-            @RequestParam("slots") String slotsRaw,
-            RedirectAttributes redirectAttributes
+            @RequestParam("slots") String slotsRaw
     ) {
         try {
             Set<String> selectedSlots = Arrays.stream(slotsRaw.split(","))
@@ -137,23 +138,19 @@ public class EmployeeController {
                     availabilityService.validateMinimumAvailabilityPerWeek(selectedSlots);
 
             if (!valid) {
-                redirectAttributes.addFlashAttribute(
-                        "availabilityError",
-                        "Her hafta Minimum 4 gün ve her gün Minimum 5'er saat arka arkaya seçmelisiniz."
-                );
-                return "redirect:/employees/" + employeeId + "/availability";
+                return ResponseEntity
+                        .badRequest()
+                        .body("Her hafta minimum 4 gün ve her gün 5 saat arka arkaya seçmelisiniz.");
             }
 
             availabilityService.saveAvailabilityForWeek(employeeId, selectedSlots);
 
-            return "redirect:/employees/" + employeeId + "/dashboard";
+            return ResponseEntity.ok("OK");
 
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute(
-                    "availabilityError",
-                    "Beklenmeyen bir hata oluştu."
-            );
-            return "redirect:/employees/" + employeeId + "/availability";
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Beklenmeyen bir hata oluştu.");
         }
     }
 

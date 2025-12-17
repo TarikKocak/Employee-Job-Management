@@ -10,7 +10,7 @@
 <div class="container availability-container">
     <h1>Availability</h1>
 
-    <!-- Geri dön -->
+    <!-- GO BACK TO DASHBOARD -->
     <div class="availability-actions">
         <a th:href="@{|/employees/${employeeId}/dashboard|}"
            class="btn btn-secondary">
@@ -18,15 +18,18 @@
         </a>
     </div>
 
-    <!-- Hata mesajı -->
-    <div class="availability-warning"
-         th:if="${availabilityError != null}"
-         th:text="${availabilityError}">
+    <!-- ERROR MESSAGE -->
+    <div id="availability-warning"
+         class="availability-warning"
+         style="display:none;">
     </div>
 
-    <form th:action="@{|/employees/${employeeId}/availability/submit|}"
-          method="post"
-          onsubmit="prepareSubmit()">
+    <div id="success-popup" class="availability-success-popup">
+        Availability başarıyla kaydedildi. ✔
+    </div>
+
+
+    <form id="availabilityForm" onsubmit="submitAvailability(event)">
 
         <!-- FINAL SELECTION -->
         <input type="hidden" name="slots" id="slotsInput">
@@ -123,8 +126,9 @@
 
     // FINAL STATE
     let selectedSlots = new Set();
+    const employeeId = [[${employeeId}]];
 
-    // SAYFA AÇILIRKEN DB'DEN YEŞİL OLANLARI SET'E AL
+    // WHEN THE PAGE LOADS, ADD THE GREEN ONES FROM THE DB TO SET.
     document.querySelectorAll(".cell.status-1").forEach(td => {
         selectedSlots.add(td.dataset.key);
     });
@@ -156,6 +160,56 @@
     function prepareSubmit() {
         document.getElementById("slotsInput").value =
             Array.from(selectedSlots).join(",");
+    }
+
+    // SUBMIT (AJAX)
+    function submitAvailability(event) {
+        event.preventDefault(); //  NO PAGE RELOAD
+
+        // Filling hidden inputs fow slots that filled already
+        document.getElementById("slotsInput").value =
+            Array.from(selectedSlots).join(",");
+
+        fetch(`/employees/${employeeId}/availability/submit`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: new URLSearchParams({
+                slots: document.getElementById("slotsInput").value
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(msg => { throw msg; });
+                }
+                return response.text();
+            })
+            .then(() => {
+                //  SUCCESSFUL → SHOW POPUP
+                showSuccessPopup();
+            })
+            .catch(errorMessage => {
+                //  ERROR → REDIRECT SAME PAGE WITHOUT RELOADING
+                showAvailabilityError(errorMessage);
+            });
+    }
+
+    // IF SUCCESS SHOW POP UP
+    function showSuccessPopup() {
+        const popup = document.getElementById("success-popup");
+        popup.style.display = "block";
+
+        setTimeout(() => {
+            popup.style.display = "none";
+        }, 2000); // 2 soconds for pop up to disappear
+    }
+
+    // SHOW ERROR
+    function showAvailabilityError(message) {
+        const warning = document.getElementById("availability-warning");
+        warning.innerText = message;
+        warning.style.display = "block";
     }
 
     /*]]>*/
