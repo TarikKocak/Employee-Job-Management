@@ -45,6 +45,13 @@ public class AdminController {
         LocalDate week1Monday = availabilityService.getNextWeekMonday();
         LocalDate week2Monday = week1Monday.plusWeeks(1);
 
+        Map<String, Map<String, Integer>> week1Overlap =
+                availabilityService.getOverlappingAvailabilityForWeek(week1Monday);
+
+        Map<String, Map<String, Integer>> week2Overlap =
+                availabilityService.getOverlappingAvailabilityForWeek(week2Monday);
+
+
         model.addAttribute("hours", availabilityService.getHours());
 
         model.addAttribute("week1Dates",
@@ -58,6 +65,12 @@ public class AdminController {
 
         model.addAttribute("week2OverlapMap",
                 availabilityService.getOverlappingAvailabilityForWeek(week2Monday));
+
+        model.addAttribute("week1AvailableCountMap",
+                availabilityService.buildAvailableCountMap(week1Overlap));
+
+        model.addAttribute("week2AvailableCountMap",
+                availabilityService.buildAvailableCountMap(week2Overlap));
 
         return "admin/admin-employees-list";
     }
@@ -76,7 +89,7 @@ public class AdminController {
     }
 
 
-    // Viewing emplyee details
+    // Viewing employee details
     @GetMapping("/employees/{id}")
     public String showEmployee(@PathVariable Long id, Model model) {
         Employee employee = employeeRepository.findById(id).orElse(null);

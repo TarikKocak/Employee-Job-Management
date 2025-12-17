@@ -94,7 +94,8 @@ public class AvailabilityService {
     // VALIDATION
     // =========================
 
-    public boolean validateMinimumAvailabilityPerWeek(Collection<String> slotKeys) {
+    public boolean
+    validateMinimumAvailabilityPerWeek(Collection<String> slotKeys) {
 
         // 🔹 slotları haftalara ayır
         Map<LocalDate, List<String>> slotsByWeek = new HashMap<>();
@@ -191,7 +192,8 @@ public class AvailabilityService {
     }
 
     @Transactional
-    public void blockAvailabilityForJob(Long employeeId, LocalDate date, LocalTime startTime, double duration){
+    public void
+    blockAvailabilityForJob(Long employeeId, LocalDate date, LocalTime startTime, double duration){
         List<Integer> hours = calculateBlockedHours(startTime, duration);
 
         for(Integer hour : hours){
@@ -245,6 +247,26 @@ public class AvailabilityService {
                             .put(emp.getName(), status);
                 }
             }
+        }
+
+        return result;
+    }
+
+    public Map<String, Integer>
+    buildAvailableCountMap(Map<String, Map<String, Integer>> overlapMap) {
+
+        Map<String, Integer> result = new HashMap<>();
+
+        for (Map.Entry<String, Map<String, Integer>> entry : overlapMap.entrySet()) {
+
+            int count = 0;
+            for (Integer status : entry.getValue().values()) {
+                if (status != null && status == 1) {
+                    count++;
+                }
+            }
+
+            result.put(entry.getKey(), count);
         }
 
         return result;

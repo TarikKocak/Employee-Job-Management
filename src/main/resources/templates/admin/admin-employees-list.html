@@ -8,111 +8,129 @@
 
 <body>
 <div class="container">
-    <h1 class="page-title">Employee Listesi</h1>
 
-    <div class="admin-card">
+    <div class="admin-availability-layout">
 
-        <table class="table">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>İsim</th>
-                <th>Detay</th>
-            </tr>
-            </thead>
+        <!-- LEFT COLUMN -->
+        <div class="admin-section">
+            <h1 class="page-title">Employee Listesi</h1>
 
-            <tbody>
-            <tr th:each="emp : ${employees}">
-                <td th:text="${emp.id}"></td>
-                <td th:text="${emp.name}"></td>
-                <td>
-                    <a th:href="@{'/admin/employees/' + ${emp.id}}" class="btn btn-small btn-primary">
-                        Detay
-                    </a>
+            <div class="admin-card">
 
-                    <a th:href="@{|/admin/employees/${emp.id}/assign-job|}"
-                       class="admin-btn btn-success">
-                        Assign Job
-                    </a>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>İsim</th>
+                        <th>Detay</th>
+                    </tr>
+                    </thead>
 
-        <a href="/admin/dashboard" class="btn btn-secondary">Geri Dön</a>
-    </div>
+                    <tbody>
+                    <tr th:each="emp : ${employees}">
+                        <td th:text="${emp.id}"></td>
+                        <td th:text="${emp.name}"></td>
+                        <td>
+                            <a th:href="@{'/admin/employees/' + ${emp.id}}" class="btn btn-small btn-primary">
+                                Detay
+                            </a>
 
-    <h2>Overall Availability</h2>
+                            <a th:href="@{|/admin/employees/${emp.id}/assign-job|}"
+                               class="admin-btn btn-success">
+                                Assign Job
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
-    <div class="availability-layout">
-
-        <div class="availability-sidebar">
-            <button id="btn-week1" class="btn btn-small active"
-                    onclick="showWeek(1)">Next Week</button>
-
-            <button id="btn-week2" class="btn btn-small"
-                    onclick="showWeek(2)">Following Week</button>
+                <a href="/admin/dashboard" class="btn btn-secondary">Geri Dön</a>
+            </div>
         </div>
 
-        <div class="availability-table-wrapper">
+        <!-- RIGHT COLUMN -->
+        <div class="availability-section">
 
-            <!-- WEEK 1 -->
-            <table id="week1-table" class="table availability-table">
-                <thead>
-                <tr>
-                    <th>Hour</th>
-                    <th th:each="d : ${week1Dates}"
-                        th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
-                </tr>
-                </thead>
+            <h2>Overall Availability</h2>
 
-                <tbody>
-                <tr th:each="hour : ${hours}">
-                    <td th:text="${hour + ':00'}"></td>
+            <div class="availability-layout">
 
-                    <td th:each="d : ${week1Dates}"
-                        th:with="
-                      key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour}
-                    "
-                        class="cell status-0"
-                        th:attr="data-key=${key}"
-                        onmouseenter="showTooltip(event)"
-                        onmouseleave="hideTooltip()">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                <div class="availability-sidebar">
+                    <button id="btn-week1" class="btn btn-small active"
+                            onclick="showWeek(1)">Next Week</button>
 
-            <!-- WEEK 2 -->
-            <table id="week2-table" class="table availability-table" style="display:none;">
-                <thead>
-                <tr>
-                    <th>Hour</th>
-                    <th th:each="d : ${week2Dates}"
-                        th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
-                </tr>
-                </thead>
+                    <button id="btn-week2" class="btn btn-small"
+                            onclick="showWeek(2)">Following Week</button>
+                </div>
 
-                <tbody>
-                <tr th:each="hour : ${hours}">
-                    <td th:text="${hour + ':00'}"></td>
+                <div class="availability-table-wrapper">
 
-                    <td th:each="d : ${week2Dates}"
-                        th:with="
-                      key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour}
-                    "
-                        class="cell status-0"
-                        th:attr="data-key=${key}"
-                        onmouseenter="showTooltip(event)"
-                        onmouseleave="hideTooltip()">
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                    <!-- WEEK 1 -->
+                    <table id="week1-table" class="table availability-table">
+                        <thead>
+                        <tr>
+                            <th>Hour</th>
+                            <th th:each="d : ${week1Dates}"
+                                th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="hour : ${hours}">
+                            <td th:text="${hour + ':00'}"></td>
+
+                            <td th:each="d : ${week1Dates}"
+                                th:with="
+                                    key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour},
+                                    count=${week1AvailableCountMap.get(key) != null
+                                            ? week1AvailableCountMap.get(key)
+                                            : 0}
+                                "
+                                th:class="|cell availability-level-${count == 0 ? 0 : (count >= 4 ? 4 : count)}|"
+                                th:attr="data-key=${key}"
+                                onmouseenter="showTooltip(event)"
+                                onmouseleave="hideTooltip()">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- WEEK 2 -->
+                    <table id="week2-table" class="table availability-table" style="display:none;">
+                        <thead>
+                        <tr>
+                            <th>Hour</th>
+                            <th th:each="d : ${week2Dates}"
+                                th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                        <tr th:each="hour : ${hours}">
+                            <td th:text="${hour + ':00'}"></td>
+
+                            <td th:each="d : ${week2Dates}"
+                                th:with="
+                                    key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour},
+                                    count=${week2AvailableCountMap.get(key) != null
+                                            ? week2AvailableCountMap.get(key)
+                                            : 0}
+                                "
+                                th:class="|cell availability-level-${count == 0 ? 0 : (count >= 4 ? 4 : count)}|"
+                                th:attr="data-key=${key}"
+                                onmouseenter="showTooltip(event)"
+                                onmouseleave="hideTooltip()">
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
+
+       <div id="availability-tooltip" class="availability-tooltip"></div>
     </div>
 
-    <div id="availability-tooltip" class="availability-tooltip"></div>
 </div>
 
 
