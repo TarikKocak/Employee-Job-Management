@@ -17,11 +17,18 @@ public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySl
     // To pull all slots (for weekly scroll)
     List<AvailabilitySlot> findByEmployeeId(Long employeeId);
 
+    /*
     void deleteByEmployeeIdAndDateBetween(
             Long employeeId,
             LocalDate start,
             LocalDate end
-    );
+    );*/
 
     void deleteByEmployeeIdAndStatus(Long employeeId, Integer status);
+
+    // FOR OVERLAPPING AVAILABILITY SLOT
+    List<AvailabilitySlot> findByDateBetween(
+            LocalDate start,
+            LocalDate end
+    );
 }

@@ -41,6 +41,140 @@
 
         <a href="/admin/dashboard" class="btn btn-secondary">Geri Dön</a>
     </div>
+
+    <h2>Overall Availability</h2>
+
+    <div class="availability-layout">
+
+        <div class="availability-sidebar">
+            <button id="btn-week1" class="btn btn-small active"
+                    onclick="showWeek(1)">Next Week</button>
+
+            <button id="btn-week2" class="btn btn-small"
+                    onclick="showWeek(2)">Following Week</button>
+        </div>
+
+        <div class="availability-table-wrapper">
+
+            <!-- WEEK 1 -->
+            <table id="week1-table" class="table availability-table">
+                <thead>
+                <tr>
+                    <th>Hour</th>
+                    <th th:each="d : ${week1Dates}"
+                        th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="hour : ${hours}">
+                    <td th:text="${hour + ':00'}"></td>
+
+                    <td th:each="d : ${week1Dates}"
+                        th:with="
+                      key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour}
+                    "
+                        class="cell status-0"
+                        th:attr="data-key=${key}"
+                        onmouseenter="showTooltip(event)"
+                        onmouseleave="hideTooltip()">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- WEEK 2 -->
+            <table id="week2-table" class="table availability-table" style="display:none;">
+                <thead>
+                <tr>
+                    <th>Hour</th>
+                    <th th:each="d : ${week2Dates}"
+                        th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="hour : ${hours}">
+                    <td th:text="${hour + ':00'}"></td>
+
+                    <td th:each="d : ${week2Dates}"
+                        th:with="
+                      key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour}
+                    "
+                        class="cell status-0"
+                        th:attr="data-key=${key}"
+                        onmouseenter="showTooltip(event)"
+                        onmouseleave="hideTooltip()">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="availability-tooltip" class="availability-tooltip"></div>
 </div>
+
+
+<script th:inline="javascript">
+    const week1Data = [[${week1OverlapMap}]];
+    const week2Data = [[${week2OverlapMap}]];
+    let activeData = week1Data;
+
+    function showWeek(w) {
+
+        const week1Table = document.getElementById("week1-table");
+        const week2Table = document.getElementById("week2-table");
+
+        const btn1 = document.getElementById("btn-week1");
+        const btn2 = document.getElementById("btn-week2");
+
+        if (w === 1) {
+            week1Table.style.display = "";
+            week2Table.style.display = "none";
+
+            btn1.classList.add("active");
+            btn2.classList.remove("active");
+
+            activeData = week1Data;
+        } else {
+            week1Table.style.display = "none";
+            week2Table.style.display = "";
+
+            btn1.classList.remove("active");
+            btn2.classList.add("active");
+
+            activeData = week2Data;
+        }
+    }
+
+    function showTooltip(e) {
+        const key = e.target.dataset.key;
+        const data = activeData[key];
+        if (!data) return;
+
+        let html = "<strong>Available</strong><br>";
+        for (const [name, status] of Object.entries(data)) {
+            if (status === 1) html += "🟢 " + name + "<br>";
+        }
+
+        html += "<hr><strong>Unavailable</strong><br>";
+        for (const [name, status] of Object.entries(data)) {
+            if (status === 2) html += "🔴 " + name + "<br>";
+        }
+
+        const tooltip = document.getElementById("availability-tooltip");
+        tooltip.innerHTML = html;
+        tooltip.style.display = "block";
+        tooltip.style.left = e.pageX + 15 + "px";
+        tooltip.style.top = e.pageY + 15 + "px";
+    }
+
+    function hideTooltip() {
+        document.getElementById("availability-tooltip").style.display = "none";
+    }
+</script>
 </body>
 </html>
+
+

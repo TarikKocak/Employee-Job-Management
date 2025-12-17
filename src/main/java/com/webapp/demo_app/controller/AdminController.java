@@ -35,10 +35,30 @@ public class AdminController {
         return "admin/admin-dashboard";
     }
 
-    // Employee List
     @GetMapping("/employees")
     public String listEmployees(Model model) {
+
+        // Employee list
         model.addAttribute("employees", employeeRepository.findAll());
+
+        // === AVAILABILITY (OVERALL) ===
+        LocalDate week1Monday = availabilityService.getNextWeekMonday();
+        LocalDate week2Monday = week1Monday.plusWeeks(1);
+
+        model.addAttribute("hours", availabilityService.getHours());
+
+        model.addAttribute("week1Dates",
+                availabilityService.getWeekDates(week1Monday));
+
+        model.addAttribute("week2Dates",
+                availabilityService.getWeekDates(week2Monday));
+
+        model.addAttribute("week1OverlapMap",
+                availabilityService.getOverlappingAvailabilityForWeek(week1Monday));
+
+        model.addAttribute("week2OverlapMap",
+                availabilityService.getOverlappingAvailabilityForWeek(week2Monday));
+
         return "admin/admin-employees-list";
     }
 

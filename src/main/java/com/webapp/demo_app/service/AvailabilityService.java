@@ -210,6 +210,44 @@ public class AvailabilityService {
 
     }
 
-    //
+    public Map<String, Map<String, Integer>>
+    getOverlappingAvailabilityForWeek(LocalDate monday) {
+
+        LocalDate end = monday.plusDays(6);
+
+        List<Employee> employees = employeeRepository.findAll();
+
+        List<AvailabilitySlot> slots =
+                availabilitySlotRepository.findByDateBetween(monday, end);
+
+        // employeeId_date_hour -> status
+        Map<String, Integer> slotIndex = new HashMap<>();
+        for (AvailabilitySlot slot : slots) {
+            String key = slot.getEmployee().getId()
+                    + "_" + slot.getDate()
+                    + "_" + slot.getHour();
+            slotIndex.put(key, slot.getStatus());
+        }
+
+        Map<String, Map<String, Integer>> result = new HashMap<>();
+
+        for (Employee emp : employees) {
+            for (LocalDate d = monday; !d.isAfter(end); d = d.plusDays(1)) {
+                for (Integer hour : getHours()) {
+
+                    String cellKey = d + "_" + hour;
+                    String empKey = emp.getId() + "_" + d + "_" + hour;
+
+                    int status = slotIndex.getOrDefault(empKey, 0);
+
+                    result
+                            .computeIfAbsent(cellKey, k -> new LinkedHashMap<>())
+                            .put(emp.getName(), status);
+                }
+            }
+        }
+
+        return result;
+    }
 
 }

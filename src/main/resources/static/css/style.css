@@ -389,6 +389,18 @@ h1 {
     font-weight: bold;
 }
 
+.availability-tooltip {
+    position: fixed;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 12px;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    font-size: 0.9rem;
+    display: none;
+    z-index: 3000;
+    min-width: 180px;
+}
 /* ========================================================= */
 /* --- END OF ADMIN SECTION --- */
 /* ========================================================= */
