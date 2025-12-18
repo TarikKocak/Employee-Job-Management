@@ -460,6 +460,13 @@ h1 {
     background-color: #154512;
     color: #ffffff;
 }
+
+.filter-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
 /* ========================================================= */
 /* --- END OF ADMIN SECTION --- */
 /* ========================================================= */

@@ -1,6 +1,7 @@
 package com.webapp.demo_app.model;
 
 
+import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,9 @@ public class Employee {
     private String password;
 
     //<----------------------------------->
+
+    @Enumerated(EnumType.STRING)
+    private EmployeeeTitle title;
 
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)

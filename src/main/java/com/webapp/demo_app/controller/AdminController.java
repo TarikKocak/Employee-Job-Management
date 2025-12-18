@@ -2,6 +2,9 @@ package com.webapp.demo_app.controller;
 
 
 import com.webapp.demo_app.model.*;
+import com.webapp.demo_app.model.enums.EmployeeeTitle;
+import com.webapp.demo_app.model.enums.Tur;
+import com.webapp.demo_app.model.enums.UcretTahsilTipi;
 import com.webapp.demo_app.repository.EmployeeRepository;
 import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.JobService;
@@ -36,41 +39,60 @@ public class AdminController {
     }
 
     @GetMapping("/employees")
-    public String listEmployees(Model model) {
+    public String listEmployees(
+            @RequestParam(required = false) EmployeeeTitle title,
+            @RequestParam(required = false) Long employeeId,
+            Model model
+    ) {
 
-        // Employee list
-        model.addAttribute("employees", employeeRepository.findAll());
+        // 🔹 Dropdown için HER ZAMAN tüm employee’ler
+        List<Employee> allEmployees = employeeRepository.findAll();
 
-        // === AVAILABILITY (OVERALL) ===
+        // 🔹 Filtreli employee listesi (SOL TABLO)
+        List<Employee> filteredEmployees;
+
+        if (employeeId != null) {
+            filteredEmployees = employeeRepository.findById(employeeId)
+                    .map(List::of)
+                    .orElse(List.of());
+        } else if (title != null) {
+            filteredEmployees = employeeRepository.findByTitle(title);
+        } else {
+            filteredEmployees = allEmployees;
+        }
+
+        model.addAttribute("employees", filteredEmployees);
+        model.addAttribute("allEmployees", allEmployees);
+
+        // === AVAILABILITY (FILTERED) ===
         LocalDate week1Monday = availabilityService.getNextWeekMonday();
         LocalDate week2Monday = week1Monday.plusWeeks(1);
 
         Map<String, Map<String, Integer>> week1Overlap =
-                availabilityService.getOverlappingAvailabilityForWeek(week1Monday);
+                availabilityService.getOverlappingAvailabilityForWeek(
+                        week1Monday, filteredEmployees);
 
         Map<String, Map<String, Integer>> week2Overlap =
-                availabilityService.getOverlappingAvailabilityForWeek(week2Monday);
-
+                availabilityService.getOverlappingAvailabilityForWeek(
+                        week2Monday, filteredEmployees);
 
         model.addAttribute("hours", availabilityService.getHours());
-
         model.addAttribute("week1Dates",
                 availabilityService.getWeekDates(week1Monday));
-
         model.addAttribute("week2Dates",
                 availabilityService.getWeekDates(week2Monday));
 
-        model.addAttribute("week1OverlapMap",
-                availabilityService.getOverlappingAvailabilityForWeek(week1Monday));
-
-        model.addAttribute("week2OverlapMap",
-                availabilityService.getOverlappingAvailabilityForWeek(week2Monday));
+        model.addAttribute("week1OverlapMap", week1Overlap);
+        model.addAttribute("week2OverlapMap", week2Overlap);
 
         model.addAttribute("week1AvailableCountMap",
                 availabilityService.buildAvailableCountMap(week1Overlap));
-
         model.addAttribute("week2AvailableCountMap",
                 availabilityService.buildAvailableCountMap(week2Overlap));
+
+        // 🔹 Filtrelerin HTML’de seçili kalması için
+        model.addAttribute("selectedTitle", title);
+        model.addAttribute("selectedEmployeeId", employeeId);
 
         return "admin/admin-employees-list";
     }
@@ -79,6 +101,7 @@ public class AdminController {
     @GetMapping("/add-employee")
     public String addEmployeeForm(Model model) {
         model.addAttribute("employee", new Employee());
+        model.addAttribute("titles", EmployeeeTitle.values());
         return "admin/admin-add-employee";
     }
 

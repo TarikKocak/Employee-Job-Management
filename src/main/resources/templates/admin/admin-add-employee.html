@@ -20,6 +20,18 @@
             </div>
 
             <div class="form-group">
+                <label>Employee Title</label>
+                <select name="title" required>
+                    <option value="" disabled selected>Seçiniz</option>
+
+                    <option th:each="t : ${titles}"
+                            th:value="${t}"
+                            th:text="${t}">
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label>Password</label>
                 <input type="text" name="password" placeholder="Şifre" required>
             </div>

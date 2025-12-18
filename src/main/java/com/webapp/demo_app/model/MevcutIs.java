@@ -1,6 +1,8 @@
 package com.webapp.demo_app.model;
 
 
+import com.webapp.demo_app.model.enums.Tur;
+import com.webapp.demo_app.model.enums.UcretTahsilTipi;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;

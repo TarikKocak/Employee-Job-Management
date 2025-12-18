@@ -7,7 +7,45 @@
 </head>
 
 <body>
+
 <div class="container">
+    <div class="filter-bar">
+
+        <form method="get" action="/admin/employees" class="filter-form">
+
+            <!-- TITLE -->
+            <select name="title" class="filter-select">
+                <option value="">Tüm Ünvanlar</option>
+
+                <option value="SENIOR"
+                        th:selected="${selectedTitle != null and selectedTitle.name() == 'SENIOR'}">
+                    SENIOR
+                </option>
+
+                <option value="JUNIOR"
+                        th:selected="${selectedTitle != null and selectedTitle.name() == 'JUNIOR'}">
+                    JUNIOR
+                </option>
+            </select>
+
+            <!-- EMPLOYEE -->
+            <select name="employeeId" class="filter-select">
+                <option value="">Tüm Çalışanlar</option>
+                <option th:each="e : ${allEmployees}"
+                        th:value="${e.id}"
+                        th:text="${e.name}"
+                        th:selected="${selectedEmployeeId == e.id}">
+                </option>
+            </select>
+
+            <!-- BUTTON -->
+            <button type="submit" class="btn btn-primary">
+                Filtrele
+            </button>
+
+        </form>
+
+    </div>
 
     <div class="admin-availability-layout">
 
@@ -20,7 +58,7 @@
                 <table class="table">
                     <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Title</th>
                         <th>İsim</th>
                         <th>Detay</th>
                     </tr>
@@ -28,7 +66,7 @@
 
                     <tbody>
                     <tr th:each="emp : ${employees}">
-                        <td th:text="${emp.id}"></td>
+                        <td th:text="${emp.title}"></td>
                         <td th:text="${emp.name}"></td>
                         <td>
                             <a th:href="@{'/admin/employees/' + ${emp.id}}" class="btn btn-small btn-primary">
