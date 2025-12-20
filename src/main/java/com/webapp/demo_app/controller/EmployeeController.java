@@ -1,7 +1,9 @@
 package com.webapp.demo_app.controller;
 
 import com.webapp.demo_app.model.AvailabilitySlot;
+import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.MevcutIs;
+import com.webapp.demo_app.repository.EmployeeRepository;
 import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.IncompleteJobException;
 import com.webapp.demo_app.service.JobService;
@@ -26,10 +28,12 @@ public class EmployeeController {
     private final JobService jobService;
 
     private final AvailabilityService availabilityService;
+    private final EmployeeRepository employeeRepository;
 
-    public EmployeeController(JobService jobService, AvailabilityService availabilityService) {
+    public EmployeeController(JobService jobService, AvailabilityService availabilityService, EmployeeRepository employeeRepository) {
         this.jobService = jobService;
         this.availabilityService = availabilityService;
+        this.employeeRepository = employeeRepository;
     }
 
     @GetMapping("/home")
@@ -39,6 +43,11 @@ public class EmployeeController {
 
     @GetMapping("/{employeeId}/dashboard")
     public String dashboard(@PathVariable Long employeeId, Model model) {
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
+
+        model.addAttribute("employeeName", employee.getName());
         model.addAttribute("employeeId", employeeId);
         return "home-dashboard";
     }

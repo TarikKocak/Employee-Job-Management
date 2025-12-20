@@ -9,5 +9,6 @@ import java.util.List;
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     Employee findByName(String name); // for futer login implementation
+    Employee findById(long id);
     List<Employee> findByTitle(EmployeeeTitle title);
 }

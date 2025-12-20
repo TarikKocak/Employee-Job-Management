@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="container">
-    <h1>Employee Dashboard</h1>
+    <h1> Welcome to Dashboard, <span th:text="${employeeName}">Employee</span></h1>
 
     <div class="button-group">
         <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn">Mevcut İşlerim</a>

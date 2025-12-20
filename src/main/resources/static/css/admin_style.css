@@ -56,7 +56,6 @@ body {
     background-color: #0056b3;
 }
 
-/* Yeşil (success) */
 .admin-btn.btn-success {
     background-color: #28a745;
 }
@@ -65,19 +64,17 @@ body {
     background-color: #1e7c33;
 }
 
-/* Küçük buton */
 .btn-small {
     padding: 4px 8px;
     font-size: 0.85rem;
 }
 
-/* Aktif buton (week seçimi vs) */
 .btn.active {
     box-shadow: 0 0 0 2px #333;
 }
 
 /* ===================================== */
-/*               ADMIN TABLE              */
+/*               TABLES                   */
 /* ===================================== */
 
 .admin-table,
@@ -133,6 +130,7 @@ textarea {
 /* ===================================== */
 /*      ASSIGN JOB PAGE – FLEX LAYOUT     */
 /* ===================================== */
+/* ⚠️ BU KISIM ESKİ HALİYLE KORUNDU */
 
 .admin-assign-layout {
     display: flex;
@@ -140,12 +138,12 @@ textarea {
     align-items: flex-start;
 }
 
-/* Sol taraf: Job assign form */
+/* Sol taraf: form (SABİT GENİŞLİK) */
 .assign-form {
     flex: 0 0 380px;
 }
 
-/* Sağ taraf: Availability preview */
+/* Sağ taraf: availability */
 .assign-availability-preview {
     flex: 1;
     background-color: #fafafa;
@@ -162,16 +160,26 @@ textarea {
     gap: 15px;
 }
 
-/* Sol: hafta seçimi */
 .availability-sidebar {
     width: 140px;
+    background-color: #f5f6f8;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 12px;
 }
 
 .availability-sidebar h4 {
-    margin-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: center;
 }
 
-/* Sağ: tablolar */
+.availability-sidebar .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
 .availability-table-wrapper {
     flex: 1;
 }
@@ -184,87 +192,56 @@ textarea {
     font-weight: bold;
 }
 
-/* Hücreler */
 .cell {
     width: 32px;
     height: 26px;
 }
 
 /* Status renkleri */
-.status-0 {
-    background-color: #cccccc; /* gri */
-}
+.status-0 { background-color: #cccccc; }
+.status-1 { background-color: #2b8122; color: #fff; }
+.status-2 { background-color: #e61a0b; color: #fff; }
 
-.status-1 {
-    background-color: #2b8122; /* yeşil */
-    color: #ffffff;
-}
-
-.status-2 {
-    background-color: #e61a0b; /* kırmızı */
-    color: #ffffff;
-}
-
-/* Admin preview: tıklanamaz */
+/* Preview hücreleri tıklanamaz */
 .assign-availability-preview .cell {
     cursor: default;
 }
 
-/* ===================================== */
-/*      WEEK SELECTION SIDEBAR (ADMIN)   */
-/* ===================================== */
-
-.availability-sidebar {
-    background-color: #f5f6f8;     /* NEW */
-    border: 1px solid #ddd;        /* NEW */
-    border-radius: 6px;            /* NEW */
-    padding: 12px;                 /* NEW */
-    width: 140px;
-}
-
-.availability-sidebar h4 {
-    margin-top: 0;
-    margin-bottom: 10px;
-    font-size: 1rem;
-    text-align: center;
-    color: #333;
-}
-
-
+/* Varsayılan (inaktif) – MAVİ */
 .availability-sidebar .btn {
-    display: block;           /* NEW: inline-block yerine */
-    width: 100%;              /* NEW: hepsi aynı genişlik */
-    padding: 8px 16px;
-    margin-bottom: 10px;      /* NEW: aralık */
-    text-decoration: none;
-    border-radius: 4px;
+    display: block;
+    width: 100%;
+    padding: 10px 16px;        /* ⬅️ biraz büyüttük */
+    font-size: 0.95rem;       /* ⬅️ yazı biraz daha büyük */
+    font-weight: 600;         /* ⬅️ daha dolgun */
     background-color: #007bff;
-    border-color: #007bff ;
-    color: #fff;
-    transition: 0.3s ease;
-    text-align: center;       /* NEW */
-    box-sizing: border-box;   /* NEW: padding genişliği bozmaz */
+    border: none;
+    color: #ffffff;
+    border-radius: 6px;       /* ⬅️ daha modern */
+    margin-bottom: 12px;      /* ⬅️ aralık arttı */
+    cursor: pointer;
+    transition: all 0.25s ease;
 }
 
-
-/* Aktif hafta vurgusu */
-.availability-sidebar .btn.active {
-    background-color: #28a745;     /* NEW */
-    border-color: #28a745;         /* NEW */
-    box-shadow: none;              /* NEW */
-}
-
-/* Hover efekti */
+/* Hover (inaktif) */
 .availability-sidebar .btn:hover {
-    opacity: 0.9;                  /* NEW */
+    background-color: #0056b3;
 }
 
-/* Son butonda boşluk olmasın */
+/* Aktif – YEŞİL */
+.availability-sidebar .btn.active {
+    background-color: #28a745;
+    border-color: #28a745;
+    box-shadow: none;
+}
 
-
+/* Aktif hover */
+.availability-sidebar .btn.active:hover {
+    background-color: #1e7c33;
+}
 
 /* ===================================== */
-/*       COLLAPSIBLE SECTIONS (DETAIL)    */
+/*       COLLAPSIBLE SECTIONS             */
 /* ===================================== */
 
 .section-box {
@@ -280,20 +257,8 @@ textarea {
     font-weight: bold;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
-/* Ok ikonları */
-.section-header::after {
-    content: "▼";
-    font-size: 0.9rem;
-}
-
-.section-header.active::after {
-    content: "▲";
-}
-
-/* İçerik */
 .section-body {
     display: none;
     padding: 10px;
@@ -318,7 +283,6 @@ textarea {
 }
 
 @media (max-width: 600px) {
-
     .admin-container {
         padding: 15px;
     }
