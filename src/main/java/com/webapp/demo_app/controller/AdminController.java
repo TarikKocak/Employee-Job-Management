@@ -7,6 +7,7 @@ import com.webapp.demo_app.model.enums.Tur;
 import com.webapp.demo_app.model.enums.UcretTahsilTipi;
 import com.webapp.demo_app.repository.EmployeeRepository;
 import com.webapp.demo_app.service.AvailabilityService;
+import com.webapp.demo_app.service.EmployeeService;
 import com.webapp.demo_app.service.JobService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,14 +21,14 @@ import java.util.Map;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final EmployeeRepository employeeRepository;
+    private final EmployeeService employeeService;
     private final JobService jobService;
     private final AvailabilityService availabilityService;
 
-    public AdminController(EmployeeRepository employeeRepository,
+    public AdminController(EmployeeService employeeService,
                            JobService jobService,
                            AvailabilityService availabilityService) {
-        this.employeeRepository = employeeRepository;
+        this.employeeService = employeeService;
         this.jobService = jobService;
         this.availabilityService = availabilityService;
     }
@@ -46,17 +47,15 @@ public class AdminController {
     ) {
 
         // 🔹 Dropdown için HER ZAMAN tüm employee’ler
-        List<Employee> allEmployees = employeeRepository.findAll();
+        List<Employee> allEmployees = employeeService.getAll();
 
         // 🔹 Filtreli employee listesi (SOL TABLO)
         List<Employee> filteredEmployees;
 
         if (employeeId != null) {
-            filteredEmployees = employeeRepository.findById(employeeId)
-                    .map(List::of)
-                    .orElse(List.of());
+            filteredEmployees = List.of(employeeService.getById(employeeId));
         } else if (title != null) {
-            filteredEmployees = employeeRepository.findByTitle(title);
+            filteredEmployees = employeeService.getByTitle(title);
         } else {
             filteredEmployees = allEmployees;
         }
@@ -107,7 +106,7 @@ public class AdminController {
 
     @PostMapping("/add-employee")
     public String saveEmployee(@ModelAttribute Employee employee) {
-        employeeRepository.save(employee);
+        employeeService.save(employee);
         return "redirect:/admin/employees";
     }
 
@@ -115,7 +114,7 @@ public class AdminController {
     // Viewing employee details
     @GetMapping("/employees/{id}")
     public String showEmployee(@PathVariable Long id, Model model) {
-        Employee employee = employeeRepository.findById(id).orElse(null);
+        Employee employee = employeeService.getById(id);
 
         model.addAttribute("employee", employee);
         model.addAttribute("currentJobs", employee.getMevcutIsler());
@@ -126,8 +125,7 @@ public class AdminController {
 
     @GetMapping("/employees/{id}/assign-job")
     public String showAssignJob(@PathVariable Long id, Model model) {
-        Employee employee = employeeRepository.findById(id).
-                orElseThrow(() -> new RuntimeException("Employee not found"));
+        Employee employee = employeeService.getById(id);
 
         // ==========
         //  JOB FORM

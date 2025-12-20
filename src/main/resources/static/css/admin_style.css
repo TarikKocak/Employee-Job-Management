@@ -130,7 +130,6 @@ textarea {
 /* ===================================== */
 /*      ASSIGN JOB PAGE – FLEX LAYOUT     */
 /* ===================================== */
-/* ⚠️ BU KISIM ESKİ HALİYLE KORUNDU */
 
 .admin-assign-layout {
     display: flex;
@@ -138,12 +137,12 @@ textarea {
     align-items: flex-start;
 }
 
-/* Sol taraf: form (SABİT GENİŞLİK) */
+/* Sol taraf */
 .assign-form {
     flex: 0 0 380px;
 }
 
-/* Sağ taraf: availability */
+/* Sağ taraf */
 .assign-availability-preview {
     flex: 1;
     background-color: #fafafa;
@@ -154,7 +153,21 @@ textarea {
 /* ===================================== */
 /*          AVAILABILITY PREVIEW          */
 /* ===================================== */
+.admin-availability-layout {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+}
 
+/* Sol kolon */
+.admin-section {
+    flex: 1;
+}
+
+/* Sağ kolon */
+.availability-section {
+    flex: 1.4;
+}
 .availability-layout {
     display: flex;
     gap: 15px;
@@ -207,65 +220,122 @@ textarea {
     cursor: default;
 }
 
-/* Varsayılan (inaktif) – MAVİ */
+/* Varsayılan (mavi) */
 .availability-sidebar .btn {
-    display: block;
-    width: 100%;
-    padding: 10px 16px;        /* ⬅️ biraz büyüttük */
-    font-size: 0.95rem;       /* ⬅️ yazı biraz daha büyük */
-    font-weight: 600;         /* ⬅️ daha dolgun */
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    font-weight: 600;
     background-color: #007bff;
     border: none;
     color: #ffffff;
-    border-radius: 6px;       /* ⬅️ daha modern */
-    margin-bottom: 12px;      /* ⬅️ aralık arttı */
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.25s ease;
 }
 
-/* Hover (inaktif) */
 .availability-sidebar .btn:hover {
     background-color: #0056b3;
 }
 
-/* Aktif – YEŞİL */
 .availability-sidebar .btn.active {
     background-color: #28a745;
-    border-color: #28a745;
-    box-shadow: none;
 }
 
-/* Aktif hover */
 .availability-sidebar .btn.active:hover {
     background-color: #1e7c33;
 }
+.availability-table .availability-level-0 {
+    background-color: #cccccc;
+}
 
+/* 1 kişi (mevcut senin yeşilin) */
+.availability-table .availability-level-1 {
+    background-color: #40c333;
+    color: #ffffff;
+}
+
+/* 2 kişi */
+.availability-table .availability-level-2 {
+    background-color: #2a8022;
+    color: #ffffff;
+}
+
+/* 3 kişi */
+.availability-table .availability-level-3 {
+    background-color: #1d5a18;
+    color: #ffffff;
+}
+
+/* 4+ kişi */
+.availability-table .availability-level-4 {
+    background-color: #154512;
+    color: #ffffff;
+}
 /* ===================================== */
 /*       COLLAPSIBLE SECTIONS             */
 /* ===================================== */
 
+
+/* Section container */
 .section-box {
-    margin-top: 20px;
+    margin: 20px 0;
+    border-radius: 8px;
+    overflow: hidden; /* NEW: animasyon için gerekli */
     border: 1px solid #ddd;
-    border-radius: 6px;
 }
 
+/* Section header */
 .section-header {
-    padding: 10px;
-    background-color: #f0f0f0;
-    cursor: pointer;
+    background: #ececec;
+    padding: 14px 18px;
+    font-size: 1.1rem;
     font-weight: bold;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between;  /* NEW */
+    align-items: center;             /* NEW */
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease; /* NEW */
 }
 
+.section-header:hover {
+    background: #dcdcdc; /* NEW */
+}
+
+/* Arrow animation */
+.section-header .arrow {
+    font-size: 18px;
+    transition: transform 0.3s ease; /* NEW */
+}
+
+/* Header açıkken değişen görünüm */
+.section-header.open {
+    background: #d6d6d6;  /* NEW */
+}
+
+.section-header.open .arrow {
+    transform: rotate(180deg);  /* NEW */
+}
+
+/* Section body - animasyonlu aç/kapa */
 .section-body {
-    display: none;
-    padding: 10px;
+    max-height: 0;                 /* NEW: kapalı halde */
+    overflow: hidden;              /* NEW */
+    transition: max-height 0.35s ease; /* NEW: animasyon */
+    background: #fafafa;
+    padding: 0 18px;               /* NEW but invisible when closed */
 }
 
-.section-body.active {
-    display: block;
+/* İçerik görünürken padding gelsin */
+.section-body.open {
+    padding: 18px; /* NEW */
+    max-height: 1000px; /* NEW: yeterince büyük bir değer */
+}
+
+/* Tablo uyumu */
+.section-body table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
 /* ===================================== */
@@ -299,4 +369,83 @@ textarea {
     .availability-sidebar {
         width: 100%;
     }
+}
+
+/* ===================================== */
+/*   ADDED FROM EXTRACTED ADMIN CSS      */
+/* ===================================== */
+
+.container {
+    width: 95%;
+    max-width: 1100px;
+    margin: 20px auto;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-sizing: border-box;
+}
+
+.page-title {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.button-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    text-decoration: none;
+    border-radius: 4px;
+    border: 1px solid #007bff;
+    background-color: #007bff;
+    color: #fff;
+    transition: 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.admin-card {
+    background: #fafafa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.btn-secondary {
+    border-color: #28a745;
+    background-color: #28a745;
+    margin-top: 10px;
+}
+
+.btn-secondary:hover {
+    border-color: #1e7c33;
+    background-color: #1e7c33;
+}
+
+.filter-bar {
+    margin-bottom: 20px;
+}
+
+.filter-select {
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 0.95rem;
+    background-color: #fff;
 }
