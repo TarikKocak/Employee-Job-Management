@@ -107,7 +107,7 @@ It supports **role-based usage** (Admin & Employee) and provides an advanced **a
 ## 👨‍💻 Author
 
 **Tarık Koçak**  
-Software Engineer 
+Software Engineer <br />
 Backend & Full-Stack Development Enthusiast
 
 ---
