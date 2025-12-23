@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All Employees</title>
+    <link rel="stylesheet" th:href="@{/css/admin_style.css}">
+</head>
+
+<body>
+
+<div class="container">
+    <h1 class="page-title">All Employees</h1>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Title</th>
+            <th>İsim</th>
+            <th>Detay</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr th:each="emp : ${employees}">
+            <td th:text="${emp.title}"></td>
+            <td th:text="${emp.name}"></td>
+            <td>
+                <a th:href="@{'/admin/employees/' + ${emp.id} + '?returnUrl=/admin/all-employees'}"
+                   class="btn btn-small btn-primary">
+                    Detay
+                </a>
+
+                <a th:href="@{|/admin/employees/${emp.id}/assign-job|}"
+                   class="btn btn-small btn-success">
+                    Assign Job
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <a href="/admin/dashboard" class="btn btn-secondary">⬅ Geri Dön</a>
+    </div>
+</div>
+
+</body>
+</html>

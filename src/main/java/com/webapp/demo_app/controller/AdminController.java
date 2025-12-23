@@ -5,7 +5,6 @@ import com.webapp.demo_app.model.*;
 import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import com.webapp.demo_app.model.enums.Tur;
 import com.webapp.demo_app.model.enums.UcretTahsilTipi;
-import com.webapp.demo_app.repository.EmployeeRepository;
 import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.EmployeeService;
 import com.webapp.demo_app.service.JobService;
@@ -39,8 +38,18 @@ public class AdminController {
         return "admin/admin-dashboard";
     }
 
+    @GetMapping("/all-employees")
+    public String listAllEmployees(Model model) {
+
+        List<Employee> employees = employeeService.getAll();
+
+        model.addAttribute("employees", employees);
+
+        return "admin/admin-employee-list";
+    }
+
     @GetMapping("/employees")
-    public String listEmployees(
+    public String listFilteredEmployees(
             @RequestParam(required = false) EmployeeeTitle title,
             @RequestParam(required = false) Long employeeId,
             Model model
@@ -93,7 +102,7 @@ public class AdminController {
         model.addAttribute("selectedTitle", title);
         model.addAttribute("selectedEmployeeId", employeeId);
 
-        return "admin/admin-employees-list";
+        return "admin/admin-employees-list-filtered";
     }
 
     // To access the employee creation form
@@ -113,12 +122,16 @@ public class AdminController {
 
     // Viewing employee details
     @GetMapping("/employees/{id}")
-    public String showEmployee(@PathVariable Long id, Model model) {
+    public String showEmployee(@PathVariable Long id,
+                               @RequestParam(required = false, defaultValue = "/admin/employees") String returnUrl,
+                               Model model) {
         Employee employee = employeeService.getById(id);
 
         model.addAttribute("employee", employee);
         model.addAttribute("currentJobs", employee.getMevcutIsler());
         model.addAttribute("completedJobs", employee.getTamamlananIsler());
+        model.addAttribute("returnUrl", returnUrl);
+
 
         return "admin/admin-employees-details";
     }

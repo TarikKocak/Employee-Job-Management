@@ -3,24 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <title>Employee Details</title>
-    <link rel="stylesheet" th:href="@{/css/admin_style.css}">
+
+    <style>
+        /* =========================
+           ADMIN BASE
+        ========================= */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f3f5f7;
+            color: #1f2937;
+        }
+
+        .admin-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .admin-btn {
+            display: inline-block;
+            margin-bottom: 24px;
+            padding: 10px 16px;
+            background: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .admin-btn:hover {
+            background: #1d4ed8;
+        }
+
+        /* =========================
+           SECTION (ACCORDION)
+        ========================= */
+        .section-box {
+            background: white;
+            border-radius: 14px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 18px 22px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(180deg, #fafafa, #f4f4f4);
+            user-select: none;
+        }
+
+        .section-header:hover {
+            background: #eef2ff;
+        }
+
+        .arrow {
+            transition: transform 0.25s ease;
+            font-size: 14px;
+        }
+
+        .section-header.open .arrow {
+            transform: rotate(180deg);
+        }
+
+        /* =========================
+           COLLAPSIBLE BODY
+        ========================= */
+        .section-body {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.25s ease;
+            padding: 0 22px;
+        }
+
+        .section-body.open {
+            max-height: 1000px; /* large enough */
+            padding: 18px 22px 22px;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+        }
+
+        .admin-table thead {
+            background: #f8fafc;
+        }
+
+        .admin-table th,
+        .admin-table td {
+            text-align: left;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .admin-table th {
+            font-size: 13px;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .admin-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .admin-table td {
+            font-size: 14px;
+        }
+
+        /* =========================
+           EMPTY STATE (OPTIONAL)
+        ========================= */
+        .empty {
+            padding: 20px;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+        @media (max-width: 768px) {
+            .admin-table th:nth-child(3),
+            .admin-table td:nth-child(3) {
+                display: none;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
 <div class="admin-container">
 
     <h1 th:text="'Employee: ' + ${employee.name}"></h1>
 
-    <a th:href="@{/admin/employees}" class="admin-btn">Back to List</a>
+    <a th:href="${returnUrl}" class="admin-btn">⬅ Back</a>
 
-    <!-- CURRENT JOBS SECTION -->
+    <!-- CURRENT JOBS -->
     <div class="section-box">
         <div class="section-header" onclick="toggleSection(this)">
             Current Jobs
             <span class="arrow">▼</span>
         </div>
-        <div class="section-body">
 
+        <div class="section-body">
             <table class="admin-table">
                 <thead>
                 <tr>
@@ -30,29 +173,26 @@
                     <th>Price</th>
                 </tr>
                 </thead>
-
                 <tbody>
                 <tr th:each="job : ${currentJobs}">
-                    <td th:text="${job.isTanimi}">Job Name</td>
-                    <td th:text="${job.tarih}">2025-01-01</td>
-                    <td th:text="${job.isAdresi}">Address</td>
-                    <td th:text="${job.ucret}">100</td>
+                    <td th:text="${job.isTanimi}"></td>
+                    <td th:text="${job.tarih}"></td>
+                    <td th:text="${job.isAdresi}"></td>
+                    <td th:text="${job.ucret}"></td>
                 </tr>
                 </tbody>
-
             </table>
-
         </div>
     </div>
 
-    <!-- COMPLETED JOBS SECTION -->
+    <!-- COMPLETED JOBS -->
     <div class="section-box">
         <div class="section-header" onclick="toggleSection(this)">
             Completed Jobs
             <span class="arrow">▼</span>
         </div>
-        <div class="section-body">
 
+        <div class="section-body">
             <table class="admin-table">
                 <thead>
                 <tr>
@@ -62,18 +202,15 @@
                     <th>Price</th>
                 </tr>
                 </thead>
-
                 <tbody>
                 <tr th:each="job : ${completedJobs}">
-                    <td th:text="${job.tanimi}">Job Name</td>
-                    <td th:text="${job.tarih}">2025-01-01</td>
-                    <td th:text="${job.isAdresi}">address</td>
-                    <td th:text="${job.ucret}">100</td>
+                    <td th:text="${job.tanimi}"></td>
+                    <td th:text="${job.tarih}"></td>
+                    <td th:text="${job.isAdresi}"></td>
+                    <td th:text="${job.ucret}"></td>
                 </tr>
                 </tbody>
-
             </table>
-
         </div>
     </div>
 
@@ -81,11 +218,12 @@
 
 <script>
     function toggleSection(header) {
-        const body = header.nextElementSibling;
-
         header.classList.toggle("open");
-        body.classList.toggle("open");
+        header.nextElementSibling.classList.toggle("open");
     }
+
+    // Optional: open first section by default
+    // document.querySelector(".section-header")?.click();
 </script>
 
 </body>
