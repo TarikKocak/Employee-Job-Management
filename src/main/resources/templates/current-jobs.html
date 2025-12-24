@@ -4,7 +4,185 @@
 <head>
     <meta charset="UTF-8">
     <title>Mevcut İşler</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- <link rel="stylesheet" th:href="@{/css/style.css}"> -->
+    <style>
+        /* =========================
+   GLOBAL
+========================= */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f6f7f9;
+            color: #111827;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        /* =========================
+           PAGE TITLE
+        ========================= */
+        .container h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #111827;
+            margin-bottom: 20px;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* =========================
+           TABLE WRAPPER
+        ========================= */
+        .table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 10px 28px rgba(0,0,0,0.08);
+            font-size: 14px;
+        }
+
+        /* =========================
+           TABLE HEADER
+        ========================= */
+        .table thead {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* =========================
+           TABLE BODY
+        ========================= */
+        .table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Hover */
+        .table tbody tr:hover {
+            background: #f1f5ff;
+        }
+
+        /* =========================
+           ACTION COLUMN (CURRENT JOBS)
+        ========================= */
+        .table td:last-child {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* =========================
+           ACTION BUTTONS
+        ========================= */
+        .btn-small {
+            padding: 8px 14px;
+            font-size: 13px;
+            border-radius: 8px;
+            font-weight: 700;
+        }
+
+        /* Edit */
+        .btn-small:not(.btn-success) {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .btn-small:not(.btn-success):hover {
+            background: #d1d5db;
+        }
+
+        /* Submit */
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(34,197,94,0.35);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 22px rgba(34,197,94,0.45);
+        }
+        /* =========================
+           ALERT MESSAGE
+        ========================= */
+        .alert {
+            background: #fef2f2;            /* soft red */
+            color: #991b1b;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            box-shadow: 0 8px 22px rgba(220, 38, 38, 0.18);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Optional left indicator */
+        .alert::before {
+            content: "⚠";
+            font-size: 18px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+        @media (max-width: 1100px) {
+            .table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+    </style>
 </head>
 <body>
 <div class="container">
@@ -13,10 +191,9 @@
     <a th:href="@{|/employees/${employeeId}/dashboard|}" class="btn btn-secondary">Geri Dön</a>
 
     <!-- Hata mesajı varsa küçük popup (alert) -->
-    <div th:if="${errorMessage != null && !#strings.isEmpty(errorMessage)}">
-        <script th:inline="javascript">
-            alert([[${errorMessage}]]);
-        </script>
+    <div th:if="${errorMessage != null && !#strings.isEmpty(errorMessage)}"
+         class="alert"
+         th:text="${errorMessage}">
     </div>
 
     <table class="table">

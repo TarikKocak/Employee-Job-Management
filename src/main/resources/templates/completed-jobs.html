@@ -4,7 +4,133 @@
 <head>
     <meta charset="UTF-8">
     <title>Tamamlanan İşler</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- <link rel="stylesheet" th:href="@{/css/style.css}"> -->
+    <style>
+        /* =========================
+           GLOBAL
+        ========================= */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+        .container {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        /* =========================
+           TITLE
+        ========================= */
+        .container h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 24px;
+        }
+
+        /* =========================
+           BACK BUTTON
+        ========================= */
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* =========================
+           TABLE CARD
+        ========================= */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            font-size: 14px;
+        }
+
+        /* =========================
+           TABLE HEADER
+        ========================= */
+        .table thead {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .table thead th {
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* =========================
+           TABLE BODY
+        ========================= */
+        .table tbody td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Zebra rows */
+        .table tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        /* Hover */
+        .table tbody tr:hover {
+            background: #eef2ff;
+        }
+
+        /* =========================
+           STATUS COLORS (EVET / HAYIR)
+        ========================= */
+        .table td {
+            font-weight: 500;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+        @media (max-width: 1000px) {
+            .table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+    </style>
 </head>
 <body>
 <div class="container">

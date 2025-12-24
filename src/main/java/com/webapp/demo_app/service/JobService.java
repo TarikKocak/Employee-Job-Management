@@ -72,7 +72,7 @@ public class JobService {
                 mevcutIs.getKartVerildi() == null ||
                 mevcutIs.getYorumKartiVerildi() == null ||
                 mevcutIs.getFotoAtildi() == null) {
-            throw new IncompleteJobException("Lütfen tüm alanları doldurunuz.");
+            throw new IncompleteJobException("Lütfen gödermek istediğiniz işin tüm alanlarını doldurunuz.");
         }
 
         // Create data for TamamlananIs
