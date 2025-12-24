@@ -52,41 +52,71 @@ public class AdminController {
     public String listFilteredEmployees(
             @RequestParam(required = false) EmployeeeTitle title,
             @RequestParam(required = false) Long employeeId,
+            @RequestParam(required = false) Integer minHours,
             Model model
     ) {
+
+        // normalize minHours
+        if (minHours != null && minHours < 1) {
+            minHours = null;
+        }
 
         // 🔹 Dropdown için HER ZAMAN tüm employee’ler
         List<Employee> allEmployees = employeeService.getAll();
 
-        // 🔹 Filtreli employee listesi (SOL TABLO)
+        // 🔹 Base filtering (title / employee)
         List<Employee> filteredEmployees;
 
         if (employeeId != null) {
-            filteredEmployees = List.of(employeeService.getById(employeeId));
+            filteredEmployees =
+                    List.of(employeeService.getById(employeeId));
         } else if (title != null) {
-            filteredEmployees = employeeService.getByTitle(title);
+            filteredEmployees =
+                    employeeService.getByTitle(title);
         } else {
             filteredEmployees = allEmployees;
+        }
+
+        // 🔥 APPLY MIN ADJACENT HOURS FILTER
+        if (minHours != null) {
+            filteredEmployees =
+                    availabilityService.filterEmployeesByMinAdjacentHours(
+                            filteredEmployees, minHours
+                    );
         }
 
         model.addAttribute("employees", filteredEmployees);
         model.addAttribute("allEmployees", allEmployees);
 
-        // === AVAILABILITY (FILTERED) ===
-        LocalDate week1Monday = availabilityService.getNextWeekMonday();
-        LocalDate week2Monday = week1Monday.plusWeeks(1);
+        // ==================================================
+        // AVAILABILITY OVERLAY (MIN HOURS AWARE)
+        // ==================================================
+
+        LocalDate week1Monday =
+                availabilityService.getNextWeekMonday();
+        LocalDate week2Monday =
+                week1Monday.plusWeeks(1);
 
         Map<String, Map<String, Integer>> week1Overlap =
                 availabilityService.getOverlappingAvailabilityForWeek(
-                        week1Monday, filteredEmployees);
+                        week1Monday,
+                        filteredEmployees,
+                        minHours
+                );
 
         Map<String, Map<String, Integer>> week2Overlap =
                 availabilityService.getOverlappingAvailabilityForWeek(
-                        week2Monday, filteredEmployees);
+                        week2Monday,
+                        filteredEmployees,
+                        minHours
+                );
 
-        model.addAttribute("hours", availabilityService.getHours());
+        model.addAttribute("hours",
+                availabilityService.getHours());
+
         model.addAttribute("week1Dates",
                 availabilityService.getWeekDates(week1Monday));
+
         model.addAttribute("week2Dates",
                 availabilityService.getWeekDates(week2Monday));
 
@@ -95,12 +125,14 @@ public class AdminController {
 
         model.addAttribute("week1AvailableCountMap",
                 availabilityService.buildAvailableCountMap(week1Overlap));
+
         model.addAttribute("week2AvailableCountMap",
                 availabilityService.buildAvailableCountMap(week2Overlap));
 
-        // 🔹 Filtrelerin HTML’de seçili kalması için
+        // 🔹 Keep filters selected in UI
         model.addAttribute("selectedTitle", title);
         model.addAttribute("selectedEmployeeId", employeeId);
+        model.addAttribute("selectedMinHours", minHours);
 
         return "admin/admin-employees-list-filtered";
     }

@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -36,9 +38,12 @@ public class MevcutIs {
     private String isAdresi;
     private String telNo;
     private String isTanimi;
-    private LocalDate tarih;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate tarih;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.TIME)
     private LocalTime baslangicSaati;
+
     private Double ucret;
 
     @Enumerated(EnumType.STRING)

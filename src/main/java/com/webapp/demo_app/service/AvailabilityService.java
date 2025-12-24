@@ -212,6 +212,7 @@ public class AvailabilityService {
 
     }
 
+    /*
     public Map<String, Map<String, Integer>>
     getOverlappingAvailabilityForWeek(LocalDate monday) {
 
@@ -252,6 +253,8 @@ public class AvailabilityService {
         return result;
     }
 
+     */
+
     public Map<String, Integer>
     buildAvailableCountMap(Map<String, Map<String, Integer>> overlapMap) {
 
@@ -279,33 +282,45 @@ public class AvailabilityService {
     public Map<String, Map<String, Integer>>
     getOverlappingAvailabilityForWeek(
             LocalDate monday,
-            List<Employee> employees
+            List<Employee> employees,
+            Integer minHours
     ) {
         LocalDate end = monday.plusDays(6);
-        return buildOverlappingAvailability(monday, end, employees);
+        return buildOverlappingAvailability(
+                monday, end, employees, minHours);
     }
-
 
     private Map<String, Map<String, Integer>>
     buildOverlappingAvailability(
             LocalDate monday,
             LocalDate end,
-            List<Employee> employees
+            List<Employee> employees,
+            Integer minHours
     ) {
-
         List<AvailabilitySlot> slots =
-                availabilitySlotRepository.findByDateBetween(monday, end);
+                availabilitySlotRepository
+                        .findByDateBetween(monday, end);
 
         // employeeId_date_hour -> status
         Map<String, Integer> slotIndex = new HashMap<>();
         for (AvailabilitySlot slot : slots) {
-            String key = slot.getEmployee().getId()
-                    + "_" + slot.getDate()
-                    + "_" + slot.getHour();
+            String key =
+                    slot.getEmployee().getId() + "_" +
+                            slot.getDate() + "_" +
+                            slot.getHour();
             slotIndex.put(key, slot.getStatus());
         }
 
         Map<String, Map<String, Integer>> result = new HashMap<>();
+
+        Set<String> validEmployeeDays = null;
+
+        if (minHours != null) {
+            validEmployeeDays =
+                    findValidEmployeeDays(
+                            employees, monday, end, minHours, slotIndex
+                    );
+        }
 
         for (Employee emp : employees) {
             for (LocalDate d = monday; !d.isAfter(end); d = d.plusDays(1)) {
@@ -314,7 +329,13 @@ public class AvailabilityService {
                     String cellKey = d + "_" + hour;
                     String empKey = emp.getId() + "_" + d + "_" + hour;
 
-                    int status = slotIndex.getOrDefault(empKey, 0);
+                    boolean validDay =
+                            minHours == null ||
+                                    validEmployeeDays.contains(emp.getId() + "_" + d);
+
+                    int status = validDay
+                            ? slotIndex.getOrDefault(empKey, 0)
+                            : 0;
 
                     result
                             .computeIfAbsent(cellKey, k -> new LinkedHashMap<>())
@@ -325,5 +346,97 @@ public class AvailabilityService {
 
         return result;
     }
+
+
+    //-----------------//
+    // MIN TIME FILTER //
+    //-----------------//
+
+    public List<Employee> filterEmployeesByMinAdjacentHours(
+            List<Employee> employees,
+            int minHours
+    ) {
+        LocalDate start = getNextWeekMonday();
+        LocalDate end = start.plusDays(13); // 2 weeks (matches UI)
+
+        List<AvailabilitySlot> slots =
+                availabilitySlotRepository.findByDateBetween(start, end);
+
+        // employeeId -> date -> list of available hours
+        Map<Long, Map<LocalDate, List<Integer>>> map = new HashMap<>();
+
+        for (AvailabilitySlot slot : slots) {
+            if (slot.getStatus() != 1) continue;
+
+            map
+                    .computeIfAbsent(slot.getEmployee().getId(), k -> new HashMap<>())
+                    .computeIfAbsent(slot.getDate(), d -> new ArrayList<>())
+                    .add(slot.getHour());
+        }
+
+        return employees.stream()
+                .filter(emp ->
+                        hasMinAdjacentHours(map.get(emp.getId()), minHours)
+                )
+                .toList();
+    }
+
+    private boolean hasMinAdjacentHours(
+            Map<LocalDate, List<Integer>> byDate,
+            int minHours
+    ) {
+        if (byDate == null) return false;
+
+        for (List<Integer> hours : byDate.values()) {
+            Collections.sort(hours);
+
+            int count = 1;
+            for (int i = 1; i < hours.size(); i++) {
+                if (hours.get(i) == hours.get(i - 1) + 1) {
+                    count++;
+                    if (count >= minHours) return true;
+                } else {
+                    count = 1;
+                }
+            }
+        }
+        return false;
+    }
+
+    private Set<String> findValidEmployeeDays(
+            List<Employee> employees,
+            LocalDate monday,
+            LocalDate end,
+            int minHours,
+            Map<String, Integer> slotIndex
+    ) {
+        Set<String> validDays = new HashSet<>();
+
+        for (Employee emp : employees) {
+            for (LocalDate d = monday; !d.isAfter(end); d = d.plusDays(1)) {
+
+                int maxBlock = 0;
+                int current = 0;
+
+                for (int hour = 7; hour <= 16; hour++) {
+                    String key = emp.getId() + "_" + d + "_" + hour;
+
+                    if (slotIndex.getOrDefault(key, 0) == 1) {
+                        current++;
+                        maxBlock = Math.max(maxBlock, current);
+                    } else {
+                        current = 0;
+                    }
+                }
+
+                if (maxBlock >= minHours) {
+                    // employeeId_date
+                    validDays.add(emp.getId() + "_" + d);
+                }
+            }
+        }
+        return validDays;
+    }
+
 
 }

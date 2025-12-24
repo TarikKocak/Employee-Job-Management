@@ -102,6 +102,8 @@ public class JobService {
 
         Employee employee = employeeRepository.findById(employeeId).orElseThrow();
 
+        job.setId(null);
+
         job.setEmployee(employee);
 
         //Writenoly fields should be null for employee
