@@ -169,6 +169,7 @@
                 <tr>
                     <th>Job Description</th>
                     <th>Date</th>
+                    <th>Hour</th>
                     <th>Address</th>
                     <th>Price</th>
                 </tr>
@@ -177,6 +178,7 @@
                 <tr th:each="job : ${currentJobs}">
                     <td th:text="${job.isTanimi}"></td>
                     <td th:text="${job.tarih}"></td>
+                    <td th:text="${job.baslangicSaati}"></td>
                     <td th:text="${job.isAdresi}"></td>
                     <td th:text="${job.ucret}"></td>
                 </tr>

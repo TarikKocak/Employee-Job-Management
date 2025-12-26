@@ -31,4 +31,6 @@ public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySl
             LocalDate start,
             LocalDate end
     );
+
+    List<AvailabilitySlot> findByDateBetweenAndStatus(LocalDate start, LocalDate end, Integer status);
 }

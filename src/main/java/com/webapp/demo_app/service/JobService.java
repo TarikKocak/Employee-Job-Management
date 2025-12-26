@@ -1,7 +1,10 @@
 package com.webapp.demo_app.service;
 
+import com.webapp.demo_app.dto.JobCellDTO;
+import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.MevcutIs;
 import com.webapp.demo_app.model.TamamlananIs;
+import com.webapp.demo_app.repository.AvailabilitySlotRepository;
 import com.webapp.demo_app.repository.MevcutIsRepository;
 import com.webapp.demo_app.repository.TamamlananIsRepository;
 import com.webapp.demo_app.repository.EmployeeRepository;
@@ -10,7 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class JobService {
@@ -20,15 +24,18 @@ public class JobService {
     private final TamamlananIsRepository tamamlananIsRepository;
     private final EmployeeRepository employeeRepository;
     private final AvailabilityService availabilityService;
+    private final AvailabilitySlotRepository availabilitySlotRepository;
 
     public JobService(MevcutIsRepository mevcutIsRepository,
                       TamamlananIsRepository tamamlananIsRepository,
                       EmployeeRepository employeeRepository,
-                      AvailabilityService availabilityService) {
+                      AvailabilityService availabilityService,
+                      AvailabilitySlotRepository availabilitySlotRepository) {
         this.mevcutIsRepository = mevcutIsRepository;
         this.tamamlananIsRepository = tamamlananIsRepository;
         this.employeeRepository = employeeRepository;
         this.availabilityService = availabilityService;
+        this.availabilitySlotRepository = availabilitySlotRepository;
     }
 
     public List<MevcutIs> getMevcutIsler(Long employeeId) {
@@ -122,4 +129,56 @@ public class JobService {
                 job.getTahminiSure()
         );
     }
+
+    public Map<String, List<JobCellDTO>>
+    getJobOverlapForWeek(LocalDate monday) {
+
+        LocalDate end = monday.plusDays(6);
+
+        // 1️⃣ occupied slots only
+        List<AvailabilitySlot> occupiedSlots =
+                availabilitySlotRepository
+                        .findByDateBetweenAndStatus(monday, end, 2);
+
+        // 2️⃣ current jobs
+        List<MevcutIs> jobs = mevcutIsRepository.findAll();
+
+        // employeeId_date → job
+        Map<String, MevcutIs> jobIndex = new HashMap<>();
+        for (MevcutIs job : jobs) {
+            String key =
+                    job.getEmployee().getId() + "_" + job.getTarih();
+            jobIndex.put(key, job);
+        }
+
+        // date_hour → list of JobCellDTO
+        Map<String, List<JobCellDTO>> result = new HashMap<>();
+
+        for (AvailabilitySlot slot : occupiedSlots) {
+
+            String cellKey =
+                    slot.getDate() + "_" + slot.getHour();
+
+            String jobKey =
+                    slot.getEmployee().getId() + "_" + slot.getDate();
+
+            MevcutIs job = jobIndex.get(jobKey);
+            if (job == null) continue;
+
+            JobCellDTO dto = new JobCellDTO(
+                    job.getId(),
+                    job.getEmployee().getName(),
+                    slot.getDate(),
+                    slot.getHour()
+            );
+
+            result
+                    .computeIfAbsent(cellKey, k -> new ArrayList<>())
+                    .add(dto);
+        }
+
+        return result;
+    }
+
+
 }

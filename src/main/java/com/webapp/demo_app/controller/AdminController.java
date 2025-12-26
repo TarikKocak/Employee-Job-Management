@@ -1,10 +1,10 @@
 package com.webapp.demo_app.controller;
 
-
 import com.webapp.demo_app.model.*;
 import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import com.webapp.demo_app.model.enums.Tur;
 import com.webapp.demo_app.model.enums.UcretTahsilTipi;
+import com.webapp.demo_app.repository.MevcutIsRepository;
 import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.EmployeeService;
 import com.webapp.demo_app.service.JobService;
@@ -23,13 +23,16 @@ public class AdminController {
     private final EmployeeService employeeService;
     private final JobService jobService;
     private final AvailabilityService availabilityService;
+    private final MevcutIsRepository mevcutIsRepository;
 
     public AdminController(EmployeeService employeeService,
                            JobService jobService,
-                           AvailabilityService availabilityService) {
+                           AvailabilityService availabilityService,
+                           MevcutIsRepository mevcutIsRepository) {
         this.employeeService = employeeService;
         this.jobService = jobService;
         this.availabilityService = availabilityService;
+        this.mevcutIsRepository=mevcutIsRepository;
     }
 
     // Admin dashboard
@@ -221,5 +224,34 @@ public class AdminController {
 
         return "redirect:/admin/employees/" + id;
     }
+
+    @GetMapping("/jobs-overview")
+    public String jobsOverview(Model model) {
+
+        LocalDate week1Monday =
+                availabilityService.getNextWeekMonday();
+        LocalDate week2Monday =
+                week1Monday.plusWeeks(1);
+
+        model.addAttribute("hours",
+                availabilityService.getHours());
+
+        model.addAttribute("week1Dates",
+                availabilityService.getWeekDates(week1Monday));
+        model.addAttribute("week2Dates",
+                availabilityService.getWeekDates(week2Monday));
+
+        model.addAttribute("week1JobMap",
+                jobService.getJobOverlapForWeek(week1Monday));
+
+        model.addAttribute("week2JobMap",
+                jobService.getJobOverlapForWeek(week2Monday));
+
+        model.addAttribute("jobs",
+                mevcutIsRepository.findAll());
+
+        return "admin/admin-jobs-overview";
+    }
+
 
 }

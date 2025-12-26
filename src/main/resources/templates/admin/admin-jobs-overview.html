@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Jobs Overview</title>
+
+    <style>
+        /* =====================================================
+           BASE
+        ===================================================== */
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f3f5f7;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        /* =====================================================
+           MAIN LAYOUT
+        ===================================================== */
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 26px;
+        }
+
+        /* =====================================================
+           CARD
+        ===================================================== */
+        .card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+        }
+
+        /* =====================================================
+           TABLE
+        ===================================================== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            padding: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+            font-weight: 700;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        tbody td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        /* =====================================================
+           BUTTONS
+        ===================================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #111827;
+            margin-top: 16px;
+        }
+
+        /* =====================================================
+           AVAILABILITY GRID
+        ===================================================== */
+        .availability-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .week-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .week-buttons .btn {
+            background: #e0e7ff;
+            color: #1e3a8a;
+        }
+
+        .week-buttons .btn.active {
+            background: #2563EBFF;
+            color: #fff;
+        }
+
+        .grid-wrapper {
+            overflow-x: auto;
+        }
+
+        .grid-table th,
+        .grid-table td {
+            min-width: 85px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .grid-table th:first-child,
+        .grid-table td:first-child {
+            text-align: left;
+            font-weight: 700;
+            background: #f9fafb;
+        }
+
+        /* =====================================================
+           CELLS
+        ===================================================== */
+        .cell {
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .cell-empty {
+            background: #d1d5db;
+        }
+
+        .job-cell {
+            background: #1e7c33;
+            cursor: pointer;
+        }
+
+        .job-cell:hover {
+            filter: brightness(1.1);
+        }
+
+        /* =====================================================
+           TOOLTIP
+        ===================================================== */
+        .tooltip {
+            position: absolute;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            display: none;
+            z-index: 999;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+        @media (max-width: 1200px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>Jobs Overview</h1>
+
+    <div class="admin-layout">
+
+        <!-- =========================
+             LEFT: JOB LIST
+        ========================== -->
+        <div class="card">
+            <h2>Current Jobs</h2>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Employee</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="job : ${jobs}">
+                    <td th:text="${job.id}"></td>
+                    <td th:text="${job.employee.name}"></td>
+                    <td th:text="${job.tarih}"></td>
+                    <td th:text="${job.baslangicSaati}"></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <a href="/admin/dashboard" class="btn btn-secondary">
+                ⬅ Geri Dön
+            </a>
+        </div>
+
+        <!-- =========================
+             RIGHT: JOB GRID
+        ========================== -->
+        <div class="card">
+
+            <div class="availability-header">
+                <h2>Job Schedule</h2>
+
+                <div class="week-buttons">
+                    <button id="btn-week1"
+                            class="btn active"
+                            onclick="showWeek(1)">Next Week</button>
+
+                    <button id="btn-week2"
+                            class="btn"
+                            onclick="showWeek(2)">Following Week</button>
+                </div>
+            </div>
+
+            <div class="grid-wrapper">
+
+                <!-- WEEK 1 -->
+                <table id="week1-table" class="grid-table">
+                    <thead>
+                    <tr>
+                        <th>Hour</th>
+                        <th th:each="d : ${week1Dates}"
+                            th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="hour : ${hours}">
+                        <td th:text="${hour + ':00'}"></td>
+
+                        <td th:each="d : ${week1Dates}"
+                            th:with="
+                                key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour},
+                                jobMap=${week1JobMap.get(key)}
+                            "
+                            th:class="|cell ${jobMap != null ? 'job-cell' : 'cell-empty'}|"
+                            th:attr="data-key=${key}"
+                            onmouseenter="showTooltip(event)"
+                            onmouseleave="hideTooltip()">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- WEEK 2 -->
+                <table id="week2-table" class="grid-table" style="display:none;">
+                    <thead>
+                    <tr>
+                        <th>Hour</th>
+                        <th th:each="d : ${week2Dates}"
+                            th:text="${#temporals.format(d,'EEE dd.MM')}"></th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="hour : ${hours}">
+                        <td th:text="${hour + ':00'}"></td>
+
+                        <td th:each="d : ${week2Dates}"
+                            th:with="
+                                key=${#temporals.format(d,'yyyy-MM-dd') + '_' + hour},
+                                jobMap=${week2JobMap.get(key)}
+                            "
+                            th:class="|cell ${jobMap != null ? 'job-cell' : 'cell-empty'}|"
+                            th:attr="data-key=${key}"
+                            onmouseenter="showTooltip(event)"
+                            onmouseleave="hideTooltip()">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="tooltip" class="tooltip"></div>
+</div>
+<script th:inline="javascript">
+    const week1Data = [[${week1JobMap}]];
+    const week2Data = [[${week2JobMap}]];
+    let activeData = week1Data;
+
+    function showWeek(w) {
+        document.getElementById("week1-table").style.display = w === 1 ? "" : "none";
+        document.getElementById("week2-table").style.display = w === 2 ? "" : "none";
+
+        document.getElementById("btn-week1").classList.toggle("active", w === 1);
+        document.getElementById("btn-week2").classList.toggle("active", w === 2);
+
+        activeData = w === 1 ? week1Data : week2Data;
+    }
+
+    function showTooltip(e) {
+        const key = e.target.dataset.key;
+        const jobs = activeData[key];
+        if (!jobs) return;
+
+        let html = "<strong>Assigned Jobs</strong><br><hr>";
+
+        jobs.forEach(j => {
+            html +=
+                "🛠 <strong>Job ID:</strong> " + j.jobId + "<br>" +
+                "👤 <strong>Employee:</strong> " + j.employeeName + "<br><br>";
+        });
+
+        const tooltip = document.getElementById("tooltip");
+        tooltip.innerHTML = html;
+        tooltip.style.display = "block";
+        tooltip.style.left = e.pageX + 15 + "px";
+        tooltip.style.top = e.pageY + 15 + "px";
+    }
+
+    function hideTooltip() {
+        document.getElementById("tooltip").style.display = "none";
+    }
+</script>
+
+</body>
+</html>
