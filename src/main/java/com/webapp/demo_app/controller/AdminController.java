@@ -256,5 +256,14 @@ public class AdminController {
         return "admin/admin-jobs-overview";
     }
 
+    @GetMapping("/completed-jobs")
+    public String completedJobs(Model model) {
+
+        model.addAttribute("completedJobs",
+                jobService.getAllTamamlananIsler());
+
+        return "admin/admin-completed-jobs";
+    }
+
 
 }

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
-public class JobCellDTO {
+public class CurrJobDTO {
 
     private Long jobId;
     private String employeeName;

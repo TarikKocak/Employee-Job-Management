@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tamamlanan İşler</title>
+
+    <style>
+        /* =========================
+           BASE ADMIN STYLE
+        ========================= */
+        :root{
+            --bg: #f3f5f7;
+            --text: #1f2937;
+            --muted: #6b7280;
+            --card: #ffffff;
+            --line: #e5e7eb;
+            --head: #f8fafc;
+
+            --primary: #2563eb;
+            --primaryHover: #1d4ed8;
+
+            --success: #16a34a;
+            --successHover: #15803d;
+
+            --secondary: #e5e7eb;
+            --secondaryHover: #d1d5db;
+
+            --warning: #f59e0b;
+            --danger: #ef4444;
+
+            --shadow: 0 10px 28px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .page-title {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .page-subtitle {
+            margin: 6px 0 0 0;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* =========================
+           ACTIONS / SEARCH
+        ========================= */
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search {
+            position: relative;
+            min-width: 280px;
+        }
+
+        .search input {
+            width: 100%;
+            height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 0 12px 0 38px;
+            outline: none;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        .search input:focus {
+            border-color: rgba(37, 99, 235, 0.35);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .search .icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 14px;
+            pointer-events: none;
+        }
+
+        /* =========================
+           TABLE CARD
+        ========================= */
+        .table-card {
+            background: var(--card);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .table-wrap{
+            width: 100%;
+            overflow-x: auto; /* mobile friendly */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px; /* ensures columns don't crush */
+        }
+
+        thead {
+            background: var(--head);
+        }
+
+        th {
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 12.5px;
+            color: var(--muted);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 18px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .muted { color: var(--muted); }
+
+        .money {
+            font-variant-numeric: tabular-nums;
+            font-weight: 700;
+        }
+
+        /* =========================
+           BADGES
+        ========================= */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            height: 26px;
+            padding: 0 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+
+        .badge-ok {
+            background: rgba(22, 163, 74, 0.10);
+            color: #166534;
+            border-color: rgba(22, 163, 74, 0.20);
+        }
+
+        .badge-no {
+            background: rgba(239, 68, 68, 0.10);
+            color: #991b1b;
+            border-color: rgba(239, 68, 68, 0.20);
+        }
+
+        .badge-warn {
+            background: rgba(245, 158, 11, 0.12);
+            color: #92400e;
+            border-color: rgba(245, 158, 11, 0.22);
+        }
+
+        /* =========================
+           PAYMENT TYPE BADGES
+        ========================= */
+        .badge-cash {
+            background: rgba(245, 158, 11, 0.12);
+            color: #92400e;
+            border: 1px solid rgba(245, 158, 11, 0.25);
+        }
+
+        .badge-bank {
+            background: rgba(37, 99, 235, 0.12);
+            color: #1e40af;
+            border: 1px solid rgba(37, 99, 235, 0.25);
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+        .btn {
+            height: 36px;
+            padding: 0 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: transform .08s ease, background .12s ease, box-shadow .12s ease;
+            white-space: nowrap;
+        }
+
+        .btn:active { transform: translateY(1px); }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.18);
+        }
+
+        .btn-primary:hover {
+            background: var(--primaryHover);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondaryHover);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--line);
+        }
+
+        .btn-ghost:hover {
+            background: #f9fafb;
+        }
+
+        .btn-group {
+            display: inline-flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* =========================
+           FOOTER ACTION
+        ========================= */
+        .footer-action {
+            margin-top: 18px;
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+        .empty {
+            padding: 26px 18px;
+            color: var(--muted);
+            text-align: center;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+        @media (max-width: 768px) {
+            .container { margin: 30px auto; }
+            .topbar { flex-direction: column; align-items: stretch; }
+            .search { min-width: 100%; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="topbar">
+        <div>
+            <h1 class="page-title">Tamamlanan İşler</h1>
+            <p class="page-subtitle">Tüm tamamlanan işleri burada görüntüleyebilirsiniz.</p>
+        </div>
+
+        <!-- Optional local search UI (frontend-only). You can remove if not needed -->
+        <div class="actions">
+            <div class="search">
+                <span class="icon">🔎</span>
+                <input id="searchInput" type="text" placeholder="İsim / adres / tür ara...">
+            </div>
+            <a href="/admin/dashboard" class="btn btn-secondary">⬅ Geri Dön</a>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-wrap">
+            <table id="jobsTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Employee</th>
+                    <th>Tür</th>
+                    <th>Tarih</th>
+                    <th>Saat</th>
+                    <th>Adres</th>
+                    <th>Ücret</th>
+                    <th>Ücret Tipi</th>
+                    <th>Süre (saat)</th>
+                    <th>Duvar</th>
+                    <th>Kart</th>
+                    <th>Yorum</th>
+                    <th>Foto</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:if="${#lists.isEmpty(completedJobs)}">
+                    <td colspan="12" class="empty">Henüz tamamlanan iş bulunmuyor.</td>
+                </tr>
+
+                <tr th:each="is : ${completedJobs}">
+                    <td th:text="${is.id}"></td>
+
+                    <!-- LAZY employee: ensure you fetch join in backend if needed -->
+                    <td>
+                        <div style="font-weight: 800;" th:text="${is.employee.name}">Employee Name</div>
+                        <div class="muted" style="font-size: 12.5px;"
+                             th:text="${'ID: ' + is.employee.id}">ID: 0</div>
+                    </td>
+
+                    <td th:text="${is.tur}"></td>
+                    <td th:text="${is.tarih}"></td>
+                    <td th:text="${is.sure}"></td>
+                    <td th:text="${is.isAdresi}"></td>
+
+                    <td class="money" th:text="${is.ucret}"></td>
+                    <td>
+                        <span th:if="${is.ucretTahsilTipi != null}"
+                              th:class="
+                                ${is.ucretTahsilTipi.name() == 'CASH'}
+                                    ? 'badge badge-cash'
+                                    : 'badge badge-bank'
+                              "
+                              th:text="${is.ucretTahsilTipi.name() == 'CASH' ? 'Nakit' : 'Banka'}">
+                        </span>
+
+                                            <span th:if="${is.ucretTahsilTipi == null}"
+                                                  class="badge badge-warn">
+                            Belirtilmemiş
+                        </span>
+                    </td>
+
+                    <td th:text="${is.sure}"></td>
+
+                    <!-- Boolean badges -->
+
+                    <td>
+                        <span th:class="${is.duvarMontaji} ? 'badge badge-ok' : 'badge badge-no'"
+                              th:text="${is.duvarMontaji} ? 'VAR' : 'YOK'"></span>
+                    </td>
+
+                    <td>
+                        <span th:class="${is.kartVerildi} ? 'badge badge-ok' : 'badge badge-no'"
+                              th:text="${is.kartVerildi} ? 'VERİLDİ' : 'YOK'"></span>
+                    </td>
+
+                    <td>
+                        <span th:class="${is.yorumKartiVerildi} ? 'badge badge-ok' : 'badge badge-no'"
+                              th:text="${is.yorumKartiVerildi} ? 'VERİLDİ' : 'YOK'"></span>
+                    </td>
+
+                    <td>
+                        <span th:class="${is.fotoAtildi} ? 'badge badge-ok' : 'badge badge-no'"
+                              th:text="${is.fotoAtildi} ? 'ATILDI' : 'YOK'"></span>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- If you want a second back button at bottom -->
+    <div class="footer-action">
+        <a href="/admin/dashboard" class="btn btn-ghost">⬅ Geri Dön</a>
+    </div>
+
+</div>
+
+<script>
+    // Simple client-side filter (optional)
+    const input = document.getElementById("searchInput");
+    const table = document.getElementById("jobsTable");
+    if (input && table) {
+        input.addEventListener("keyup", function () {
+            const query = input.value.toLowerCase();
+            const rows = table.querySelectorAll("tbody tr");
+            rows.forEach(row => {
+                // ignore empty-state row
+                if (row.querySelector(".empty")) return;
+
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(query) ? "" : "none";
+            });
+        });
+    }
+</script>
+
+</body>
+</html>

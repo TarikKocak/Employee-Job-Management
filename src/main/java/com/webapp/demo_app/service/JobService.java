@@ -1,6 +1,6 @@
 package com.webapp.demo_app.service;
 
-import com.webapp.demo_app.dto.JobCellDTO;
+import com.webapp.demo_app.dto.CurrJobDTO;
 import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.MevcutIs;
 import com.webapp.demo_app.model.TamamlananIs;
@@ -44,6 +44,10 @@ public class JobService {
 
     public List<TamamlananIs> getTamamlananIsler(Long employeeId) {
         return tamamlananIsRepository.findByEmployeeId(employeeId);
+    }
+
+    public List<TamamlananIs> getAllTamamlananIsler() {
+        return tamamlananIsRepository.findAll();
     }
 
     public MevcutIs getMevcutIsById(Long id) {
@@ -130,7 +134,7 @@ public class JobService {
         );
     }
 
-    public Map<String, List<JobCellDTO>>
+    public Map<String, List<CurrJobDTO>>
     getJobOverlapForWeek(LocalDate monday) {
 
         LocalDate end = monday.plusDays(6);
@@ -152,7 +156,7 @@ public class JobService {
         }
 
         // date_hour → list of JobCellDTO
-        Map<String, List<JobCellDTO>> result = new HashMap<>();
+        Map<String, List<CurrJobDTO>> result = new HashMap<>();
 
         for (AvailabilitySlot slot : occupiedSlots) {
 
@@ -165,7 +169,7 @@ public class JobService {
             MevcutIs job = jobIndex.get(jobKey);
             if (job == null) continue;
 
-            JobCellDTO dto = new JobCellDTO(
+            CurrJobDTO dto = new CurrJobDTO(
                     job.getId(),
                     job.getEmployee().getName(),
                     slot.getDate(),
