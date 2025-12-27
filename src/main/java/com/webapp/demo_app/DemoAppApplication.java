@@ -1,7 +1,10 @@
 package com.webapp.demo_app;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.time.ZonedDateTime;
 
 @SpringBootApplication
 public class DemoAppApplication {
@@ -9,6 +12,9 @@ public class DemoAppApplication {
 	public static void main(String[] args) {
 		System.out.println("Spring Boot is starting...");
 		System.out.println("Running Java version: " + System.getProperty("java.version"));
+		ZonedDateTime now = ZonedDateTime.now();
+		System.out.println("Timezone: " + now.getZone());
+		System.out.println("Current Time: " + now);
 		SpringApplication.run(DemoAppApplication.class, args);
 	}
 

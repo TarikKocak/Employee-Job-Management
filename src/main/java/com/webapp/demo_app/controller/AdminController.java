@@ -172,8 +172,11 @@ public class AdminController {
     }
 
     @GetMapping("/employees/{id}/assign-job")
-    public String showAssignJob(@PathVariable Long id, Model model) {
+    public String showAssignJob(@PathVariable Long id, Model model,
+                                @RequestParam(required = false, defaultValue = "/admin/employees") String returnUrl) {
         Employee employee = employeeService.getById(id);
+
+        model.addAttribute("returnUrl", returnUrl);
 
         // ==========
         //  JOB FORM

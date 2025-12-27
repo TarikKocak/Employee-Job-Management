@@ -1,0 +1,35 @@
+header {
+    background: #111827;
+    padding: 16px 0;
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    text-align: left;
+}
+
+.nav-links a {
+    color: #d1d5db;
+    margin-left: 20px;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: #ffffff;
+}
+
+.logout {
+    color: #f87171;
+}

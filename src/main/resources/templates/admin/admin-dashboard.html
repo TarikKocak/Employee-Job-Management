@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
+    <!--For Header CSS-->
+    <link rel="stylesheet" th:href="@{/css/adminheader.css}">
 
     <style>
         /* =========================
@@ -99,6 +101,7 @@
 </head>
 
 <body>
+<div th:replace="~{fragments/admin_header :: mainHeader}"></div>
 
 <div class="container">
 

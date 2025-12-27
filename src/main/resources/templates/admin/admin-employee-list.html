@@ -163,7 +163,7 @@
                         Detay
                     </a>
 
-                    <a th:href="@{|/admin/employees/${emp.id}/assign-job|}"
+                    <a th:href="@{/admin/employees/{id}/assign-job(id=${emp.id}, returnUrl='/admin/all-employees')}"
                        class="btn btn-success">
                         Assign Job
                     </a>

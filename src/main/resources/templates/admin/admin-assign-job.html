@@ -12,9 +12,7 @@
 
     <h1 th:text="'Assign Job to ' + ${employee.name}"></h1>
 
-    <a th:href="@{|/admin/employees|}" class="admin-btn btn-success">
-        Back
-    </a>
+    <a th:href="${returnUrl}" class="admin-btn">⬅ Back</a>
 
     <!-- ================================= -->
     <!-- NEW: FLEX LAYOUT (YAN YANA) -->
