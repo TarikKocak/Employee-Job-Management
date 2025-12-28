@@ -1,5 +1,6 @@
 package com.webapp.demo_app.service;
 
+import com.webapp.demo_app.dto.AvailabilityValidationResult;
 import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.repository.AvailabilitySlotRepository;
@@ -94,16 +95,15 @@ public class AvailabilityService {
     // VALIDATION
     // =========================
 
-    public boolean
-    validateMinimumAvailabilityPerWeek(Collection<String> slotKeys) {
-
-        // 🔹 slotları haftalara ayır
+    public AvailabilityValidationResult validateMinimumAvailabilityPerWeek(
+            Long employeeId,
+            Collection<String> slotKeys
+    ) {
         Map<LocalDate, List<String>> slotsByWeek = new HashMap<>();
 
         for (String key : slotKeys) {
             String[] parts = key.split("_");
             LocalDate date = LocalDate.parse(parts[0]);
-
             LocalDate monday = getWeekMonday(date);
 
             slotsByWeek
@@ -111,18 +111,43 @@ public class AvailabilityService {
                     .add(key);
         }
 
-        // 🔹 her hafta için kural kontrolü
-        for (List<String> weekSlots : slotsByWeek.values()) {
+        for (Map.Entry<LocalDate, List<String>> entry : slotsByWeek.entrySet()) {
 
-            if (!validateSingleWeek(weekSlots)) {
-                return false; // herhangi bir hafta kuralı bozarsa → FAIL
+            LocalDate monday = entry.getKey();
+            LocalDate sunday = monday.plusDays(6);
+
+            int assignedJobDays =
+                    availabilitySlotRepository
+                            .countAssignedJobDaysInWeek(
+                                    employeeId, monday, sunday
+                            );
+
+            int requiredDays = Math.max(0, 4 - assignedJobDays);
+
+            int providedValidDays =
+                    countValidAvailabilityDays(entry.getValue());
+
+            if (providedValidDays < requiredDays) {
+
+                int missing = requiredDays - providedValidDays;
+
+                String message =
+                        "Bu hafta için en az " + requiredDays +
+                                " gün (5 saat arka arkaya) seçmelisiniz. " +
+                                "Şu anda " + providedValidDays +
+                                " gün seçilmiş. " +
+                                missing + " gün eksik.";
+
+                return new AvailabilityValidationResult(false, message);
             }
         }
 
-        return true;
+        return new AvailabilityValidationResult(true, "OK");
     }
 
-    private boolean validateSingleWeek(Collection<String> slotKeys) {
+
+
+    private int countValidAvailabilityDays(Collection<String> slotKeys) {
 
         Map<LocalDate, List<Integer>> byDate = new HashMap<>();
 
@@ -156,14 +181,12 @@ public class AvailabilityService {
             if (max >= 5) {
                 validDayCount++;
             }
-
-            if (validDayCount >= 4) {
-                return true;
-            }
         }
 
-        return false;
+        return validDayCount;
     }
+
+
 
 
 

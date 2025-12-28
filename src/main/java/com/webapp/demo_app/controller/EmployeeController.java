@@ -1,5 +1,6 @@
 package com.webapp.demo_app.controller;
 
+import com.webapp.demo_app.dto.AvailabilityValidationResult;
 import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.MevcutIs;
@@ -132,6 +133,11 @@ public class EmployeeController {
         return "availability";
     }
 
+
+
+
+
+
     @PostMapping("/{employeeId}/availability/submit")
     @ResponseBody
     public ResponseEntity<?> submitAvailability(
@@ -143,17 +149,19 @@ public class EmployeeController {
                     .filter(s -> !s.isBlank())
                     .collect(Collectors.toSet());
 
-            boolean valid =
-                    availabilityService.validateMinimumAvailabilityPerWeek(selectedSlots);
+            AvailabilityValidationResult result =
+                    availabilityService.validateMinimumAvailabilityPerWeek(
+                            employeeId,
+                            selectedSlots
+                    );
 
-            if (!valid) {
+            if (!result.valid()) {
                 return ResponseEntity
                         .badRequest()
-                        .body("Her hafta minimum 4 gün ve her gün 5 saat arka arkaya seçmelisiniz.");
+                        .body(result.message());
             }
 
             availabilityService.saveAvailabilityForWeek(employeeId, selectedSlots);
-
             return ResponseEntity.ok("OK");
 
         } catch (Exception e) {
@@ -162,6 +170,7 @@ public class EmployeeController {
                     .body("Beklenmeyen bir hata oluştu.");
         }
     }
+
 
 
 }

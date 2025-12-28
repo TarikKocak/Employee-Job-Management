@@ -2,6 +2,8 @@ package com.webapp.demo_app.repository;
 import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -33,4 +35,17 @@ public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySl
     );
 
     List<AvailabilitySlot> findByDateBetweenAndStatus(LocalDate start, LocalDate end, Integer status);
+
+    @Query("""
+    SELECT COUNT(DISTINCT a.date)
+    FROM AvailabilitySlot a
+    WHERE a.employee.id = :employeeId
+      AND a.status = 2
+      AND a.date BETWEEN :start AND :end
+""")
+    int countAssignedJobDaysInWeek(
+            @Param("employeeId") Long employeeId,
+            @Param("start") LocalDate start,
+            @Param("end") LocalDate end
+    );
 }
