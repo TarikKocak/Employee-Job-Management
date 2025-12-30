@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Employee Dashboard</title>
     <!-- <link rel="stylesheet" th:href="@{/css/style.css}"> -->
+    <link rel="stylesheet" th:href="@{/css/adminheader.css}">
     <style>
         /* =========================
            GLOBAL RESET & FONT
@@ -19,9 +20,19 @@
             font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background: linear-gradient(135deg, #f4f6f9, #e9eef5);
             color: #1f2937;
+
             display: flex;
-            align-items: center;
+            flex-direction: column;
+        }
+
+
+        .page-content {
+            flex: 1;
+            display: flex;
             justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 40px 20px;
         }
 
         /* =========================
@@ -106,14 +117,20 @@
     </style>
 </head>
 <body>
-<div class="container">
-    <h1> Welcome to Dashboard, <span th:text="${employeeName}">Employee</span></h1>
+<div th:replace="~{fragments/admin_header :: mainHeader}"></div>
 
-    <div class="button-group">
-        <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn">Mevcut İşlerim</a>
-        <a th:href="@{|/employees/${employeeId}/completed-jobs|}" class="btn">Tamamlanan İşlerim</a>
+<div class="page-content">
+    <div class="container">
+        <h1>
+            Welcome to Dashboard,
+            <span th:text="${employeeName}">Employee</span>
+        </h1>
 
-        <a th:href="@{|/employees/${employeeId}/availability|}" class="btn">Availability</a>
+        <div class="button-group">
+            <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn">Mevcut İşlerim</a>
+            <a th:href="@{|/employees/${employeeId}/completed-jobs|}" class="btn">Tamamlanan İşlerim</a>
+            <a th:href="@{|/employees/${employeeId}/availability|}" class="btn">Availability</a>
+        </div>
     </div>
 </div>
 <script th:src="@{/js/main.js}"></script>

@@ -5,6 +5,7 @@ import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import com.webapp.demo_app.repository.EmployeeRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,9 +15,12 @@ import java.util.List;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public EmployeeService(EmployeeRepository employeeRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository,
+                           PasswordEncoder passwordEncoder) {
         this.employeeRepository = employeeRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // =========================
@@ -38,15 +42,13 @@ public class EmployeeService {
     }
 
 
-
-
-
     // =========================
     // WRITE OPERATIONS
     // =========================
 
     @Transactional
     public Employee save(Employee employee) {
+        employee.setPassword(passwordEncoder.encode(employee.getPassword()));
         return employeeRepository.save(employee);
     }
 

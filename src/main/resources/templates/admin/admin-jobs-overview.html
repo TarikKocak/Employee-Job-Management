@@ -215,7 +215,7 @@
                 <tbody>
                 <tr th:each="job : ${jobs}">
                     <td th:text="${job.id}"></td>
-                    <td th:text="${job.employee.name}"></td>
+                    <td th:text="${job.employee.getUsername}"></td>
                     <td th:text="${job.tarih}"></td>
                     <td th:text="${job.baslangicSaati}"></td>
                 </tr>

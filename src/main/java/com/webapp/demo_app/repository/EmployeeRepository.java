@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    Employee findByName(String name); // for futer login implementation
+    Optional<Employee> findByUsername(String username); // for futer login implementation
     //Employee findById(long id);
     //Optional<Employee> findById(Long id);
     List<Employee> findByTitle(EmployeeeTitle title);

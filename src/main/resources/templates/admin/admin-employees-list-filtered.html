@@ -354,7 +354,7 @@
                 <option value="">Tüm Çalışanlar</option>
                 <option th:each="e : ${allEmployees}"
                         th:value="${e.id}"
-                        th:text="${e.name}"
+                        th:text="${e.getUsername}"
                         th:selected="${selectedEmployeeId == e.id}">
                 </option>
             </select>
@@ -398,7 +398,7 @@
                     <tbody>
                     <tr th:each="emp : ${employees}">
                         <td th:text="${emp.title}"></td>
-                        <td th:text="${emp.name}"></td>
+                        <td th:text="${emp.getUsername}"></td>
                         <td>
                             <a th:href="@{'/admin/employees/' + ${emp.id} + '?returnUrl=/admin/employees'}"
                                class="btn btn-small btn-primary">

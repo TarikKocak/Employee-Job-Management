@@ -171,7 +171,7 @@ public class JobService {
 
             CurrJobDTO dto = new CurrJobDTO(
                     job.getId(),
-                    job.getEmployee().getName(),
+                    job.getEmployee().getUsername(),
                     slot.getDate(),
                     slot.getHour()
             );

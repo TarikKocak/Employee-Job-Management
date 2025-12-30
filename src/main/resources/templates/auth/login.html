@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+
+    <!-- Modern system font stack -->
+    <style>
+        /* =========================
+           GLOBAL RESET
+        ========================= */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #060b22, #07366e);
+        }
+
+        /* =========================
+           LOGIN CARD
+        ========================= */
+        .login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 380px;
+            padding: 32px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .login-title {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 28px;
+        }
+
+        /* =========================
+           FORM ELEMENTS
+        ========================= */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            font-size: 15px;
+            transition: all 0.2s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 44px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.6;
+            user-select: none;
+        }
+
+        .toggle-password:hover {
+            opacity: 1;
+        }
+
+        /* =========================
+           BUTTON
+        ========================= */
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: #6366f1;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        /* =========================
+           FOOTER TEXT
+        ========================= */
+        .login-footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+        @media (max-width: 480px) {
+
+            body {
+                align-items: flex-start;
+                padding-top: 12vh;
+            }
+
+            .login-card {
+                width: 100%;
+                max-width: 360px;
+                margin: 0 16px;
+                padding: 28px 24px;
+                border-radius: 14px;
+            }
+
+            .login-title {
+                font-size: 24px;
+            }
+
+            .login-subtitle {
+                font-size: 13px;
+                margin-bottom: 22px;
+            }
+
+            input {
+                padding: 14px 14px;
+                font-size: 16px; /* prevents iOS zoom */
+            }
+
+            .login-btn {
+                padding: 15px;
+                font-size: 16px;
+                border-radius: 14px;
+            }
+
+            .toggle-password {
+                font-size: 20px;
+                right: 14px;
+            }
+
+            .login-footer {
+                font-size: 12px;
+                margin-top: 16px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="login-card">
+    <h1 class="login-title">Welcome Back</h1>
+    <p class="login-subtitle">Please sign in to your account</p>
+
+    <form method="post" action="/login" autocomplete="off">
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group password-group">
+            <label for="password">Password</label>
+
+            <div class="password-wrapper">
+                <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        autocomplete="new-password"
+                        required
+                >
+
+                <span class="toggle-password" onclick="togglePassword()">
+            <!-- OPEN EYE -->
+            <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+
+                    <!-- CLOSED EYE -->
+            <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                 viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                 style="display:none">
+                <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8
+                         a21.77 21.77 0 0 1 5.08-5.88"/>
+                <path d="M1 1l22 22"/>
+                <path d="M9.53 9.53a3 3 0 0 0 4.24 4.24"/>
+                <path d="M14.47 14.47L9.53 9.53"/>
+            </svg>
+        </span>
+            </div>
+        </div>
+
+
+        <button type="submit" class="login-btn">Login</button>
+    </form>
+
+    <div class="login-footer">
+        © 2025 Engineer Craftsman
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const eyeOpen = document.getElementById("eyeOpen");
+        const eyeClosed = document.getElementById("eyeClosed");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            eyeOpen.style.display = "none";
+            eyeClosed.style.display = "block";
+        } else {
+            passwordInput.type = "password";
+            eyeOpen.style.display = "block";
+            eyeClosed.style.display = "none";
+        }
+    }
+</script>
+</body>
+</html>

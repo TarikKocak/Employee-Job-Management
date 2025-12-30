@@ -156,7 +156,7 @@
             <tbody>
             <tr th:each="emp : ${employees}">
                 <td th:text="${emp.title}"></td>
-                <td th:text="${emp.name}"></td>
+                <td th:text="${emp.getUsername}"></td>
                 <td>
                     <a th:href="@{'/admin/employees/' + ${emp.id} + '?returnUrl=/admin/all-employees'}"
                        class="btn btn-primary">

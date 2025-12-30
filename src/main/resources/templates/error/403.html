@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Access Denied</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background: #fef2f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,.1);
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #dc2626;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h1>403 - Access Denied</h1>
+    <p>You do not have permission to access this page.</p>
+    <a th:href="@{/logout}">Logout</a>
+</div>
+</body>
+</html>

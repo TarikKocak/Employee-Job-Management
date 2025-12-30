@@ -24,7 +24,7 @@ public class Employee {
 
     // for login page
 
-    private String name;
+    private String username;
     private String password;
 
     //<----------------------------------->

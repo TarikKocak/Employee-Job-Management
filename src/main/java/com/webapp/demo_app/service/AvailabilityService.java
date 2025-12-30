@@ -362,7 +362,7 @@ public class AvailabilityService {
 
                     result
                             .computeIfAbsent(cellKey, k -> new LinkedHashMap<>())
-                            .put(emp.getName(), status);
+                            .put(emp.getUsername(), status);
                 }
             }
         }

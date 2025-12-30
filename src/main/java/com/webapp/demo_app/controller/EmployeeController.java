@@ -1,18 +1,18 @@
 package com.webapp.demo_app.controller;
 
 import com.webapp.demo_app.dto.AvailabilityValidationResult;
-import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.MevcutIs;
-import com.webapp.demo_app.repository.EmployeeRepository;
+import com.webapp.demo_app.security.SecurityUser;
 import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.EmployeeService;
 import com.webapp.demo_app.service.IncompleteJobException;
 import com.webapp.demo_app.service.JobService;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,105 +22,175 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Controller
 @RequestMapping("/employees")
 public class EmployeeController {
 
     private final JobService jobService;
-
     private final AvailabilityService availabilityService;
     private final EmployeeService employeeService;
 
-    public EmployeeController(JobService jobService, AvailabilityService availabilityService, EmployeeService employeeService) {
+    public EmployeeController(JobService jobService,
+                              AvailabilityService availabilityService,
+                              EmployeeService employeeService) {
         this.jobService = jobService;
         this.availabilityService = availabilityService;
         this.employeeService = employeeService;
     }
 
-    @GetMapping("/home")
-    public String homeRedirect(@RequestParam Long employeeId) {
-        return "redirect:/employees/" + employeeId + "/home-dashboard";
+    // ======================
+    // SECURITY GUARD
+    // ======================
+    private void verifyEmployeeOwnership(Long employeeId,
+                                         Authentication authentication) {
+
+        if (authentication == null) {
+            throw new AccessDeniedException("Not authenticated");
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (!(principal instanceof SecurityUser)) {
+            throw new AccessDeniedException("Invalid authentication");
+        }
+
+        SecurityUser user = (SecurityUser) principal;
+
+        if (!Objects.equals(user.getId(), employeeId)) {
+            throw new AccessDeniedException("Unauthorized access");
+        }
     }
 
+    // ======================
+    // DASHBOARD
+    // ======================
     @GetMapping("/{employeeId}/dashboard")
-    public String dashboard(@PathVariable Long employeeId, Model model) {
+    public String dashboard(@PathVariable Long employeeId,
+                            Authentication authentication,
+                            Model model) {
+
+        verifyEmployeeOwnership(employeeId, authentication);
 
         Employee employee = employeeService.getById(employeeId);
-
-        model.addAttribute("employeeName", employee.getName());
+        model.addAttribute("employeeName", employee.getUsername());
         model.addAttribute("employeeId", employeeId);
-        return "home-dashboard";
+
+        return "employee/home-dashboard";
     }
 
+    // ======================
+    // CURRENT JOBS
+    // ======================
     @GetMapping("/{employeeId}/current-jobs")
     public String currentJobs(@PathVariable Long employeeId,
+                              Authentication authentication,
                               @ModelAttribute("errorMessage") String errorMessage,
                               Model model) {
-        List<MevcutIs> jobs = jobService.getMevcutIsler(employeeId);
-        model.addAttribute("jobs", jobs);
+
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        model.addAttribute("jobs",
+                jobService.getMevcutIsler(employeeId));
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("errorMessage", errorMessage);
-        return "current-jobs";
+
+        return "employee/current-jobs";
     }
 
     @GetMapping("/{employeeId}/current-jobs/{jobId}/edit")
     public String editCurrentJob(@PathVariable Long employeeId,
                                  @PathVariable Long jobId,
+                                 Authentication authentication,
                                  Model model) {
+
+        verifyEmployeeOwnership(employeeId, authentication);
+
         MevcutIs job = jobService.getMevcutIsById(jobId);
+
+        // 🔒 EXTRA SAFETY: job must belong to employee
+        if (!job.getEmployee().getId().equals(employeeId)) {
+            throw new AccessDeniedException("Unauthorized job access");
+        }
+
         model.addAttribute("job", job);
         model.addAttribute("employeeId", employeeId);
-        return "edit-current-job";
+
+        return "employee/edit-current-job";
     }
 
     @PostMapping("/{employeeId}/current-jobs/{jobId}/edit")
     public String saveCurrentJob(@PathVariable Long employeeId,
                                  @PathVariable Long jobId,
+                                 Authentication authentication,
                                  @RequestParam Double sure,
                                  @RequestParam Integer bahsis,
                                  @RequestParam Boolean kartVerildi,
                                  @RequestParam Boolean yorumKartiVerildi,
                                  @RequestParam Boolean fotoAtildi) {
 
-        jobService.updateWriteOnlyFields(jobId, sure, bahsis, kartVerildi, yorumKartiVerildi, fotoAtildi);
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        jobService.updateWriteOnlyFields(
+                jobId, sure, bahsis, kartVerildi,
+                yorumKartiVerildi, fotoAtildi
+        );
+
         return "redirect:/employees/" + employeeId + "/current-jobs";
     }
 
     @PostMapping("/{employeeId}/current-jobs/{jobId}/submit")
     public String submitJob(@PathVariable Long employeeId,
                             @PathVariable Long jobId,
+                            Authentication authentication,
                             RedirectAttributes redirectAttributes) {
+
+        verifyEmployeeOwnership(employeeId, authentication);
+
         try {
             jobService.submitJob(employeeId, jobId);
         } catch (IncompleteJobException e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
+
         return "redirect:/employees/" + employeeId + "/current-jobs";
     }
 
+    // ======================
+    // COMPLETED JOBS
+    // ======================
     @GetMapping("/{employeeId}/completed-jobs")
-    public String completedJobs(@PathVariable Long employeeId, Model model) {
-        model.addAttribute("jobs", jobService.getTamamlananIsler(employeeId));
+    public String completedJobs(@PathVariable Long employeeId,
+                                Authentication authentication,
+                                Model model) {
+
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        model.addAttribute("jobs",
+                jobService.getTamamlananIsler(employeeId));
         model.addAttribute("employeeId", employeeId);
-        return "completed-jobs";
+
+        return "employee/completed-jobs";
     }
 
-
     // ======================
-    // NEW: AVAILABILITY PART
+    // AVAILABILITY
     // ======================
     @GetMapping("/{employeeId}/availability")
-    public String availability(@PathVariable Long employeeId, Model model) {
+    public String availability(@PathVariable Long employeeId,
+                               Authentication authentication,
+                               Model model) {
+
+        verifyEmployeeOwnership(employeeId, authentication);
 
         LocalDate week1 = availabilityService.getNextWeekMonday();
         LocalDate week2 = week1.plusWeeks(1);
 
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("hours", availabilityService.getHours());
-
-        model.addAttribute("week1Dates", availabilityService.getWeekDates(week1));
-        model.addAttribute("week2Dates", availabilityService.getWeekDates(week2));
+        model.addAttribute("week1Dates",
+                availabilityService.getWeekDates(week1));
+        model.addAttribute("week2Dates",
+                availabilityService.getWeekDates(week2));
 
         model.addAttribute("week1StatusMap",
                 availabilityService.buildStatusMap(
@@ -130,20 +200,17 @@ public class EmployeeController {
                 availabilityService.buildStatusMap(
                         availabilityService.getWeekSlots(employeeId, week2)));
 
-        return "availability";
+        return "employee/availability";
     }
-
-
-
-
-
 
     @PostMapping("/{employeeId}/availability/submit")
     @ResponseBody
-    public ResponseEntity<?> submitAvailability(
-            @PathVariable Long employeeId,
-            @RequestParam("slots") String slotsRaw
-    ) {
+    public ResponseEntity<?> submitAvailability(@PathVariable Long employeeId,
+                                                Authentication authentication,
+                                                @RequestParam("slots") String slotsRaw) {
+
+        verifyEmployeeOwnership(employeeId, authentication);
+
         try {
             Set<String> selectedSlots = Arrays.stream(slotsRaw.split(","))
                     .filter(s -> !s.isBlank())
@@ -151,26 +218,22 @@ public class EmployeeController {
 
             AvailabilityValidationResult result =
                     availabilityService.validateMinimumAvailabilityPerWeek(
-                            employeeId,
-                            selectedSlots
+                            employeeId, selectedSlots
                     );
 
             if (!result.valid()) {
-                return ResponseEntity
-                        .badRequest()
+                return ResponseEntity.badRequest()
                         .body(result.message());
             }
 
-            availabilityService.saveAvailabilityForWeek(employeeId, selectedSlots);
+            availabilityService.saveAvailabilityForWeek(
+                    employeeId, selectedSlots);
+
             return ResponseEntity.ok("OK");
 
         } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Beklenmeyen bir hata oluştu.");
         }
     }
-
-
-
 }
