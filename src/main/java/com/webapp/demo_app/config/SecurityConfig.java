@@ -30,7 +30,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/css/**",
-                                "/js/**"
+                                "/js/**",
+                                "/error/**"
                         ).permitAll()
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")

@@ -50,11 +50,9 @@ public class EmployeeController {
 
         Object principal = authentication.getPrincipal();
 
-        if (!(principal instanceof SecurityUser)) {
+        if (!(principal instanceof SecurityUser user)) {
             throw new AccessDeniedException("Invalid authentication");
         }
-
-        SecurityUser user = (SecurityUser) principal;
 
         if (!Objects.equals(user.getId(), employeeId)) {
             throw new AccessDeniedException("Unauthorized access");

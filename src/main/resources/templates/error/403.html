@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Access Denied</title>
@@ -26,13 +27,46 @@
             color: #dc2626;
             font-weight: 600;
         }
+        .btn {
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+        .btn-employee {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-admin {
+            background: #16a34a;
+            color: white;
+        }
+        .btn-login {
+            background: #dc2626;
+            color: white;
+        }
     </style>
 </head>
 <body>
 <div class="box">
     <h1>403 - Access Denied</h1>
     <p>You do not have permission to access this page.</p>
-    <a th:href="@{/logout}">Logout</a>
+    <div sec:authorize="hasRole('EMPLOYEE')">
+        <a class="btn btn-employee"
+           th:href="@{'/employees/' + ${#authentication.principal.id} + '/dashboard'}">
+            ⬅ Back to Dashboard
+        </a>
+    </div>
+    <div sec:authorize="hasRole('ADMIN')">
+        <a class="btn btn-admin"
+           th:href="@{/admin/dashboard}">
+            ⬅ Back to Admin Dashboard
+        </a>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <a class="btn btn-login"
+           th:href="@{/login}">
+            Go to Login
+        </a>
+    </div>
 </div>
 </body>
 </html>
