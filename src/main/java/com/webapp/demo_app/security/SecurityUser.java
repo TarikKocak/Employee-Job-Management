@@ -15,6 +15,8 @@ public class SecurityUser implements UserDetails {
     private final Long id;
     private final String username;
     private final String password;
+
+    @Getter
     private final String role;
 
     public SecurityUser(Long id, String username, String password, String role) {

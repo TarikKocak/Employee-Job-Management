@@ -53,6 +53,13 @@ public class EmployeeService {
     }
 
     @Transactional
+    public void updatePassword(Long employeeId, String rawPassword) {
+        Employee employee = getById(employeeId);
+        employee.setPassword(passwordEncoder.encode(rawPassword));
+        employeeRepository.save(employee);
+    }
+
+    @Transactional
     public void delete(Long employeeId) {
         Employee employee = getById(employeeId);
         employeeRepository.delete(employee);

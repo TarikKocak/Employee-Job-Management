@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Settings</title>
+
+    <style>
+        /* =========================
+           GLOBAL RESET
+        ========================= */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f8fafc, #eef2ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            color: #111827;
+        }
+
+        /* =========================
+           CARD
+        ========================= */
+        .settings-card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            padding: 32px;
+            border-radius: 18px;
+            box-shadow:
+                    0 10px 25px rgba(0,0,0,0.08),
+                    0 4px 10px rgba(0,0,0,0.04);
+            animation: fadeUp 0.4s ease;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            margin: 0 0 24px;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* =========================
+           FORM
+        ========================= */
+        label {
+            display: block;
+            margin-top: 18px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            margin-top: 6px;
+            border-radius: 10px;
+            border: 1px solid #d1d5db;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: #ffffff;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        input[readonly] {
+            background: #f9fafb;
+            color: #6b7280;
+            cursor: not-allowed;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+        .settings-actions {
+            display: flex;
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #1f2937;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        /* =========================
+           POPUPS
+        ========================= */
+        .availability-error-popup,
+        .availability-success-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 20px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .availability-error-popup {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .availability-success-popup {
+            background: #16a34a;
+            color: #ffffff;
+        }
+        /* =========================
+           PASSWORD TOGGLE
+        ========================= */
+        .password-field {
+            position: relative;
+        }
+
+        .password-field input {
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+        }
+
+        .toggle-password:hover {
+            color: #2563eb;
+        }
+
+        .eye-closed {
+            display: none;
+        }
+
+
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+        @media (max-width: 480px) {
+            .settings-card {
+                padding: 24px;
+            }
+
+            .settings-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- ERROR POPUP -->
+<div id="error-popup"
+     class="availability-error-popup"
+     th:if="${popupError}"
+     th:text="${popupError}">
+</div>
+
+<!-- SUCCESS POPUP -->
+<div id="success-popup"
+     class="availability-success-popup"
+     th:if="${popupSuccess}"
+     th:text="${popupSuccess}">
+</div>
+
+<div id="client-error-popup"
+     class="availability-error-popup"
+     style="display:none;">
+    Passwords do not match
+</div>
+
+<div class="settings-card">
+    <h2>Account Settings</h2>
+
+    <label>Username</label>
+    <input type="text" th:value="${username}" readonly>
+
+    <!-- PASSWORD FORM -->
+    <form id="passwordForm"
+          th:action="@{/settings/change-password}"
+          method="post">
+
+        <label>New Password</label>
+        <div class="password-field">
+            <input type="password" name="newPassword" id="newPassword" required>
+
+            <button type="button"
+                    class="toggle-password"
+                    data-target="newPassword">
+                <!-- OPEN EYE -->
+                <svg class="eye-open" xmlns="http://www.w3.org/2000/svg"
+                     width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+
+                <!-- CLOSED EYE -->
+                <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg"
+                     width="20" height="20" viewBox="0 0 24 24"
+                     fill="none" stroke="currentColor" stroke-width="2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8
+                     a21.77 21.77 0 0 1 5.08-5.88"/>
+                    <path d="M1 1l22 22"/>
+                    <path d="M9.53 9.53a3 3 0 0 0 4.24 4.24"/>
+                    <path d="M14.47 14.47L9.53 9.53"/>
+                </svg>
+            </button>
+        </div>
+
+        <label>Confirm Password</label>
+        <div class="password-field">
+            <input type="password" name="confirmPassword" id="confirmPassword" required>
+
+            <button type="button"
+                    class="toggle-password"
+                    data-target="confirmPassword">
+                <!-- same SVGs -->
+                <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+
+                <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8
+                     a21.77 21.77 0 0 1 5.08-5.88"/>
+                    <path d="M1 1l22 22"/>
+                    <path d="M9.53 9.53a3 3 0 0 0 4.24 4.24"/>
+                    <path d="M14.47 14.47L9.53 9.53"/>
+                </svg>
+            </button>
+        </div>
+
+    </form>
+
+    <!-- ACTION BUTTONS -->
+    <div class="settings-actions">
+
+        <!-- ADMIN -->
+        <a th:if="${#authorization.expression('hasRole(''ADMIN'')')}"
+           th:href="@{/admin/dashboard}"
+           class="btn btn-secondary">
+            ← Go back
+        </a>
+
+        <!-- EMPLOYEE -->
+        <a th:if="${#authorization.expression('hasRole(''EMPLOYEE'')')}"
+           th:href="@{/employees/{id}/dashboard(id=${#authentication.principal.id})}"
+           class="btn btn-secondary">
+            ← Go back
+        </a>
+
+        <!-- UPDATE -->
+        <button type="submit"
+                form="passwordForm"
+                class="btn btn-primary">
+            Update Password
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+        // AUTO-HIDE SERVER POPUPS
+        const success = document.getElementById("success-popup");
+        const error = document.getElementById("error-popup");
+
+        if (success) setTimeout(() => success.style.display = "none", 2000);
+        if (error) setTimeout(() => error.style.display = "none", 2000);
+
+        // PASSWORD TOGGLE
+        document.querySelectorAll(".toggle-password").forEach(button => {
+            button.addEventListener("click", () => {
+                const input = document.getElementById(button.dataset.target);
+                const eyeOpen = button.querySelector(".eye-open");
+                const eyeClosed = button.querySelector(".eye-closed");
+
+                const isHidden = input.type === "password";
+                input.type = isHidden ? "text" : "password";
+                eyeOpen.style.display = isHidden ? "none" : "block";
+                eyeClosed.style.display = isHidden ? "block" : "none";
+            });
+        });
+
+        // CLIENT-SIDE PASSWORD VALIDATION
+        const form = document.getElementById("passwordForm");
+        const newPassword = document.getElementById("newPassword");
+        const confirmPassword = document.getElementById("confirmPassword");
+        const clientError = document.getElementById("client-error-popup");
+
+        form.addEventListener("submit", (e) => {
+            if (newPassword.value !== confirmPassword.value) {
+                e.preventDefault(); //
+                clientError.style.display = "block";
+
+                setTimeout(() => {
+                    clientError.style.display = "none";
+                }, 2000);
+            }
+        });
+    });
+</script>
+
+
+</body>
+</html>

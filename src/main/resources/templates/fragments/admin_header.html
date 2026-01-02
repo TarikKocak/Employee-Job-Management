@@ -3,7 +3,30 @@
         <div class="logo">Employee Management System</div>
 
         <nav class="nav-links">
-            <a th:href="@{/logout}" class="logout">Logout</a>
+            <div class="profile-menu">
+                <button class="profile-btn" onclick="toggleProfileMenu()">
+                    👤 Profile
+                </button>
+
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a th:href="@{/settings}"> Settings</a>
+                    <a th:href="@{/logout}" class="logout"> Logout</a>
+                </div>
+            </div>
         </nav>
     </div>
+
+    <script>
+        function toggleProfileMenu() {
+            document.getElementById("profileDropdown").classList.toggle("show");
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener("click", function (event) {
+            const menu = document.querySelector(".profile-menu");
+            if (!menu.contains(event.target)) {
+                document.getElementById("profileDropdown").classList.remove("show");
+            }
+        });
+    </script>
 </header>
