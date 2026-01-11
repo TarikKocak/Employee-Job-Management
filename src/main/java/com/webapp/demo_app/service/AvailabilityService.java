@@ -461,5 +461,19 @@ public class AvailabilityService {
         return validDays;
     }
 
+    // remove the expired data from db
+    @Transactional
+    public void removeExpiredAvailabilitySlots() {
+        LocalDate today = LocalDate.now();
+
+//        log.info(
+//                "Expired availability cleanup executed. Removed {} records.",
+//                (beforeCount - afterCount)
+//        );
+
+        availabilitySlotRepository.deleteByDateBefore(today);
+
+    }
+
 
 }
