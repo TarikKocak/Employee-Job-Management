@@ -8,6 +8,7 @@ import com.webapp.demo_app.repository.MevcutIsRepository;
 import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.EmployeeService;
 import com.webapp.demo_app.service.JobService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+
+@Slf4j
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
@@ -38,12 +41,14 @@ public class AdminController {
     // Admin dashboard
     @GetMapping("/dashboard")
     public String dashboard() {
+        log.info("Admin dashboard accessed");
         return "admin/admin-dashboard";
     }
 
     @GetMapping("/all-employees")
     public String listAllEmployees(Model model) {
 
+        log.info("All employees list viewed");
         List<Employee> employees = employeeService.getAll();
 
         model.addAttribute("employees", employees);
@@ -176,6 +181,7 @@ public class AdminController {
                                 @RequestParam(required = false, defaultValue = "/admin/employees") String returnUrl) {
         Employee employee = employeeService.getById(id);
 
+
         model.addAttribute("returnUrl", returnUrl);
 
         // ==========
@@ -223,13 +229,20 @@ public class AdminController {
     @PostMapping("/employees/{id}/assign-job")
     public String assignJob(@PathVariable Long id, @ModelAttribute("job") MevcutIs job) {
 
+        log.info("Job assignment requested employeeId={} jobType={}",
+                id, job.getTur());
+
         jobService.assignJobToEmployee(id, job);
+
+        log.info("Job assigned successfully employeeId={}", id);
 
         return "redirect:/admin/employees/" + id;
     }
 
     @GetMapping("/jobs-overview")
     public String jobsOverview(Model model) {
+
+        log.info("Jobs overview viewed");
 
         LocalDate week1Monday =
                 availabilityService.getNextWeekMonday();
@@ -258,6 +271,8 @@ public class AdminController {
 
     @GetMapping("/completed-jobs")
     public String completedJobs(Model model) {
+
+        log.info("Completed jobs viewed");
 
         model.addAttribute("completedJobs",
                 jobService.getAllTamamlananIsler());

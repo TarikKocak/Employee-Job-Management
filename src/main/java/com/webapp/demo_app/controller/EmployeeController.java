@@ -9,6 +9,7 @@ import com.webapp.demo_app.service.EmployeeService;
 import com.webapp.demo_app.service.IncompleteJobException;
 import com.webapp.demo_app.service.JobService;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Controller
 @RequestMapping("/employees")
 public class EmployeeController {
@@ -45,16 +47,19 @@ public class EmployeeController {
                                          Authentication authentication) {
 
         if (authentication == null) {
+            log.warn("Unauthorized access: no authentication");
             throw new AccessDeniedException("Not authenticated");
         }
 
         Object principal = authentication.getPrincipal();
 
         if (!(principal instanceof SecurityUser user)) {
+            log.warn("Unauthorized access: invalid principal");
             throw new AccessDeniedException("Invalid authentication");
         }
 
         if (!Objects.equals(user.getId(), employeeId)) {
+            log.warn("Unauthorized employee access attempt: requestedEmployeeId={}", employeeId);
             throw new AccessDeniedException("Unauthorized access");
         }
     }
@@ -68,6 +73,8 @@ public class EmployeeController {
                             Model model) {
 
         verifyEmployeeOwnership(employeeId, authentication);
+
+        log.info("Employee dashboard accessed");
 
         Employee employee = employeeService.getById(employeeId);
         model.addAttribute("employeeName", employee.getUsername());
@@ -86,6 +93,8 @@ public class EmployeeController {
                               Model model) {
 
         verifyEmployeeOwnership(employeeId, authentication);
+
+        log.info("Current jobs viewed");
 
         model.addAttribute("jobs",
                 jobService.getMevcutIsler(employeeId));
@@ -128,6 +137,8 @@ public class EmployeeController {
 
         verifyEmployeeOwnership(employeeId, authentication);
 
+        log.info("Current job edited jobId={}", jobId);
+
         jobService.updateWriteOnlyFields(
                 jobId, sure, bahsis, kartVerildi,
                 yorumKartiVerildi, fotoAtildi
@@ -144,9 +155,14 @@ public class EmployeeController {
 
         verifyEmployeeOwnership(employeeId, authentication);
 
+        log.info("Job submission requested jobId={}", jobId);
+
         try {
             jobService.submitJob(employeeId, jobId);
+            log.info("Job submitted successfully jobId={}", jobId);
+
         } catch (IncompleteJobException e) {
+            log.warn("Job submission failed jobId={} reason={}", jobId, e.getMessage());
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
@@ -209,6 +225,9 @@ public class EmployeeController {
 
         verifyEmployeeOwnership(employeeId, authentication);
 
+        log.info("Availability submission requested");
+
+
         try {
             Set<String> selectedSlots = Arrays.stream(slotsRaw.split(","))
                     .filter(s -> !s.isBlank())
@@ -220,18 +239,21 @@ public class EmployeeController {
                     );
 
             if (!result.valid()) {
+                log.warn("Availability validation failed: {}", result.message());
                 return ResponseEntity.badRequest()
                         .body(result.message());
             }
 
             availabilityService.saveAvailabilityForWeek(
                     employeeId, selectedSlots);
+            log.info("Availability saved successfully");
 
             return ResponseEntity.ok("OK");
 
         } catch (Exception e) {
+            log.error("Availability submission failed", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Beklenmeyen bir hata oluştu.");
+                    .body("Unexpected error.");
         }
     }
 }
