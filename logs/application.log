@@ -1,0 +1,154 @@
+2026-01-20 16:00:52 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 168 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:00:52 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:00:54 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:00:54 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:00:54 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:00:56 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-20 16:00:56 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@1039234
+2026-01-20 16:00:56 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-20 16:00:58 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:00:59 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:00:59 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 8.028 seconds (process running for 9.233)
+2026-01-20 16:01:03 [INFO] [] [:] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:01:12 [INFO] [ROLE_EMPLOYEE] [Muhammet:5] c.w.d.controller.EmployeeController - Employee dashboard accessed
+2026-01-20 16:02:27 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:27 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:27 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-20 16:02:27 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-20 16:02:27 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 168 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:02:27 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:02:27 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:27 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:02:27 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:02:27 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Starting...
+2026-01-20 16:02:27 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-2 - Added connection org.postgresql.jdbc.PgConnection@4b676693
+2026-01-20 16:02:27 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Start completed.
+2026-01-20 16:02:27 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:02:28 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:28 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 0.894 seconds (process running for 97.769)
+2026-01-20 16:02:28 [INFO] [] [:] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:02:29 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:29 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:29 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown initiated...
+2026-01-20 16:02:29 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-2 - Shutdown completed.
+2026-01-20 16:02:29 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 168 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:02:29 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:02:29 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:29 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:02:29 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:02:29 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Starting...
+2026-01-20 16:02:30 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-3 - Added connection org.postgresql.jdbc.PgConnection@585b4a21
+2026-01-20 16:02:30 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Start completed.
+2026-01-20 16:02:30 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:02:30 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:30 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 0.708 seconds (process running for 99.972)
+2026-01-20 16:02:37 [INFO] [] [:] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:02:38 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:38 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:38 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Shutdown initiated...
+2026-01-20 16:02:38 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-3 - Shutdown completed.
+2026-01-20 16:02:39 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 168 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:02:39 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:02:39 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:39 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:02:39 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:02:39 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Starting...
+2026-01-20 16:02:39 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-4 - Added connection org.postgresql.jdbc.PgConnection@20cb6cc6
+2026-01-20 16:02:39 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Start completed.
+2026-01-20 16:02:39 [WARN] [] [:] o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'availabilityCleanupScheduler' defined in file [C:\Users\coder\Desktop\demo_app\target\classes\com\webapp\demo_app\config\AvailabilityCleanupScheduler.class]: Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'availabilityService' defined in file [C:\Users\coder\Desktop\demo_app\target\classes\com\webapp\demo_app\service\AvailabilityService.class]: Unsatisfied dependency expressed through constructor parameter 2: No qualifying bean of type 'com.webapp.demo_app.service.AvailabilityPolicyService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
+2026-01-20 16:02:39 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Shutdown initiated...
+2026-01-20 16:02:39 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-4 - Shutdown completed.
+2026-01-20 16:02:39 [INFO] [] [:] o.a.catalina.core.StandardService - Stopping service [Tomcat]
+2026-01-20 16:02:39 [ERROR] [] [:] o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 2 of constructor in com.webapp.demo_app.service.AvailabilityService required a bean of type 'com.webapp.demo_app.service.AvailabilityPolicyService' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.webapp.demo_app.service.AvailabilityPolicyService' in your configuration.
+
+2026-01-20 16:02:41 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 168 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:02:41 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:02:41 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:41 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:02:41 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:02:41 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Starting...
+2026-01-20 16:02:41 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-5 - Added connection org.postgresql.jdbc.PgConnection@221eb4a7
+2026-01-20 16:02:41 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Start completed.
+2026-01-20 16:02:41 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:02:41 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:02:41 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 0.652 seconds (process running for 111.3)
+2026-01-20 16:02:42 [INFO] [] [:] o.a.c.c.C.[Tomcat-1].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:03:29 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:29 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:29 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Shutdown initiated...
+2026-01-20 16:03:29 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-5 - Shutdown completed.
+2026-01-20 16:03:29 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 168 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:03:29 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:03:29 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:29 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:03:29 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:03:29 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Starting...
+2026-01-20 16:03:29 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-6 - Added connection org.postgresql.jdbc.PgConnection@1195e522
+2026-01-20 16:03:29 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Start completed.
+2026-01-20 16:03:29 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:03:29 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:29 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 0.679 seconds (process running for 159.513)
+2026-01-20 16:03:29 [INFO] [] [:] o.a.c.c.C.[Tomcat-1].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:03:31 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Pausing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:31 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Stopping ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:31 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Shutdown initiated...
+2026-01-20 16:03:31 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-6 - Shutdown completed.
+2026-01-20 16:03:31 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 168 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:03:31 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:03:31 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:31 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:03:31 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:03:31 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-7 - Starting...
+2026-01-20 16:03:31 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-7 - Added connection org.postgresql.jdbc.PgConnection@1cb8a817
+2026-01-20 16:03:31 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-7 - Start completed.
+2026-01-20 16:03:32 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:03:32 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:32 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 0.769 seconds (process running for 161.762)
+2026-01-20 16:03:32 [INFO] [] [:] o.a.c.c.C.[Tomcat-1].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:03:39 [INFO] [ROLE_EMPLOYEE] [Muhammet:5] c.w.d.controller.EmployeeController - Employee dashboard accessed
+2026-01-20 16:03:42 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-7 - Shutdown initiated...
+2026-01-20 16:03:42 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-7 - Shutdown completed.
+2026-01-20 16:03:45 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 14944 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:03:45 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:03:46 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:46 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:03:46 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:03:46 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-20 16:03:46 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@fef9168
+2026-01-20 16:03:46 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-20 16:03:48 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:03:49 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:03:49 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 4.385 seconds (process running for 4.954)
+2026-01-20 16:03:50 [INFO] [] [:] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:04:39 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-20 16:04:39 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-01-20 16:04:41 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Starting DemoAppApplication using Java 21.0.3 with PID 15092 (C:\Users\coder\Desktop\demo_app\target\classes started by coder in C:\Users\coder\Desktop\demo_app)
+2026-01-20 16:04:41 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - The following 1 profile is active: "local"
+2026-01-20 16:04:42 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:04:42 [INFO] [] [:] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-20 16:04:42 [INFO] [] [:] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.15]
+2026-01-20 16:04:43 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-20 16:04:43 [INFO] [] [:] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2015de12
+2026-01-20 16:04:43 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-20 16:04:45 [WARN] [] [:] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-01-20 16:04:45 [INFO] [] [:] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-01-20 16:04:45 [INFO] [] [:] c.webapp.demo_app.DemoAppApplication - Started DemoAppApplication in 4.284 seconds (process running for 4.827)
+2026-01-20 16:04:46 [INFO] [] [:] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-20 16:04:48 [INFO] [ROLE_EMPLOYEE] [Muhammet:5] c.w.d.controller.EmployeeController - Employee dashboard accessed
+2026-01-20 16:05:27 [INFO] [ROLE_EMPLOYEE] [Muhammet:5] c.w.d.controller.EmployeeController - Employee dashboard accessed
+2026-01-20 16:05:35 [INFO] [ROLE_EMPLOYEE] [Muhammet:5] c.w.d.controller.EmployeeController - Employee dashboard accessed
+2026-01-20 16:09:30 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-01-20 16:09:30 [INFO] [] [:] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

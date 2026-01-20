@@ -4,10 +4,7 @@ import com.webapp.demo_app.dto.AvailabilityValidationResult;
 import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.MevcutIs;
 import com.webapp.demo_app.security.SecurityUser;
-import com.webapp.demo_app.service.AvailabilityService;
-import com.webapp.demo_app.service.EmployeeService;
-import com.webapp.demo_app.service.IncompleteJobException;
-import com.webapp.demo_app.service.JobService;
+import com.webapp.demo_app.service.*;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,13 +28,16 @@ public class EmployeeController {
     private final JobService jobService;
     private final AvailabilityService availabilityService;
     private final EmployeeService employeeService;
+    private final AvailabilityPolicyService policyService;
 
     public EmployeeController(JobService jobService,
                               AvailabilityService availabilityService,
-                              EmployeeService employeeService) {
+                              EmployeeService employeeService,
+                              AvailabilityPolicyService policyService) {
         this.jobService = jobService;
         this.availabilityService = availabilityService;
         this.employeeService = employeeService;
+        this.policyService = policyService;
     }
 
     // ======================
@@ -199,6 +199,8 @@ public class EmployeeController {
         LocalDate week1 = availabilityService.getNextWeekMonday();
         LocalDate week2 = week1.plusWeeks(1);
 
+        boolean isSunday = policyService.isSunday();
+
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("hours", availabilityService.getHours());
         model.addAttribute("week1Dates",
@@ -213,6 +215,8 @@ public class EmployeeController {
         model.addAttribute("week2StatusMap",
                 availabilityService.buildStatusMap(
                         availabilityService.getWeekSlots(employeeId, week2)));
+
+        model.addAttribute("isSunday", isSunday);
 
         return "employee/availability";
     }

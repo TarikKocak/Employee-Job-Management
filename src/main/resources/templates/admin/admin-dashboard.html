@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-    <!--For Header CSS-->
+
+    <!-- Header CSS -->
     <link rel="stylesheet" th:href="@{/css/adminheader.css}">
 
     <style>
@@ -47,14 +48,30 @@
         }
 
         /* =========================
-           ACTION GRID
+           DASHBOARD SPLIT
         ========================= */
-        .button-group {
+        .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
         }
 
+        .dashboard-section h3 {
+            margin-bottom: 14px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .dashboard-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
         .btn {
             height: 56px;
             border-radius: 14px;
@@ -64,7 +81,9 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            transition: transform 0.15s ease,
+            box-shadow 0.15s ease,
+            background 0.15s ease;
         }
 
         .btn-primary {
@@ -92,6 +111,10 @@
                 font-size: 24px;
             }
 
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
             .btn {
                 height: 52px;
                 font-size: 14px;
@@ -101,6 +124,7 @@
 </head>
 
 <body>
+
 <div th:replace="~{fragments/admin_header :: mainHeader}"></div>
 
 <div class="container">
@@ -110,26 +134,42 @@
     <div class="admin-card">
         <h2>Yönetim</h2>
 
-        <div class="button-group">
-            <a href="/admin/add-employee" class="btn btn-primary">
-                ➕ Yeni Employee Ekle
-            </a>
+        <div class="dashboard-grid">
 
-            <a href="/admin/employees" class="btn btn-primary">
-                👥 Employee – Overall Availability Listesi
-            </a>
+            <!-- EMPLOYEE RELATED -->
+            <div class="dashboard-section">
+                <h3>Employee Yönetimi</h3>
 
-            <a href="/admin/all-employees" class="btn btn-primary">
-                📋 All Employees
-            </a>
+                <div class="dashboard-actions">
+                    <a href="/admin/add-employee" class="btn btn-primary">
+                        ➕ Yeni Employee Ekle
+                    </a>
 
-            <a href="/admin/jobs-overview" class="btn btn-primary">
-                🛠 Job Schedule Overview
-            </a>
+                    <a href="/admin/employees" class="btn btn-primary">
+                        👥 Employee – Overall Availability Listesi
+                    </a>
 
-            <a href="/admin/completed-jobs" class="btn btn-primary">
-                ✅ Tamamlanan İşler
-            </a>
+                    <a href="/admin/all-employees" class="btn btn-primary">
+                        📋 All Employees
+                    </a>
+                </div>
+            </div>
+
+            <!-- JOB / NON-EMPLOYEE -->
+            <div class="dashboard-section">
+                <h3>İş & Planlama</h3>
+
+                <div class="dashboard-actions">
+                    <a href="/admin/jobs-overview" class="btn btn-primary">
+                        🛠 Job Schedule Overview
+                    </a>
+
+                    <a href="/admin/completed-jobs" class="btn btn-primary">
+                        ✅ Tamamlanan İşler
+                    </a>
+                </div>
+            </div>
+
         </div>
     </div>
 

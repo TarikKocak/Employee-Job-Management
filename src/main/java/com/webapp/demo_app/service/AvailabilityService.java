@@ -20,11 +20,14 @@ public class AvailabilityService {
 
     private final AvailabilitySlotRepository availabilitySlotRepository;
     private final EmployeeRepository employeeRepository;
+    private final AvailabilityPolicyService policyService;
 
     public AvailabilityService(AvailabilitySlotRepository availabilitySlotRepository,
-                               EmployeeRepository employeeRepository) {
+                               EmployeeRepository employeeRepository,
+                               AvailabilityPolicyService policyService) {
         this.availabilitySlotRepository = availabilitySlotRepository;
         this.employeeRepository = employeeRepository;
+        this.policyService = policyService;
     }
 
 
@@ -70,6 +73,8 @@ public class AvailabilityService {
             Long employeeId,
             Set<String> selectedSlots
     ) {
+
+        policyService.assertSubmissionAllowed();
         Employee employee = employeeRepository.getReferenceById(employeeId);
 
         // SADECE YEŞİL SLOT'LARI TEMİZLE
@@ -99,6 +104,8 @@ public class AvailabilityService {
             Long employeeId,
             Collection<String> slotKeys
     ) {
+        Employee employee = employeeRepository.getReferenceById(employeeId);
+
         Map<LocalDate, List<String>> slotsByWeek = new HashMap<>();
 
         for (String key : slotKeys) {
@@ -122,10 +129,11 @@ public class AvailabilityService {
                                     employeeId, monday, sunday
                             );
 
-            int requiredDays = Math.max(0, 4 - assignedJobDays);
+            int requiredDays = Math.max(0, employee.getMinDay() - assignedJobDays);
+            int requiredHours = employee.getMinHour();
 
             int providedValidDays =
-                    countValidAvailabilityDays(entry.getValue());
+                    countValidAvailabilityDays(entry.getValue(), employee.getMinHour());
 
             if (providedValidDays < requiredDays) {
 
@@ -133,10 +141,11 @@ public class AvailabilityService {
 
                 String message =
                         "Bu hafta için en az " + requiredDays +
-                                " gün (5 saat arka arkaya) seçmelisiniz. " +
+                                " gün seçmeli ve her gün için en az " + requiredHours +
+                                " saat yan yana müsaitlik belirtmelisiniz. " +
                                 "Şu anda " + providedValidDays +
-                                " gün seçilmiş. " +
-                                missing + " gün eksik.";
+                                " gün geçerli. " +
+                                missing + " gün daha eklemeniz gerekiyor.";
 
                 return new AvailabilityValidationResult(false, message);
             }
@@ -147,7 +156,7 @@ public class AvailabilityService {
 
 
 
-    private int countValidAvailabilityDays(Collection<String> slotKeys) {
+    private int countValidAvailabilityDays(Collection<String> slotKeys,Integer minhour) {
 
         Map<LocalDate, List<Integer>> byDate = new HashMap<>();
 
@@ -178,15 +187,13 @@ public class AvailabilityService {
                 }
             }
 
-            if (max >= 5) {
+            if (max >= minhour) {
                 validDayCount++;
             }
         }
 
         return validDayCount;
     }
-
-
 
 
 
@@ -235,48 +242,6 @@ public class AvailabilityService {
 
     }
 
-    /*
-    public Map<String, Map<String, Integer>>
-    getOverlappingAvailabilityForWeek(LocalDate monday) {
-
-        LocalDate end = monday.plusDays(6);
-
-        List<Employee> employees = employeeRepository.findAll();
-
-        List<AvailabilitySlot> slots =
-                availabilitySlotRepository.findByDateBetween(monday, end);
-
-        // employeeId_date_hour -> status
-        Map<String, Integer> slotIndex = new HashMap<>();
-        for (AvailabilitySlot slot : slots) {
-            String key = slot.getEmployee().getId()
-                    + "_" + slot.getDate()
-                    + "_" + slot.getHour();
-            slotIndex.put(key, slot.getStatus());
-        }
-
-        Map<String, Map<String, Integer>> result = new HashMap<>();
-
-        for (Employee emp : employees) {
-            for (LocalDate d = monday; !d.isAfter(end); d = d.plusDays(1)) {
-                for (Integer hour : getHours()) {
-
-                    String cellKey = d + "_" + hour;
-                    String empKey = emp.getId() + "_" + d + "_" + hour;
-
-                    int status = slotIndex.getOrDefault(empKey, 0);
-
-                    result
-                            .computeIfAbsent(cellKey, k -> new LinkedHashMap<>())
-                            .put(emp.getName(), status);
-                }
-            }
-        }
-
-        return result;
-    }
-
-     */
 
     public Map<String, Integer>
     buildAvailableCountMap(Map<String, Map<String, Integer>> overlapMap) {

@@ -87,6 +87,13 @@
             grid-column: span 2;
         }
 
+        /* Minimum day & hour row */
+        .inline-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px 24px;
+        }
+
         /* =========================
            BUTTONS
         ========================= */
@@ -141,6 +148,10 @@
             .form-actions {
                 grid-column: span 1;
             }
+
+            .inline-row {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
@@ -179,6 +190,28 @@
                        name="password"
                        placeholder="Şifre"
                        required>
+            </div>
+
+            <div class="inline-row">
+
+                <div class="form-group">
+                    <label>Minimum Gün</label>
+                    <input type="number"
+                           name="minDay"
+                           placeholder="Örn: 4"
+                           min="1"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label>Minimum Saat</label>
+                    <input type="number"
+                           name="minHour"
+                           placeholder="Örn: 5"
+                           min="1"
+                           required>
+                </div>
+
             </div>
 
             <div class="form-actions">

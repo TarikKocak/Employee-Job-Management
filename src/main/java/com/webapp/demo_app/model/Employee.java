@@ -32,6 +32,10 @@ public class Employee {
     @Enumerated(EnumType.STRING)
     private EmployeeeTitle title;
 
+    // Custom required day/hour for employees to submit availability
+    private Integer minDay;
+    private Integer minHour;
+
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MevcutIs> mevcutIsler;

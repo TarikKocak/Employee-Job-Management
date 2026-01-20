@@ -366,9 +366,17 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-success">
+        <button type="submit"
+                id="submitBtn"
+                class="btn btn-success"
+                th:if="${isSunday}">
             Availability Kaydet
         </button>
+
+        <div th:if="${!isSunday}"
+             style="margin-top:24px; font-weight:700; color:#dc2626;">
+            Bu tabloyu sadece <strong>Pazar günleri</strong> doldurabilir veya değişiklik yapabilirsiniz.
+        </div>
     </form>
 </div>
 
@@ -378,6 +386,7 @@
     // FINAL STATE
     let selectedSlots = new Set();
     const employeeId = [[${employeeId}]];
+    const isSunday = [[${isSunday}]];
 
     // WHEN THE PAGE LOADS, ADD THE GREEN ONES FROM THE DB TO SET.
     document.querySelectorAll(".cell.status-1").forEach(td => {
@@ -416,6 +425,12 @@
     // SUBMIT (AJAX)
     function submitAvailability(event) {
         event.preventDefault(); //  NO PAGE RELOAD
+
+
+        if (!isSunday) {
+            showAvailabilityError("Bu tabloyu sadece Pazar günleri doldurabilir veya değişiklik yapabilirsiniz.");
+            return;
+        }
 
         // Filling hidden inputs fow slots that filled already
         document.getElementById("slotsInput").value =
