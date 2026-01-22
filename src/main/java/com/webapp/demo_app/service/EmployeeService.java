@@ -1,6 +1,7 @@
 package com.webapp.demo_app.service;
 
 
+import com.webapp.demo_app.dto.AdminEmployeeUpdateDto;
 import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import com.webapp.demo_app.repository.EmployeeRepository;
@@ -63,5 +64,20 @@ public class EmployeeService {
     public void delete(Long employeeId) {
         Employee employee = getById(employeeId);
         employeeRepository.delete(employee);
+    }
+
+    @Transactional
+    public void adminUpdateEmployee(Long employeeId, AdminEmployeeUpdateDto dto) {
+
+        Employee employee = getById(employeeId);
+
+        employee.setUsername(dto.getUsername());
+        employee.setMinDay(dto.getMinDay());
+        employee.setMinHour(dto.getMinHour());
+
+        // password changes only if its changed
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            employee.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
     }
 }

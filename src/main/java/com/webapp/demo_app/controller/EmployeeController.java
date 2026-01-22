@@ -196,12 +196,18 @@ public class EmployeeController {
 
         verifyEmployeeOwnership(employeeId, authentication);
 
+        Employee employee = employeeService.getById(employeeId);
         LocalDate week1 = availabilityService.getNextWeekMonday();
         LocalDate week2 = week1.plusWeeks(1);
 
         boolean isSunday = policyService.isSunday();
 
         model.addAttribute("employeeId", employeeId);
+
+        model.addAttribute("minDay", employee.getMinDay());
+        model.addAttribute("minHour", employee.getMinHour());
+
+
         model.addAttribute("hours", availabilityService.getHours());
         model.addAttribute("week1Dates",
                 availabilityService.getWeekDates(week1));

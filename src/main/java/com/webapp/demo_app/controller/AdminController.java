@@ -1,5 +1,6 @@
 package com.webapp.demo_app.controller;
 
+import com.webapp.demo_app.dto.AdminEmployeeUpdateDto;
 import com.webapp.demo_app.model.*;
 import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import com.webapp.demo_app.model.enums.Tur;
@@ -85,7 +86,7 @@ public class AdminController {
             filteredEmployees = allEmployees;
         }
 
-        // 🔥 APPLY MIN ADJACENT HOURS FILTER
+        //  APPLY MIN ADJACENT HOURS FILTER
         if (minHours != null) {
             filteredEmployees =
                     availabilityService.filterEmployeesByMinAdjacentHours(
@@ -280,5 +281,36 @@ public class AdminController {
         return "admin/admin-completed-jobs";
     }
 
+    // Employee Info Update
+
+    @GetMapping("/employees/{id}/edit")
+    public String editEmployeeForm(
+            @PathVariable Long id,
+            @RequestParam(required = false, defaultValue = "/admin/all-employees") String returnUrl,
+            Model model
+    ) {
+        Employee employee = employeeService.getById(id);
+
+        AdminEmployeeUpdateDto dto = new AdminEmployeeUpdateDto();
+        dto.setUsername(employee.getUsername());
+        dto.setMinDay(employee.getMinDay());
+        dto.setMinHour(employee.getMinHour());
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("dto", dto);
+        model.addAttribute("returnUrl", returnUrl);
+
+        return "admin/admin-employee-edit";
+    }
+
+    @PostMapping("/employees/{id}/edit")
+    public String updateEmployee(
+            @PathVariable Long id,
+            @ModelAttribute("dto") AdminEmployeeUpdateDto dto,
+            @RequestParam(required = false, defaultValue = "/admin/all-employees") String returnUrl
+    ) {
+        employeeService.adminUpdateEmployee(id, dto);
+        return "redirect:" + returnUrl;
+    }
 
 }

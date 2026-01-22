@@ -1,19 +1,166 @@
-<header th:fragment="mainHeader">
-    <div class="header-container">
-        <div class="logo">Employee Management System</div>
+<header th:fragment="mainHeader" class="main-header">
 
+    <style>
+        /* =========================
+           HEADER
+        ========================= */
+        .main-header {
+            background: #1e1d1d;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* =========================
+           LOGO
+        ========================= */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 16px;
+            color: #2563eb;
+        }
+
+        .logo-mark {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            letter-spacing: 0.05em;
+        }
+
+        .logo-text {
+            font-size: 15px;
+        }
+
+        /* =========================
+           PROFILE MENU
+        ========================= */
+        .profile-menu {
+            position: relative;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 999px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .profile-text {
+            color: #0f172a;
+            font-weight: 700;
+        }
+        .profile-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .profile-avatar {
+            font-size: 16px;
+        }
+
+        .profile-caret {
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        /* =========================
+           DROPDOWN
+        ========================= */
+        .profile-dropdown {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 10px);
+            background: #ffffff;
+            min-width: 180px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            padding: 8px;
+            display: none;
+            flex-direction: column;
+        }
+
+        .profile-dropdown.show {
+            display: flex;
+        }
+
+        .profile-dropdown a {
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1f2937;
+            text-decoration: none;
+            transition: background 0.15s ease;
+        }
+
+        .profile-dropdown a:hover {
+            background: #f3f4f6;
+        }
+
+        .profile-dropdown .logout {
+            color: #dc2626;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e5e7eb;
+            margin: 6px 0;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+        @media (max-width: 600px) {
+            .logo-text {
+                display: none;
+            }
+        }
+
+    </style>
+    <div class="header-container">
+
+        <!-- LOGO -->
+        <div class="logo">
+            <span class="logo-mark">EMS</span>
+            <span class="logo-text">Employee Management System</span>
+        </div>
+
+        <!-- NAV -->
         <nav class="nav-links">
             <div class="profile-menu">
                 <button class="profile-btn" onclick="toggleProfileMenu()">
-                    👤 Profile
+                    <span class="profile-avatar">👤</span>
+                    <span class="profile-text">Profile</span>
+                    <span class="profile-caret">▾</span>
                 </button>
 
                 <div class="profile-dropdown" id="profileDropdown">
-                    <a th:href="@{/settings}"> Settings</a>
-                    <a th:href="@{/logout}" class="logout"> Logout</a>
+                    <a th:href="@{/settings}">⚙ Settings</a>
+                    <div class="dropdown-divider"></div>
+                    <a th:href="@{/logout}" class="logout">⎋ Logout</a>
                 </div>
             </div>
         </nav>
+
     </div>
 
     <script>
@@ -21,7 +168,6 @@
             document.getElementById("profileDropdown").classList.toggle("show");
         }
 
-        // Close dropdown when clicking outside
         document.addEventListener("click", function (event) {
             const menu = document.querySelector(".profile-menu");
             if (!menu.contains(event.target)) {

@@ -193,6 +193,25 @@
         }
 
         /* ================================
+           AVAILABILITY INFO BOX
+        ================================ */
+        .availability-info {
+            margin-bottom: 18px;
+            padding: 14px 18px;
+            background: #f8fafc;
+            border-left: 5px solid #2563eb;
+            border-radius: 10px;
+            font-weight: 600;
+            color: #1f2937;
+            line-height: 1.5;
+        }
+
+        .availability-info strong {
+            color: #2563eb;
+            font-weight: 800;
+        }
+
+        /* ================================
            AVAILABILITY CELLS
         ================================ */
         .cell {
@@ -284,6 +303,15 @@
 
         <!-- FINAL SELECTION -->
         <input type="hidden" name="slots" id="slotsInput">
+
+        <div class="availability-info">
+            Her hafta için en az
+            <strong th:text="${minDay}"></strong> gün
+            ve her gün için
+            <strong th:text="${minHour}"></strong> saat
+            olacak şekilde availability girmeniz gerekmektedir.
+        </div>
+
 
         <div class="availability-layout">
 

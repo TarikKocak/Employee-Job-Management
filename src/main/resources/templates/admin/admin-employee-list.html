@@ -96,21 +96,30 @@
             background: #1d4ed8;
         }
 
-        .btn-success {
+        .btn-secondary {
             background: #16a34a;
             color: white;
         }
 
-        .btn-success:hover {
+        .btn-secondary:hover {
             background: #15803d;
         }
 
-        .btn-secondary {
+        .btn-tertiary {
+            background: #e61a0b;
+            color: white;
+        }
+
+        .btn-tertiary:hover {
+            background: #aa1409;
+        }
+
+        .btn-goback {
             background: #e5e7eb;
             color: #1f2937;
         }
 
-        .btn-secondary:hover {
+        .btn-goback:hover {
             background: #d1d5db;
         }
 
@@ -147,9 +156,9 @@
         <table>
             <thead>
             <tr>
-                <th>Title</th>
-                <th>İsim</th>
-                <th>Detay</th>
+                <th>ÜNVAN</th>
+                <th>İSİM</th>
+                <th>EYLEMLER</th>
             </tr>
             </thead>
 
@@ -164,8 +173,13 @@
                     </a>
 
                     <a th:href="@{/admin/employees/{id}/assign-job(id=${emp.id}, returnUrl='/admin/all-employees')}"
-                       class="btn btn-success">
+                       class="btn btn-secondary">
                         Assign Job
+                    </a>
+
+                    <a th:href="@{/admin/employees/{id}/edit(id=${emp.id}, returnUrl='/admin/all-employees')}"
+                       class="btn btn-tertiary">
+                        Yönet
                     </a>
                 </td>
             </tr>
@@ -174,7 +188,7 @@
     </div>
 
     <div class="footer-action">
-        <a href="/admin/dashboard" class="btn btn-secondary">⬅ Geri Dön</a>
+        <a href="/admin/dashboard" class="btn btn-goback">⬅ Geri Dön</a>
     </div>
 
 </div>

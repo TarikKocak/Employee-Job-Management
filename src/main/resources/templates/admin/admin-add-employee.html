@@ -100,8 +100,12 @@
         .form-actions {
             grid-column: span 2;
             display: flex;
-            gap: 12px;
+            align-items: center;
             margin-top: 12px;
+        }
+
+        .form-actions .btn-primary{
+            margin-left: auto;
         }
 
         .btn {
@@ -163,7 +167,10 @@
     <h1 class="page-title">Yeni Employee Ekle</h1>
 
     <div class="admin-card">
-        <form action="/admin/add-employee" method="post" class="form">
+        <form action="/admin/add-employee"
+              method="post"
+              class="form"
+              onsubmit="return validatePasswords()">
 
             <div class="form-group">
                 <label>Employee Name</label>
@@ -186,10 +193,23 @@
 
             <div class="form-group full">
                 <label>Password</label>
-                <input type="text"
+                <input type="password"
+                       id="password"
                        name="password"
                        placeholder="Şifre"
                        required>
+            </div>
+
+            <div class="form-group full">
+                <label>Confirm Password</label>
+                <input type="password"
+                       id="confirmPassword"
+                       placeholder="Şifreyi tekrar girin"
+                       required>
+                <small id="passwordError"
+                       style="display:none; color:#dc2626; font-weight:600;">
+                    Şifreler uyuşmuyor
+                </small>
             </div>
 
             <div class="inline-row">
@@ -215,8 +235,8 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Kaydet</button>
                 <a href="/admin/dashboard" class="btn btn-secondary">Geri Dön</a>
+                <button type="submit" class="btn btn-primary">Kaydet</button>
             </div>
 
         </form>
@@ -225,4 +245,19 @@
 </div>
 
 </body>
+<script>
+    function validatePasswords() {
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const error = document.getElementById("passwordError");
+
+        if (password !== confirmPassword) {
+            error.style.display = "block";
+            return false;
+        }
+
+        error.style.display = "none";
+        return true;
+    }
+</script>
 </html>
