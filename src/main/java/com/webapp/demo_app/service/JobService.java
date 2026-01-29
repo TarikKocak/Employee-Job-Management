@@ -42,12 +42,14 @@ public class JobService {
         return mevcutIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId);
     }
 
+    //for only employees
     public List<TamamlananIs> getTamamlananIsler(Long employeeId) {
         return tamamlananIsRepository.findByEmployeeId(employeeId);
     }
 
+    //For only admins
     public List<TamamlananIs> getAllTamamlananIsler() {
-        return tamamlananIsRepository.findAll();
+        return tamamlananIsRepository.findAllByOrderByTarihAsc();
     }
 
     public MevcutIs getMevcutIsById(Long id) {
