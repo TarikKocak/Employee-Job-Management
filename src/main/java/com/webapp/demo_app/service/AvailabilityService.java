@@ -214,7 +214,7 @@ public class AvailabilityService {
         int endHour = endTime.getHour();     // floor
 
         List<Integer> hours = new ArrayList<>();
-        for (int h = startHour; h <= endHour; h++) {
+        for (int h = startHour; h < endHour; h++) {
             hours.add(h);
         }
 

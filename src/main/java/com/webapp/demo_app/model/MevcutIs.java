@@ -51,8 +51,10 @@ public class MevcutIs {
 
     private Double tahminiSure;
 
-    // WRITEONLY  (All null)
     private Double sure;
+    // WRITEONLY  (All null)
+    private LocalTime asilBaslanilanSaat;
+    private LocalTime bitisSaati;
     private Integer bahsis;
     private Boolean kartVerildi;
     private Boolean yorumKartiVerildi;

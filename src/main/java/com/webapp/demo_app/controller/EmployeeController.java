@@ -7,6 +7,7 @@ import com.webapp.demo_app.security.SecurityUser;
 import com.webapp.demo_app.service.*;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -114,7 +116,7 @@ public class EmployeeController {
 
         MevcutIs job = jobService.getMevcutIsById(jobId);
 
-        // 🔒 EXTRA SAFETY: job must belong to employee
+        //  EXTRA SAFETY: job must belong to employee
         if (!job.getEmployee().getId().equals(employeeId)) {
             throw new AccessDeniedException("Unauthorized job access");
         }
@@ -129,7 +131,8 @@ public class EmployeeController {
     public String saveCurrentJob(@PathVariable Long employeeId,
                                  @PathVariable Long jobId,
                                  Authentication authentication,
-                                 @RequestParam Double sure,
+                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime asilBaslanilanSaat,
+                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime bitisSaati,
                                  @RequestParam Integer bahsis,
                                  @RequestParam Boolean kartVerildi,
                                  @RequestParam Boolean yorumKartiVerildi,
@@ -140,8 +143,13 @@ public class EmployeeController {
         log.info("Current job edited jobId={}", jobId);
 
         jobService.updateWriteOnlyFields(
-                jobId, sure, bahsis, kartVerildi,
-                yorumKartiVerildi, fotoAtildi
+                jobId,
+                asilBaslanilanSaat,
+                bitisSaati,
+                bahsis,
+                kartVerildi,
+                yorumKartiVerildi,
+                fotoAtildi
         );
 
         return "redirect:/employees/" + employeeId + "/current-jobs";

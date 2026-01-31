@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <link rel="icon" type="image/png" th:href="@{/EM.png}">
+
 
     <!-- Modern system font stack -->
     <style>
@@ -50,6 +52,12 @@
             margin-bottom: 28px;
         }
 
+        .brand {
+            color: #2563eb;
+            font-weight: 800;
+        }
+
+
         /* =========================
            FORM ELEMENTS
         ========================= */
@@ -76,7 +84,7 @@
 
         input:focus {
             outline: none;
-            border-color: #6366f1;
+            border-color: #2563eb;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
         }
 
@@ -112,7 +120,7 @@
             padding: 14px;
             border: none;
             border-radius: 12px;
-            background: #6366f1;
+            background: #114dcf;
             color: white;
             font-size: 16px;
             font-weight: 600;
@@ -122,7 +130,7 @@
 
         .login-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 20px rgba(72, 75, 182, 0.4);
         }
 
         /* =========================
@@ -190,7 +198,9 @@
 <body>
 
 <div class="login-card">
-    <h1 class="login-title">Welcome Back</h1>
+    <h1 class="login-title">
+        Welcome to <span class="brand">EMS</span>
+    </h1>
     <p class="login-subtitle">Please sign in to your account</p>
 
     <form method="post" action="/login" autocomplete="off">
@@ -240,7 +250,7 @@
     </form>
 
     <div class="login-footer">
-        © 2025 Your preference
+        © 2025 Employee Management
     </div>
 </div>
 

@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Tamamlanan İşler</title>
-    <!-- <link rel="stylesheet" th:href="@{/css/style.css}"> -->
+    <link rel="icon" type="image/png" th:href="@{/EM.png}">
+
+    <!-- Header CSS -->
     <style>
         /* =========================
            GLOBAL
@@ -133,6 +135,7 @@
     </style>
 </head>
 <body>
+<div th:replace="~{fragments/admin_header :: mainHeader}"></div>
 <div class="container">
     <h1>Tamamlanan İşlerim</h1>
 
@@ -141,7 +144,6 @@
     <table class="table">
         <thead>
         <tr>
-            <th>İş ID</th>
             <th>Tür</th>
             <th>Duvar Montajı</th>
             <th>İş Adresi</th>
@@ -158,7 +160,6 @@
         </thead>
         <tbody>
         <tr th:each="job : ${jobs}">
-            <td th:text="${job.id}"></td>
             <td th:text="${job.tur}"></td>
             <td th:text="${job.duvarMontaji} ? 'Evet' : 'Hayır'"></td>
             <td th:text="${job.isAdresi}"></td>

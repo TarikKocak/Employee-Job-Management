@@ -42,9 +42,9 @@
         }
 
         .container {
-            max-width: 1300px;
-            margin: 50px auto;
-            padding: 0 20px;
+            max-width: 90%;
+            margin: 70px auto;
+            padding: 0 24px;
         }
 
         .topbar {
@@ -325,14 +325,14 @@
             <table id="jobsTable">
                 <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Employee</th>
                     <th>Tür</th>
                     <th>Tarih</th>
-                    <th>Saat</th>
                     <th>Adres</th>
                     <th>Ücret</th>
                     <th>Ücret Tipi</th>
+                    <th>Başlanılan Saat</th>
+                    <th>Bitirilen Saat</th>
                     <th>Süre (saat)</th>
                     <th>Duvar</th>
                     <th>Kart</th>
@@ -347,7 +347,7 @@
                 </tr>
 
                 <tr th:each="is : ${completedJobs}">
-                    <td th:text="${is.id}"></td>
+
 
                     <!-- LAZY employee: ensure you fetch join in backend if needed -->
                     <td>
@@ -358,7 +358,6 @@
 
                     <td th:text="${is.tur}"></td>
                     <td th:text="${is.tarih}"></td>
-                    <td th:text="${is.sure}"></td>
                     <td th:text="${is.isAdresi}"></td>
 
                     <td class="money" th:text="${is.ucret}"></td>
@@ -377,7 +376,8 @@
                             Belirtilmemiş
                         </span>
                     </td>
-
+                    <td th:text="${is.asilBaslanilanSaat}"></td>
+                    <td th:text="${is.bitisSaati}"></td>
                     <td th:text="${is.sure}"></td>
 
                     <!-- Boolean badges -->

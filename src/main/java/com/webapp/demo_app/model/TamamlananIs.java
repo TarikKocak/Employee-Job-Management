@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "tamamlanan_isler")
@@ -38,6 +39,8 @@ public class TamamlananIs {
     @Enumerated(EnumType.STRING)
     private UcretTahsilTipi ucretTahsilTipi;
 
+    private LocalTime asilBaslanilanSaat;
+    private LocalTime bitisSaati;
     private Double sure;
     private Integer bahsis;
     private Boolean kartVerildi;

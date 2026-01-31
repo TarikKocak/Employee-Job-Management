@@ -1,9 +1,12 @@
 package com.webapp.demo_app.service;
 
 import com.webapp.demo_app.dto.CurrJobDTO;
+import com.webapp.demo_app.dto.TamamlananIsDto;
 import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.MevcutIs;
 import com.webapp.demo_app.model.TamamlananIs;
+import com.webapp.demo_app.model.enums.Tur;
+import com.webapp.demo_app.model.enums.UcretTahsilTipi;
 import com.webapp.demo_app.repository.AvailabilitySlotRepository;
 import com.webapp.demo_app.repository.MevcutIsRepository;
 import com.webapp.demo_app.repository.TamamlananIsRepository;
@@ -13,7 +16,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.*;
 
 @Service
@@ -42,9 +47,43 @@ public class JobService {
         return mevcutIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId);
     }
 
-    //for only employees
-    public List<TamamlananIs> getTamamlananIsler(Long employeeId) {
-        return tamamlananIsRepository.findByEmployeeId(employeeId);
+    //For employees
+    public List<TamamlananIsDto> getTamamlananIsler(Long employeeId) {
+
+        return tamamlananIsRepository.findByEmployeeId(employeeId)
+                .stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    private TamamlananIsDto toDto(TamamlananIs job) {
+
+        TamamlananIsDto dto = new TamamlananIsDto();
+
+        dto.setId(job.getId());
+        dto.setTur(job.getTur());
+        dto.setDuvarMontaji(job.getDuvarMontaji());
+        dto.setIsAdresi(job.getIsAdresi());
+        dto.setTanimi(job.getTanimi());
+        dto.setTarih(job.getTarih());
+        dto.setUcretTahsilTipi(job.getUcretTahsilTipi());
+        dto.setSure(job.getSure());
+        dto.setBahsis(job.getBahsis());
+        dto.setKartVerildi(job.getKartVerildi());
+        dto.setYorumKartiVerildi(job.getYorumKartiVerildi());
+        dto.setFotoAtildi(job.getFotoAtildi());
+
+        // Ucret(price) visible to employees when Tur and UcretTahsilTipi statements are satisfied
+
+        if (job.getTur() == Tur.YALNIZ &&
+                job.getUcretTahsilTipi() == UcretTahsilTipi.CASH) {
+
+            dto.setUcret(job.getUcret() + "€");
+        } else {
+            dto.setUcret("No Info");
+        }
+
+        return dto;
     }
 
     //For only admins
@@ -58,15 +97,32 @@ public class JobService {
     }
 
     @Transactional
-    public MevcutIs updateWriteOnlyFields(Long jobId, Double sure, Integer bahsis,
-                                          Boolean kartVerildi, Boolean yorumKartiVerildi,
-                                          Boolean fotoAtildi) {
+    public MevcutIs updateWriteOnlyFields(
+            Long jobId,
+            LocalTime asilBaslanilanSaat,
+            LocalTime bitisSaati,
+            Integer bahsis,
+            Boolean kartVerildi,
+            Boolean yorumKartiVerildi,
+            Boolean fotoAtildi
+    ) {
         MevcutIs mevcutIs = getMevcutIsById(jobId);
-        mevcutIs.setSure(sure);
+
+        if (bitisSaati.isBefore(asilBaslanilanSaat)) {
+            throw new IllegalArgumentException("Bitiş saati başlangıç saatinden önce olamaz");
+        }
+        double sureSaat = Duration
+                .between(asilBaslanilanSaat, bitisSaati)
+                .toMinutes() / 60.0;
+        mevcutIs.setAsilBaslanilanSaat(asilBaslanilanSaat);
+        mevcutIs.setBitisSaati(bitisSaati);
+        mevcutIs.setSure(sureSaat);
+
         mevcutIs.setBahsis(bahsis);
         mevcutIs.setKartVerildi(kartVerildi);
         mevcutIs.setYorumKartiVerildi(yorumKartiVerildi);
         mevcutIs.setFotoAtildi(fotoAtildi);
+
         return mevcutIsRepository.save(mevcutIs);
     }
 
@@ -80,12 +136,17 @@ public class JobService {
 
         // check for write-only fields whether they are filled
 
-        if (mevcutIs.getSure() == null ||
+        if (mevcutIs.getAsilBaslanilanSaat() == null ||
+                mevcutIs.getBitisSaati() == null ||
+                mevcutIs.getSure() == null ||
                 mevcutIs.getBahsis() == null ||
                 mevcutIs.getKartVerildi() == null ||
                 mevcutIs.getYorumKartiVerildi() == null ||
                 mevcutIs.getFotoAtildi() == null) {
-            throw new IncompleteJobException("Lütfen gödermek istediğiniz işin tüm alanlarını doldurunuz.");
+
+            throw new IncompleteJobException(
+                    "Lütfen işin başlangıç ve bitiş saatleri dahil tüm alanları doldurunuz."
+            );
         }
 
         // Create data for TamamlananIs
@@ -98,7 +159,12 @@ public class JobService {
         tamamlananIs.setTarih(mevcutIs.getTarih());
         tamamlananIs.setUcret(mevcutIs.getUcret());
         tamamlananIs.setUcretTahsilTipi(mevcutIs.getUcretTahsilTipi());
+
+        tamamlananIs.setAsilBaslanilanSaat(mevcutIs.getAsilBaslanilanSaat());
+        tamamlananIs.setBitisSaati(mevcutIs.getBitisSaati());
+
         tamamlananIs.setSure(mevcutIs.getSure());
+
         tamamlananIs.setBahsis(mevcutIs.getBahsis());
         tamamlananIs.setKartVerildi(mevcutIs.getKartVerildi());
         tamamlananIs.setYorumKartiVerildi(mevcutIs.getYorumKartiVerildi());

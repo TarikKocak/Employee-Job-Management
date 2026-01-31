@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Availability</title>
-    <!-- <link rel="stylesheet" th:href="@{/css/style.css}"> -->
+    <link rel="icon" type="image/png" th:href="@{/EM.png}">
     <style>
         /* ================================
            GLOBAL RESET & BASE
@@ -278,6 +278,8 @@
 </head>
 
 <body>
+<div th:replace="~{fragments/admin_header :: mainHeader}"></div>
+
 <div class="container availability-container">
     <h1>Availability</h1>
 
