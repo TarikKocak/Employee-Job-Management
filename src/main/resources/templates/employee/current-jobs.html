@@ -73,6 +73,7 @@
         }
         .table {
             width: max-content;
+            table-layout: fixed;
             min-width: 100%;
             margin: 0 auto;
             border-collapse: separate;
@@ -217,7 +218,7 @@
                 <th>Tarih</th>
                 <th>Başlangıc Saati</th>
                 <th>Ücret</th>
-                <th>Ücret Tahsil Tipi</th>
+                <th>Ücret Tahsili</th>
                 <th>Tahmini Süre</th>
                 <th>İşlem</th>
             </tr>
@@ -239,10 +240,7 @@
                     <a th:href="@{|/employees/${employeeId}/current-jobs/${job.id}/edit|}"
                        class="btn btn-small">Edit</a>
 
-                    <form th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/submit|}"
-                          method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-small btn-success">Submit</button>
-                    </form>
+
                 </td>
             </tr>
             </tbody>

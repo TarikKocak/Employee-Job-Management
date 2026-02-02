@@ -244,6 +244,15 @@
             cursor: not-allowed;
         }
 
+        /* NOT AVAILABLE AT ALL */
+        .status-3 {
+            background: #1f2937;
+        }
+
+        .status-3:hover {
+            background: #111827;
+        }
+
         /* ================================
            SUBMIT BUTTON
         ================================ */
@@ -399,13 +408,14 @@
         <button type="submit"
                 id="submitBtn"
                 class="btn btn-success"
-                th:if="${isSunday}">
+                th:if="${canSubmitAvailability}">
             Availability Kaydet
         </button>
 
-        <div th:if="${!isSunday}"
+        <div th:if="${!canSubmitAvailability}"
              style="margin-top:24px; font-weight:700; color:#dc2626;">
-            Bu tabloyu sadece <strong>Pazar günleri</strong> doldurabilir veya değişiklik yapabilirsiniz.
+            Bu tabloyu sadece <strong>Pazar günleri</strong>
+            doldurabilir veya değişiklik yapabilirsiniz.
         </div>
     </form>
 </div>
@@ -414,13 +424,16 @@
     /*<![CDATA[*/
 
     // FINAL STATE
-    let selectedSlots = new Set();
+    let selectedSlots = new Map();
     const employeeId = [[${employeeId}]];
-    const isSunday = [[${isSunday}]];
+    //const isSunday = [[${isSunday}]];
+    const canSubmitAvailability = [[${canSubmitAvailability}]];
 
-    // WHEN THE PAGE LOADS, ADD THE GREEN ONES FROM THE DB TO SET.
-    document.querySelectorAll(".cell.status-1").forEach(td => {
-        selectedSlots.add(td.dataset.key);
+    // WHEN THE PAGE LOADS, ADD THE GREEN AND BLACK ONES FROM THE DB TO SET.
+    document.querySelectorAll(".cell").forEach(td => {
+        const key = td.dataset.key;
+        if (td.classList.contains("status-1")) selectedSlots.set(key, 1);
+        if (td.classList.contains("status-3")) selectedSlots.set(key, 3);
     });
 
     function showWeek(week) {
@@ -436,20 +449,28 @@
 
         const key = td.dataset.key;
 
-        if (selectedSlots.has(key)) {
-            selectedSlots.delete(key);
-            td.classList.remove("status-1");
-            td.classList.add("status-0");
-        } else {
-            selectedSlots.add(key);
+        if (td.classList.contains("status-0")) {
             td.classList.remove("status-0");
             td.classList.add("status-1");
+            selectedSlots.set(key, 1);
+
+        } else if (td.classList.contains("status-1")) {
+            td.classList.remove("status-1");
+            td.classList.add("status-3");
+            selectedSlots.set(key, 3);
+
+        } else if (td.classList.contains("status-3")) {
+            td.classList.remove("status-3");
+            td.classList.add("status-0");
+            selectedSlots.delete(key);
         }
     }
 
     function prepareSubmit() {
         document.getElementById("slotsInput").value =
-            Array.from(selectedSlots).join(",");
+            Array.from(selectedSlots.entries())
+                .map(([key, status]) => `${key}_${status}`)
+                .join(",");
     }
 
     // SUBMIT (AJAX)
@@ -457,14 +478,16 @@
         event.preventDefault(); //  NO PAGE RELOAD
 
 
-        if (!isSunday) {
-            showAvailabilityError("Bu tabloyu sadece Pazar günleri doldurabilir veya değişiklik yapabilirsiniz.");
+
+        if (!canSubmitAvailability) {
+            showAvailabilityError(
+                "Bu tabloyu sadece Pazar günleri doldurabilir veya değişiklik yapabilirsiniz."
+            );
             return;
         }
 
         // Filling hidden inputs fow slots that filled already
-        document.getElementById("slotsInput").value =
-            Array.from(selectedSlots).join(",");
+        prepareSubmit()
 
         fetch(`/employees/${employeeId}/availability/submit`, {
             method: "POST",

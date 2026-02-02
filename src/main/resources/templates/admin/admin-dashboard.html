@@ -103,6 +103,79 @@
             transform: translateY(0);
             box-shadow: 0 6px 14px rgba(37,99,235,0.35);
         }
+        /* =========================
+           SYSTEM SETTINGS
+        ========================= */
+        .settings-card {
+            background: #f8fafc;
+            border-radius: 14px;
+            padding: 18px 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .setting-text strong {
+            display: block;
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .setting-text span {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        /* TOGGLE SWITCH */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 54px;
+            height: 30px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #d1d5db;
+            border-radius: 999px;
+            transition: 0.25s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            top: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: 0.25s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: #2563eb;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
 
         /* =========================
            RESPONSIVE
@@ -171,10 +244,57 @@
                 </div>
             </div>
 
+            <!-- SYSTEM SETTINGS -->
+            <div class="dashboard-section">
+                <h3>Sistem Ayarları</h3>
+
+                <div class="settings-card">
+                    <div class="setting-row">
+                        <div class="setting-text">
+                            <strong>Availability Kısıtlaması</strong>
+                            <span id="availabilityStatus"
+                                  th:text="${availabilitySundayOnly}
+                          ? 'Sadece Pazar günleri aktif'
+                          : 'Her gün aktif'">
+                </span>
+                        </div>
+
+                        <label class="switch">
+                            <input type="checkbox"
+                                   id="availabilityToggle"
+                                   th:checked="${availabilitySundayOnly}">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
 </div>
+<script>
+    const toggle = document.getElementById("availabilityToggle");
+    const statusText = document.getElementById("availabilityStatus");
 
+    toggle.addEventListener("change", () => {
+        const enabled = toggle.checked;
+
+        fetch("/admin/settings/availability-sunday-only?enabled=" + enabled, {
+            method: "POST",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        }).then(() => {
+            statusText.textContent = enabled
+                ? "Sadece Pazar günleri aktif"
+                : "Her gün aktif";
+        }).catch(() => {
+            // revert on error
+            toggle.checked = !enabled;
+            alert("Ayar güncellenirken hata oluştu");
+        });
+    });
+</script>
 </body>
 </html>

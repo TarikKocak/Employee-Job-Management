@@ -68,6 +68,7 @@
            TABLE CARD
         ========================= */
         .table {
+            table-layout: fixed;
             width: 100%;
             border-collapse: collapse;
             background: #ffffff;
@@ -98,7 +99,9 @@
         .table tbody td {
             padding: 14px 16px;
             border-bottom: 1px solid #e5e7eb;
-            white-space: nowrap;
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         .table tbody tr:last-child td {
@@ -150,7 +153,7 @@
             <th>Tanımı</th>
             <th>Tarih</th>
             <th>Ücret</th>
-            <th>Ücret Tahsil Tipi</th>
+            <th>Ücret Tahsili</th>
             <th>Süre (Saat)</th>
             <th>Bahşiş</th>
             <th>Kart Verildi</th>

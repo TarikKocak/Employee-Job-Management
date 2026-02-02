@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySlot, Long>{
@@ -21,15 +22,10 @@ public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySl
     // To pull all slots (for weekly scroll)
     List<AvailabilitySlot> findByEmployeeId(Long employeeId);
 
-    /*
-    void deleteByEmployeeIdAndDateBetween(
-            Long employeeId,
-            LocalDate start,
-            LocalDate end
-    );*/
 
 
-    void deleteByEmployeeIdAndStatus(Long employeeId, Integer status);
+
+    void deleteByEmployeeIdAndStatusIn(Long employeeId, Collection<Integer> statuses);
 
     // FOR OVERLAPPING AVAILABILITY SLOT
     List<AvailabilitySlot> findByDateBetween(

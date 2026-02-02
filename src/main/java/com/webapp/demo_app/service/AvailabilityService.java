@@ -22,6 +22,7 @@ public class AvailabilityService {
     private final EmployeeRepository employeeRepository;
     private final AvailabilityPolicyService policyService;
 
+
     public AvailabilityService(AvailabilitySlotRepository availabilitySlotRepository,
                                EmployeeRepository employeeRepository,
                                AvailabilityPolicyService policyService) {
@@ -31,11 +32,16 @@ public class AvailabilityService {
     }
 
 
-    //Find the first day of the week (Monday). Here we use next(DayOfWeek.MONDAY) for the Monday of the "week."
+
     public LocalDate getNextWeekMonday() {
         LocalDate today = LocalDate.now();
-        LocalDate thisMonday = today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        return thisMonday.plusWeeks(1);
+        LocalDate thisMonday =
+                today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        if (today.getDayOfWeek() == DayOfWeek.SUNDAY) {
+            return thisMonday.plusWeeks(1);
+        }
+        return thisMonday;
     }
 
 
@@ -77,19 +83,20 @@ public class AvailabilityService {
         policyService.assertSubmissionAllowed();
         Employee employee = employeeRepository.getReferenceById(employeeId);
 
-        // SADECE YEŞİL SLOT'LARI TEMİZLE
-        availabilitySlotRepository.deleteByEmployeeIdAndStatus(employeeId, 1);
+
+        availabilitySlotRepository.deleteByEmployeeIdAndStatusIn(employeeId, List.of(1, 3));
 
         for (String key : selectedSlots) {
             String[] parts = key.split("_");
             LocalDate date = LocalDate.parse(parts[0]);
-            Integer hour = Integer.parseInt(parts[1]);
+            int hour = Integer.parseInt(parts[1]);
+            int status = Integer.parseInt(parts[2]); // 1 or 3
 
             AvailabilitySlot slot = new AvailabilitySlot();
             slot.setEmployee(employee);
             slot.setDate(date);
             slot.setHour(hour);
-            slot.setStatus(1);
+            slot.setStatus(status);
 
             availabilitySlotRepository.save(slot);
         }
@@ -110,6 +117,11 @@ public class AvailabilityService {
 
         for (String key : slotKeys) {
             String[] parts = key.split("_");
+
+
+            int status = Integer.parseInt(parts[2]);
+            if (status != 1) continue; //ONLY AVAILABLE(status-1) COUNTS
+
             LocalDate date = LocalDate.parse(parts[0]);
             LocalDate monday = getWeekMonday(date);
 

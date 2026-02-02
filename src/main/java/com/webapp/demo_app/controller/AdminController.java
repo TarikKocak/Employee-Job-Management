@@ -9,6 +9,7 @@ import com.webapp.demo_app.repository.MevcutIsRepository;
 import com.webapp.demo_app.service.AvailabilityService;
 import com.webapp.demo_app.service.EmployeeService;
 import com.webapp.demo_app.service.JobService;
+import com.webapp.demo_app.service.SystemSettingsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,20 +29,27 @@ public class AdminController {
     private final JobService jobService;
     private final AvailabilityService availabilityService;
     private final MevcutIsRepository mevcutIsRepository;
+    private final SystemSettingsService systemSettingsService;
 
     public AdminController(EmployeeService employeeService,
                            JobService jobService,
                            AvailabilityService availabilityService,
-                           MevcutIsRepository mevcutIsRepository) {
+                           MevcutIsRepository mevcutIsRepository,
+                           SystemSettingsService systemSettingsService) {
         this.employeeService = employeeService;
         this.jobService = jobService;
         this.availabilityService = availabilityService;
         this.mevcutIsRepository=mevcutIsRepository;
+        this.systemSettingsService = systemSettingsService;
     }
 
     // Admin dashboard
     @GetMapping("/dashboard")
-    public String dashboard() {
+    public String dashboard(Model model) {
+        boolean sundayOnlyEnabled =
+                systemSettingsService.isAvailabilitySundayOnlyEnabled();
+
+        model.addAttribute("availabilitySundayOnly", sundayOnlyEnabled);
         log.info("Admin dashboard accessed");
         return "admin/admin-dashboard";
     }
@@ -311,6 +319,15 @@ public class AdminController {
     ) {
         employeeService.adminUpdateEmployee(id, dto);
         return "redirect:" + returnUrl;
+    }
+
+    @PostMapping("/settings/availability-sunday-only")
+    @ResponseBody
+    public void updateAvailabilityPolicy(@RequestParam boolean enabled) {
+
+        systemSettingsService.updateAvailabilitySundayOnly(enabled);
+
+        log.info("Availability Sunday-only policy updated: {}", enabled);
     }
 
 }

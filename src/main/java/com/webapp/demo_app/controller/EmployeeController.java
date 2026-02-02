@@ -31,15 +31,18 @@ public class EmployeeController {
     private final AvailabilityService availabilityService;
     private final EmployeeService employeeService;
     private final AvailabilityPolicyService policyService;
+    private final SystemSettingsService systemSettingsService;
 
     public EmployeeController(JobService jobService,
                               AvailabilityService availabilityService,
                               EmployeeService employeeService,
-                              AvailabilityPolicyService policyService) {
+                              AvailabilityPolicyService policyService,
+                              SystemSettingsService systemSettingsService) {
         this.jobService = jobService;
         this.availabilityService = availabilityService;
         this.employeeService = employeeService;
         this.policyService = policyService;
+        this.systemSettingsService = systemSettingsService;
     }
 
     // ======================
@@ -127,6 +130,33 @@ public class EmployeeController {
         return "employee/edit-current-job";
     }
 
+    @PostMapping("/{employeeId}/current-jobs/{jobId}/save-preview")
+    @ResponseBody
+    public void savePreview(
+            @PathVariable Long employeeId,
+            @PathVariable Long jobId,
+            Authentication authentication,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime asilBaslanilanSaat,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime bitisSaati,
+            @RequestParam Integer bahsis,
+            @RequestParam Boolean kartVerildi,
+            @RequestParam Boolean yorumKartiVerildi,
+            @RequestParam Boolean fotoAtildi
+    ) {
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        jobService.updateWriteOnlyFields(
+                jobId,
+                asilBaslanilanSaat,
+                bitisSaati,
+                bahsis,
+                kartVerildi,
+                yorumKartiVerildi,
+                fotoAtildi
+        );
+    }
+
+    /*
     @PostMapping("/{employeeId}/current-jobs/{jobId}/edit")
     public String saveCurrentJob(@PathVariable Long employeeId,
                                  @PathVariable Long jobId,
@@ -153,7 +183,7 @@ public class EmployeeController {
         );
 
         return "redirect:/employees/" + employeeId + "/current-jobs";
-    }
+    }*/
 
     @PostMapping("/{employeeId}/current-jobs/{jobId}/submit")
     public String submitJob(@PathVariable Long employeeId,
@@ -208,7 +238,13 @@ public class EmployeeController {
         LocalDate week1 = availabilityService.getNextWeekMonday();
         LocalDate week2 = week1.plusWeeks(1);
 
-        boolean isSunday = policyService.isSunday();
+        //boolean isSunday = policyService.isSunday();
+        boolean canSubmit = policyService.canSubmitAvailability();
+
+        model.addAttribute("canSubmitAvailability", canSubmit);
+        model.addAttribute("availabilitySundayOnly",
+                systemSettingsService.isAvailabilitySundayOnlyEnabled());
+        model.addAttribute("isSunday", policyService.isSunday());
 
         model.addAttribute("employeeId", employeeId);
 
@@ -230,7 +266,7 @@ public class EmployeeController {
                 availabilityService.buildStatusMap(
                         availabilityService.getWeekSlots(employeeId, week2)));
 
-        model.addAttribute("isSunday", isSunday);
+        //model.addAttribute("isSunday", isSunday);
 
         return "employee/availability";
     }

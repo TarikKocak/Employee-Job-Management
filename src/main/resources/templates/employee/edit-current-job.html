@@ -153,6 +153,131 @@
             transform: translateY(-1px);
             box-shadow: 0 12px 25px rgba(79, 70, 229, 0.35);
         }
+        /* =========================
+           PREVIEW MODAL (MODERN)
+        ========================= */
+        .preview-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .preview-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 460px;
+            padding: 32px;
+            border-radius: 20px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+            animation: scaleIn 0.25s ease;
+        }
+
+        .preview-card h2 {
+            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        /* PREVIEW LIST */
+        .preview-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 24px;
+        }
+
+        .preview-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 15px;
+        }
+
+        .preview-list li:last-child {
+            border-bottom: none;
+        }
+
+        .preview-list strong {
+            color: #374151;
+        }
+
+        /* VALUE BADGES */
+        .preview-value {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            background: #eef2ff;
+            color: #4338ca;
+        }
+
+        .preview-value.yes {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .preview-value.no {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* ACTIONS */
+        .preview-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .preview-actions .btn-success {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: #ffffff;
+        }
+
+        .preview-actions .btn-success:hover {
+            box-shadow: 0 10px 24px rgba(34,197,94,0.45);
+            transform: translateY(-1px);
+        }
+
+        .preview-actions .btn-secondary {
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            background: #e5e7eb;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .preview-actions .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.96); }
+            to   { transform: scale(1); }
+        }
+        .hidden {
+            display: none !important;
+        }
+
 
         /* =========================
            MOBILE OPTIMIZATION
@@ -169,14 +294,60 @@
 
     </style>
 </head>
+<!-- PREVIEW MODAL -->
+<div id="previewModal" class="preview-overlay hidden">
+    <div class="preview-card">
+        <h2>İş Önizleme</h2>
+
+        <ul class="preview-list">
+            <li>
+                <strong>Başlangıç</strong>
+                <span class="preview-value" id="pStart"></span>
+            </li>
+            <li>
+                <strong>Bitiş</strong>
+                <span class="preview-value" id="pEnd"></span>
+            </li>
+            <li>
+                <strong>Bahşiş</strong>
+                <span class="preview-value" id="pBahsis"></span>
+            </li>
+            <li>
+                <strong>Kart Verildi</strong>
+                <span class="preview-value" id="pKart"></span>
+            </li>
+            <li>
+                <strong>Yorum Kartı</strong>
+                <span class="preview-value" id="pYorum"></span>
+            </li>
+            <li>
+                <strong>Fotoğraf</strong>
+                <span class="preview-value" id="pFoto"></span>
+            </li>
+        </ul>
+
+
+        <div class="preview-actions">
+            <form th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/submit|}"
+                  method="post">
+                <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+
+            <button type="button" class="btn btn-secondary"
+                    onclick="closePreview()">Cancel</button>
+        </div>
+    </div>
+</div>
 <body>
 <div class="container">
     <h1>Mevcut İş Düzenle</h1>
 
     <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn btn-secondary">Geri Dön</a>
 
-    <form th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/edit|}"
-          method="post" class="form">
+    <form id="editForm"
+          th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/save-preview|}"
+          method="post"
+          class="form">
 
         <div class="form-group">
             <label for="asilBaslanilanSaat">Asıl Başlanılan Saat</label>
@@ -244,9 +415,67 @@
             </div>
         </div>
 
-        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <button type="button" class="btn btn-primary"
+                onclick="saveAndPreview()">Kaydet</button>
     </form>
 </div>
-<script th:src="@{/js/main.js}"></script>
+<script>
+    function saveAndPreview() {
+        const form = document.getElementById("editForm");
+        const data = new FormData(form);
+
+        fetch(form.action, {
+            method: "POST",
+            body: data
+        }).then(res => {
+            if (!res.ok) throw new Error("Save failed");
+            fillPreview();
+            document.getElementById("previewModal").classList.remove("hidden");
+        }).catch(() => {
+            alert("Kaydetme başarısız");
+        });
+    }
+
+    function setValue(id, value, isBoolean = false) {
+        const el = document.getElementById(id);
+        el.innerText = value;
+
+        if (isBoolean) {
+            el.classList.remove("yes", "no");
+            el.classList.add(value === "Evet" ? "yes" : "no");
+        }
+    }
+
+    function fillPreview() {
+        setValue("pStart", document.getElementById("asilBaslanilanSaat").value);
+        setValue("pEnd", document.getElementById("bitisSaati").value);
+        setValue("pBahsis", document.getElementById("bahsis").value);
+
+        setValue(
+            "pKart",
+            document.querySelector('input[name="kartVerildi"]:checked').value === "true" ? "Evet" : "Hayır",
+            true
+        );
+
+        setValue(
+            "pYorum",
+            document.querySelector('input[name="yorumKartiVerildi"]:checked').value === "true" ? "Evet" : "Hayır",
+            true
+        );
+
+        setValue(
+            "pFoto",
+            document.querySelector('input[name="fotoAtildi"]:checked').value === "true" ? "Evet" : "Hayır",
+            true
+        );
+    }
+
+
+    function closePreview() {
+        document.getElementById("previewModal").classList.add("hidden");
+    }
+</script>
+
+
 </body>
 </html>
