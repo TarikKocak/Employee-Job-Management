@@ -378,7 +378,7 @@
                     </td>
                     <td th:text="${is.asilBaslanilanSaat}"></td>
                     <td th:text="${is.bitisSaati}"></td>
-                    <td th:text="${is.sure}"></td>
+                    <td th:text="${#numbers.formatDecimal(is.sure, 1, 2)}"></td>
 
                     <!-- Boolean badges -->
 

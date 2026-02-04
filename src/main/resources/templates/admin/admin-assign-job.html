@@ -179,6 +179,63 @@
             transform: translateY(-2px);
             box-shadow: 0 16px 34px rgba(37,99,235,0.5);
         }
+        .multi-dropdown {
+            position: relative;
+        }
+
+        .multi-input {
+            padding: 11px 14px;
+            border-radius: 12px;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .multi-input:hover {
+            border-color: #9ca3af;
+        }
+
+        .multi-input.active {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        /* dropdown menu */
+        .multi-menu {
+            position: absolute;
+            top: 110%;
+            left: 0;
+            right: 0;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 14px 34px rgba(0,0,0,0.12);
+            padding: 8px;
+            display: none;
+            z-index: 50;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        /* item */
+        .multi-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .multi-item:hover {
+            background: #f3f4f6;
+        }
+
+        .multi-item input {
+            accent-color: #2563eb;
+        }
 
         /* =========================
            AVAILABILITY
@@ -316,11 +373,33 @@
                 <div class="form-group">
                     <label>Type</label>
                     <select th:field="*{tur}" required>
+                        <option value="" disabled selected>-- Select type --</option>
+
                         <option th:each="t : ${turler}"
                                 th:value="${t}"
                                 th:text="${t}">
                         </option>
                     </select>
+                </div>
+
+                <div class="form-group" id="coworkEmployees" style="display:none;">
+                    <label>Other Employees</label>
+
+                    <div class="multi-dropdown">
+                        <div class="multi-input" id="coworkInput">
+                            Select coworker
+                        </div>
+
+                        <div class="multi-menu" id="coworkMenu">
+                            <label th:each="e : ${allEmployees}" class="multi-item">
+                                <input type="radio"
+                                       name="otherEmployeeId"
+                                       th:value="${e.id}"
+                                       onchange="selectCowork(this)">
+                                <span th:text="${e.username}"></span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -470,6 +549,73 @@
 </div>
 
 <script>
+    const turSelect = document.querySelector("[name='tur']");
+    const coworkBox = document.getElementById("coworkEmployees");
+
+    function toggleCowork() {
+        if (turSelect.value === 'COWORK') {
+            coworkBox.style.display = 'block';
+            initCoworkDropdown();
+        } else {
+            coworkBox.style.display = 'none';
+
+            document
+                .querySelectorAll("input[name='otherEmployeeId']")
+                .forEach(r => r.checked = false);
+
+            document.getElementById("coworkInput").textContent = "Select coworker";
+        }
+    }
+
+    turSelect.addEventListener("change", toggleCowork);
+    toggleCowork(); // run on load
+
+    // =============================
+    // SINGLE SELECT COWORK DROPDOWN
+    // =============================
+    let coworkInitialized = false;
+
+    function initCoworkDropdown() {
+        if (coworkInitialized) return;
+
+        const coworkInput = document.getElementById("coworkInput");
+        const coworkMenu = document.getElementById("coworkMenu");
+
+        if (!coworkInput || !coworkMenu) return;
+
+        // open / close on input click
+        coworkInput.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const isOpen = coworkMenu.style.display === "block";
+            coworkMenu.style.display = isOpen ? "none" : "block";
+            coworkInput.classList.toggle("active", !isOpen);
+        });
+
+        // prevent closing when clicking inside menu
+        coworkMenu.addEventListener("click", (e) => {
+            e.stopPropagation();
+        });
+
+        // close when clicking outside
+        document.addEventListener("click", () => {
+            coworkMenu.style.display = "none";
+            coworkInput.classList.remove("active");
+        });
+
+        coworkInitialized = true;
+    }
+
+    // called from radio onchange
+    function selectCowork(radio) {
+        const coworkInput = document.getElementById("coworkInput");
+        const coworkMenu = document.getElementById("coworkMenu");
+
+        coworkInput.textContent = radio.nextElementSibling.textContent;
+
+        coworkMenu.style.display = "none";
+        coworkInput.classList.remove("active");
+    }
+
     function showWeek(week) {
         const week1 = document.getElementById("week1-table");
         const week2 = document.getElementById("week2-table");

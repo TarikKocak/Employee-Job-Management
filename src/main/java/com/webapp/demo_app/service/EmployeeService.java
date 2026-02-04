@@ -42,6 +42,13 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 
+    public List<Employee> getAllExcept(Long employeeId) {
+        return employeeRepository.findAll()
+                .stream()
+                .filter(e -> !e.getId().equals(employeeId))
+                .toList();
+    }
+
 
     // =========================
     // WRITE OPERATIONS

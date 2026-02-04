@@ -231,19 +231,41 @@ public class AdminController {
         model.addAttribute("week2Dates", week2Dates);
         model.addAttribute("week1StatusMap", week1StatusMap);
         model.addAttribute("week2StatusMap", week2StatusMap);
+        model.addAttribute(
+                "allEmployees",
+                employeeService.getAllExcept(id)   // recommended
+        );
 
         return "admin/admin-assign-job";
     }
 
     @PostMapping("/employees/{id}/assign-job")
-    public String assignJob(@PathVariable Long id, @ModelAttribute("job") MevcutIs job) {
+    public String assignJob(@PathVariable Long id,
+                            @ModelAttribute("job") MevcutIs job,
+                            @RequestParam(required = false) Long otherEmployeeId) {
 
         log.info("Job assignment requested employeeId={} jobType={}",
                 id, job.getTur());
 
-        jobService.assignJobToEmployee(id, job);
+        if (job.getTur() == Tur.COWORK && otherEmployeeId == null) {
+            throw new IllegalStateException("Cowork job requires another employee");
+        }
 
-        log.info("Job assigned successfully employeeId={}", id);
+        jobService.assignJobToEmployees(id, job, otherEmployeeId);
+        if (job.getTur() == Tur.COWORK) {
+            log.info("Job assigned successfully | employeeId={} | type={} | coworkEmployee={}",
+                    id,
+                    job.getTur(),
+                    (otherEmployeeId == null
+                            ? "none"
+                            : otherEmployeeId)
+            );
+        } else {
+            log.info("Job assigned successfully | employeeId={} | type={}",
+                    id,
+                    job.getTur()
+            );
+        }
 
         return "redirect:/admin/employees/" + id;
     }

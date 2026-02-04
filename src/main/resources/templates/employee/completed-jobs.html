@@ -170,7 +170,7 @@
             <td th:text="${job.tarih}"></td>
             <td th:text="${job.ucret}"></td>
             <td th:text="${job.ucretTahsilTipi}"></td>
-            <td th:text="${job.sure}"></td>
+            <td th:text="${#numbers.formatDecimal(job.sure, 1, 2)}"></td>
             <td th:text="${job.bahsis}"></td>
             <td th:text="${job.kartVerildi} ? 'Evet' : 'Hayır'"></td>
             <td th:text="${job.yorumKartiVerildi} ? 'Evet' : 'Hayır'"></td>

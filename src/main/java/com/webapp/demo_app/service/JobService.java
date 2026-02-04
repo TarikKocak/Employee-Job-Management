@@ -202,6 +202,50 @@ public class JobService {
         );
     }
 
+    // if selected job type is COWORK, this code piece is necessary
+    @Transactional
+    public void assignJobToEmployees(
+            Long mainEmployeeId,
+            MevcutIs baseJob,
+            Long otherEmployeeId
+    ) {
+
+        // always assign to main employee
+        assignJobToEmployee(mainEmployeeId, cloneJob(baseJob));
+
+        //  only COWORK allows multi-assign
+        if (baseJob.getTur() != Tur.COWORK) {
+            return;
+        }
+
+        if (otherEmployeeId == null) {
+            return;
+        }
+
+        assignJobToEmployee(otherEmployeeId, cloneJob(baseJob));
+
+    }
+
+    private MevcutIs cloneJob(MevcutIs source) {
+        MevcutIs job = new MevcutIs();
+
+        job.setTur(source.getTur());
+        job.setDuvarMontaji(source.getDuvarMontaji());
+        job.setIsim(source.getIsim());
+        job.setIsAdresi(source.getIsAdresi());
+        job.setTelNo(source.getTelNo());
+        job.setIsTanimi(source.getIsTanimi());
+        job.setTarih(source.getTarih());
+        job.setBaslangicSaati(source.getBaslangicSaati());
+        job.setTahminiSure(source.getTahminiSure());
+        job.setUcret(source.getUcret());
+        job.setUcretTahsilTipi(source.getUcretTahsilTipi());
+
+        return job;
+    }
+
+
+
     public Map<String, List<CurrJobDTO>>
     getJobOverlapForWeek(LocalDate monday) {
 
