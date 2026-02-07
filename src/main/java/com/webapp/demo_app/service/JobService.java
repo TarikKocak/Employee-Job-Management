@@ -295,6 +295,84 @@ public class JobService {
 
         return result;
     }
+    @Transactional
+    public MevcutIs updateCurrentJobInfo(Long employeeId,
+                                         Long jobId,
+                                         MevcutIs updatedJob) {
+        MevcutIs mevcutIs = getMevcutIsById(jobId);
+
+        if (!mevcutIs.getEmployee().getId().equals(employeeId)) {
+            throw new IllegalArgumentException("Job does not belong to employee");
+        }
+
+        LocalDate oldDate = mevcutIs.getTarih();
+        LocalTime oldStart = mevcutIs.getBaslangicSaati();
+        Double oldDuration = mevcutIs.getTahminiSure();
+
+        mevcutIs.setTur(updatedJob.getTur());
+        mevcutIs.setDuvarMontaji(updatedJob.getDuvarMontaji());
+        mevcutIs.setIsim(updatedJob.getIsim());
+        mevcutIs.setIsAdresi(updatedJob.getIsAdresi());
+        mevcutIs.setTelNo(updatedJob.getTelNo());
+        mevcutIs.setIsTanimi(updatedJob.getIsTanimi());
+        mevcutIs.setTarih(updatedJob.getTarih());
+        mevcutIs.setBaslangicSaati(updatedJob.getBaslangicSaati());
+        mevcutIs.setTahminiSure(updatedJob.getTahminiSure());
+        mevcutIs.setUcret(updatedJob.getUcret());
+        mevcutIs.setUcretTahsilTipi(updatedJob.getUcretTahsilTipi());
+
+        MevcutIs savedJob = mevcutIsRepository.save(mevcutIs);
+
+        if (oldDate != null
+                && oldStart != null
+                && oldDuration != null
+                && (!Objects.equals(oldDate, savedJob.getTarih())
+                || !Objects.equals(oldStart, savedJob.getBaslangicSaati())
+                || !Objects.equals(oldDuration, savedJob.getTahminiSure()))) {
+            availabilityService.unblockAvailabilityForJob(
+                    employeeId,
+                    oldDate,
+                    oldStart,
+                    oldDuration
+            );
+        }
+
+        if (savedJob.getTarih() != null
+                && savedJob.getBaslangicSaati() != null
+                && savedJob.getTahminiSure() != null) {
+            availabilityService.blockAvailabilityForJob(
+                    employeeId,
+                    savedJob.getTarih(),
+                    savedJob.getBaslangicSaati(),
+                    savedJob.getTahminiSure()
+            );
+        }
+
+        return savedJob;
+    }
+
+    @Transactional
+    public void deleteCurrentJob(Long employeeId, Long jobId) {
+        MevcutIs mevcutIs = getMevcutIsById(jobId);
+
+        if (!mevcutIs.getEmployee().getId().equals(employeeId)) {
+            throw new IllegalArgumentException("Job does not belong to employee");
+        }
+
+        if (mevcutIs.getTarih() != null
+                && mevcutIs.getBaslangicSaati() != null
+                && mevcutIs.getTahminiSure() != null) {
+            availabilityService.unblockAvailabilityForJob(
+                    employeeId,
+                    mevcutIs.getTarih(),
+                    mevcutIs.getBaslangicSaati(),
+                    mevcutIs.getTahminiSure()
+            );
+        }
+
+        mevcutIsRepository.delete(mevcutIs);
+    }
+
 
 
 }

@@ -78,10 +78,10 @@ public class AdminController {
             minHours = null;
         }
 
-        // 🔹 Dropdown için HER ZAMAN tüm employee’ler
+        //  Dropdown için HER ZAMAN tüm employee’ler
         List<Employee> allEmployees = employeeService.getAll();
 
-        // 🔹 Base filtering (title / employee)
+        //  Base filtering (title / employee)
         List<Employee> filteredEmployees;
 
         if (employeeId != null) {
@@ -269,6 +269,60 @@ public class AdminController {
 
         return "redirect:/admin/employees/" + id;
     }
+    @GetMapping("/employees/{employeeId}/current-jobs/{jobId}/edit")
+    public String editEmployeeJob(@PathVariable Long employeeId,
+                                  @PathVariable Long jobId,
+                                  @RequestParam(required = false) String returnUrl,
+                                  Model model) {
+        MevcutIs job = jobService.getMevcutIsById(jobId);
+
+        if (!job.getEmployee().getId().equals(employeeId)) {
+            throw new IllegalArgumentException("Job does not belong to employee");
+        }
+
+        String resolvedReturnUrl =
+                returnUrl == null || returnUrl.isBlank()
+                        ? "/admin/employees/" + employeeId
+                        : returnUrl;
+
+        model.addAttribute("job", job);
+        model.addAttribute("employeeId", employeeId);
+        model.addAttribute("returnUrl", resolvedReturnUrl);
+        model.addAttribute("turler", Tur.values());
+        model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
+
+        return "admin/admin-edit-current-job";
+    }
+
+    @PostMapping("/employees/{employeeId}/current-jobs/{jobId}/edit")
+    public String updateEmployeeJob(@PathVariable Long employeeId,
+                                    @PathVariable Long jobId,
+                                    @ModelAttribute("job") MevcutIs job,
+                                    @RequestParam(required = false) String returnUrl) {
+        jobService.updateCurrentJobInfo(employeeId, jobId, job);
+
+        String resolvedReturnUrl =
+                returnUrl == null || returnUrl.isBlank()
+                        ? "/admin/employees/" + employeeId
+                        : returnUrl;
+
+        return "redirect:" + resolvedReturnUrl;
+    }
+
+    @PostMapping("/employees/{employeeId}/current-jobs/{jobId}/delete")
+    public String deleteEmployeeJob(@PathVariable Long employeeId,
+                                    @PathVariable Long jobId,
+                                    @RequestParam(required = false) String returnUrl) {
+        jobService.deleteCurrentJob(employeeId, jobId);
+
+        String resolvedReturnUrl =
+                returnUrl == null || returnUrl.isBlank()
+                        ? "/admin/employees/" + employeeId
+                        : returnUrl;
+
+        return "redirect:" + resolvedReturnUrl;
+    }
+
 
     @GetMapping("/jobs-overview")
     public String jobsOverview(Model model) {

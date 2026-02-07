@@ -126,6 +126,36 @@
         .admin-table td {
             font-size: 14px;
         }
+                .job-actions {
+            display: inline-flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+        }
+
+        .action-btn.edit {
+            background: #e0f2fe;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+        }
+
+        .action-btn.delete {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #fecaca;
+        }
 
         /* =========================
            EMPTY STATE (OPTIONAL)
@@ -172,6 +202,7 @@
                     <th>Hour</th>
                     <th>Address</th>
                     <th>Price</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -181,6 +212,23 @@
                     <td th:text="${job.baslangicSaati}"></td>
                     <td th:text="${job.isAdresi}"></td>
                     <td th:text="${job.ucret}"></td>
+                    <td>
+                        <div class="job-actions">
+                            <a class="action-btn edit"
+                               th:href="@{|/admin/employees/${employee.id}/current-jobs/${job.id}/edit?returnUrl=/admin/employees/${employee.id}|}">
+                                Edit
+                            </a>
+                            <form th:action="@{|/admin/employees/${employee.id}/current-jobs/${job.id}/delete|}"
+                                  method="post">
+                                <input type="hidden" name="returnUrl"
+                                       th:value="@{|/admin/employees/${employee.id}|}">
+                                <button type="submit" class="action-btn delete"
+                                        onclick="return confirm('Delete this job?');">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </td>
                 </tr>
                 </tbody>
             </table>

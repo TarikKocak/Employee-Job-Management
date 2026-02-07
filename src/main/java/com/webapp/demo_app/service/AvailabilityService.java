@@ -253,6 +253,28 @@ public class AvailabilityService {
         }
 
     }
+    @Transactional
+    public void unblockAvailabilityForJob(Long employeeId,
+                                          LocalDate date,
+                                          LocalTime startTime,
+                                          double duration) {
+        List<Integer> hours = calculateBlockedHours(startTime, duration);
+
+        for (Integer hour : hours) {
+            AvailabilitySlot slot =
+                    availabilitySlotRepository.findByEmployeeIdAndDateAndHour(employeeId, date, hour);
+
+            if (slot == null) {
+                slot = new AvailabilitySlot();
+                slot.setEmployee(employeeRepository.getReferenceById(employeeId));
+                slot.setDate(date);
+                slot.setHour(hour);
+            }
+
+            slot.setStatus(1);
+            availabilitySlotRepository.save(slot);
+        }
+    }
 
 
     public Map<String, Integer>
