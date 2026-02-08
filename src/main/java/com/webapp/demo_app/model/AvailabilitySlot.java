@@ -33,4 +33,6 @@ public class AvailabilitySlot {
      * 2: kırmızı (occupied - admins will use this part)
      */
     private Integer status;
+
+    private Integer previousStatus;
 }

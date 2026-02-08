@@ -7,24 +7,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 
-/*
-@Service
-public class AvailabilityPolicyService {
 
-    private static final ZoneId ZONE = ZoneId.of("Europe/Berlin");
-
-    public boolean isSunday() {
-        return LocalDate.now(ZONE).getDayOfWeek() == DayOfWeek.SUNDAY;
-    }
-
-    public void assertSubmissionAllowed() {
-        if (!isSunday()) {
-            throw new AvailabilitySubmissionNotAllowedException(
-                    "Bu tabloyu sadece Pazar günleri doldurabilir veya değişiklik yapabilirsiniz."
-            );
-        }
-    }
-}*/
 @Service
 public class AvailabilityPolicyService {
 
@@ -41,23 +24,23 @@ public class AvailabilityPolicyService {
     }
     public boolean canSubmitAvailability() {
 
-        // Admin global olarak kapattıysa → her gün serbest
+        // If the admin turn off globally → Availability can be submitted everytime
         if (!systemSettingsService.isAvailabilitySundayOnlyEnabled()) {
             return true;
         }
 
-        // Açıksa → sadece pazar
+        // If turned on  → can only be submitted on Sundays
         return isSunday();
     }
 
     public void assertSubmissionAllowed() {
 
-        //  Admin global olarak kapattıysa → serbest
+
         if (!systemSettingsService.isAvailabilitySundayOnlyEnabled()) {
             return;
         }
 
-        //  Açıksa → sadece pazar
+
         if (!isSunday()) {
             throw new AvailabilitySubmissionNotAllowedException(
                     "Bu tabloyu sadece Pazar günleri doldurabilir veya değişiklik yapabilirsiniz."

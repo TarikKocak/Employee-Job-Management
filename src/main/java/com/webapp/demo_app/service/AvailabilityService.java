@@ -247,6 +247,9 @@ public class AvailabilityService {
                 slot.setDate(date);
                 slot.setHour(hour);
             }
+            if (slot.getStatus() == null || slot.getStatus() != 2) {
+                slot.setPreviousStatus(slot.getStatus());
+            }
 
             slot.setStatus(2);
             availabilitySlotRepository.save(slot);
@@ -265,14 +268,16 @@ public class AvailabilityService {
                     availabilitySlotRepository.findByEmployeeIdAndDateAndHour(employeeId, date, hour);
 
             if (slot == null) {
-                slot = new AvailabilitySlot();
-                slot.setEmployee(employeeRepository.getReferenceById(employeeId));
-                slot.setDate(date);
-                slot.setHour(hour);
+                continue;
             }
-
-            slot.setStatus(1);
-            availabilitySlotRepository.save(slot);
+            if(slot.getPreviousStatus()==null){
+                availabilitySlotRepository.delete(slot);
+            }
+            else{
+                slot.setStatus(slot.getPreviousStatus());
+                slot.setPreviousStatus(null);
+                availabilitySlotRepository.save(slot);
+            }
         }
     }
 
