@@ -4,6 +4,7 @@ import com.webapp.demo_app.model.TamamlananIs;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface TamamlananIsRepository extends JpaRepository<TamamlananIs, Long> {
@@ -12,4 +13,5 @@ public interface TamamlananIsRepository extends JpaRepository<TamamlananIs, Long
     @EntityGraph(attributePaths = "employee")
     List<TamamlananIs> findAllByOrderByTarihAsc();
 
+    List<TamamlananIs> findByEmployeeIdOrderByTarihAsc(Long employeeId);
 }

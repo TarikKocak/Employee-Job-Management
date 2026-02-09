@@ -124,6 +124,89 @@
         .table td {
             font-weight: 500;
         }
+        /* =========================
+   PREVIEW MODAL
+========================= */
+        .preview-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .preview-overlay.hidden {
+            display: none;
+        }
+
+        .preview-modal {
+            background: #ffffff;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            animation: scaleIn 0.2s ease;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .preview-header h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .close-btn {
+            border: none;
+            background: transparent;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .preview-content {
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .preview-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e5e7eb;
+        }
+
+        .preview-row:last-child {
+            border-bottom: none;
+        }
+
+        .preview-label {
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .preview-value {
+            color: #111827;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
 
         /* =========================
            RESPONSIVE
@@ -137,6 +220,20 @@
 
     </style>
 </head>
+<!-- JOB PREVIEW MODAL -->
+<div id="jobPreviewOverlay" class="preview-overlay hidden">
+    <div class="preview-modal">
+        <div class="preview-header">
+            <h2>İş Detayı</h2>
+            <button class="close-btn" onclick="closePreview()">✕</button>
+        </div>
+
+        <div class="preview-content" id="previewContent">
+            <!-- Filled dynamically -->
+        </div>
+    </div>
+</div>
+
 <body>
 <div th:replace="~{fragments/admin_header :: mainHeader}"></div>
 <div class="container">
@@ -162,7 +259,21 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="job : ${jobs}">
+        <tr th:each="job : ${jobs}"
+            onclick="openPreview(this)"
+            style="cursor:pointer"
+            th:data-tur="${job.tur}"
+            th:data-duvar="${job.duvarMontaji}"
+            th:data-adres="${job.isAdresi}"
+            th:data-tanimi="${job.tanimi}"
+            th:data-tarih="${job.tarih}"
+            th:data-ucret="${job.ucret}"
+            th:data-tahsil="${job.ucretTahsilTipi}"
+            th:data-sure="${job.sure}"
+            th:data-bahsis="${job.bahsis}"
+            th:data-kart="${job.kartVerildi}"
+            th:data-yorum="${job.yorumKartiVerildi}"
+            th:data-foto="${job.fotoAtildi}">
             <td th:text="${job.tur}"></td>
             <td th:text="${job.duvarMontaji} ? 'Evet' : 'Hayır'"></td>
             <td th:text="${job.isAdresi}"></td>
@@ -180,5 +291,30 @@
     </table>
 </div>
 <script th:src="@{/js/main.js}"></script>
+<script>
+    function openPreview(row) {
+        const content = document.getElementById("previewContent");
+
+        const fields = row.dataset;
+
+        let html = "";
+        for (const key in fields) {
+            html += `
+            <div class="preview-row">
+                <div class="preview-label">${key}</div>
+                <div class="preview-value">${fields[key]}</div>
+            </div>
+        `;
+        }
+
+        content.innerHTML = html;
+        document.getElementById("jobPreviewOverlay").classList.remove("hidden");
+    }
+
+    function closePreview() {
+        document.getElementById("jobPreviewOverlay").classList.add("hidden");
+    }
+</script>
+
 </body>
 </html>

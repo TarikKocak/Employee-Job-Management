@@ -1,6 +1,7 @@
 package com.webapp.demo_app.service;
 
 import com.webapp.demo_app.dto.CurrJobDTO;
+import com.webapp.demo_app.dto.MevcutIsDto;
 import com.webapp.demo_app.dto.TamamlananIsDto;
 import com.webapp.demo_app.model.AvailabilitySlot;
 import com.webapp.demo_app.model.MevcutIs;
@@ -43,14 +44,41 @@ public class JobService {
         this.availabilitySlotRepository = availabilitySlotRepository;
     }
 
-    public List<MevcutIs> getMevcutIsler(Long employeeId) {
-        return mevcutIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId);
+    public List<MevcutIsDto> getMevcutIsler(Long employeeId) {
+        return mevcutIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId)
+                .stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    private MevcutIsDto toDto(MevcutIs job) {
+        MevcutIsDto dto = new MevcutIsDto();
+
+        dto.setId(job.getId());
+        dto.setTur(job.getTur());
+        dto.setDuvarMontaji(job.getDuvarMontaji());
+        dto.setIsim(job.getIsim());
+        dto.setIsAdresi(job.getIsAdresi());
+        dto.setTelNo(job.getTelNo());
+        dto.setIsTanimi(job.getIsTanimi());
+        dto.setTarih(job.getTarih());
+        dto.setBaslangicSaati(job.getBaslangicSaati());
+        dto.setTahminiSure(job.getTahminiSure());
+        dto.setUcretTahsilTipi(job.getUcretTahsilTipi());
+
+        if (job.getTur() == Tur.YALNIZ && job.getUcretTahsilTipi() == UcretTahsilTipi.CASH) {
+            dto.setUcret(job.getUcret() + "€");
+        } else {
+            dto.setUcret("No Info");
+        }
+
+        return dto;
     }
 
     //For employees
     public List<TamamlananIsDto> getTamamlananIsler(Long employeeId) {
 
-        return tamamlananIsRepository.findByEmployeeId(employeeId)
+        return tamamlananIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId)
                 .stream()
                 .map(this::toDto)
                 .toList();
@@ -63,6 +91,7 @@ public class JobService {
         dto.setId(job.getId());
         dto.setTur(job.getTur());
         dto.setDuvarMontaji(job.getDuvarMontaji());
+        dto.setIsim(job.getIsim());
         dto.setIsAdresi(job.getIsAdresi());
         dto.setTanimi(job.getTanimi());
         dto.setTarih(job.getTarih());
@@ -97,7 +126,7 @@ public class JobService {
     }
 
     @Transactional
-    public MevcutIs updateWriteOnlyFields(
+    public void updateWriteOnlyFields(
             Long jobId,
             LocalTime asilBaslanilanSaat,
             LocalTime bitisSaati,
@@ -123,7 +152,7 @@ public class JobService {
         mevcutIs.setYorumKartiVerildi(yorumKartiVerildi);
         mevcutIs.setFotoAtildi(fotoAtildi);
 
-        return mevcutIsRepository.save(mevcutIs);
+        mevcutIsRepository.save(mevcutIs);
     }
 
     public void submitJob(Long employeeId, Long jobId) {
@@ -154,6 +183,7 @@ public class JobService {
         tamamlananIs.setEmployee(mevcutIs.getEmployee());
         tamamlananIs.setTur(mevcutIs.getTur());
         tamamlananIs.setDuvarMontaji(mevcutIs.getDuvarMontaji());
+        tamamlananIs.setIsim(mevcutIs.getIsim());
         tamamlananIs.setIsAdresi(mevcutIs.getIsAdresi());
         tamamlananIs.setTanimi(mevcutIs.getIsTanimi());
         tamamlananIs.setTarih(mevcutIs.getTarih());
@@ -296,9 +326,9 @@ public class JobService {
         return result;
     }
     @Transactional
-    public MevcutIs updateCurrentJobInfo(Long employeeId,
-                                         Long jobId,
-                                         MevcutIs updatedJob) {
+    public void updateCurrentJobInfo(Long employeeId,
+                                     Long jobId,
+                                     MevcutIs updatedJob) {
         MevcutIs mevcutIs = getMevcutIsById(jobId);
 
         if (!mevcutIs.getEmployee().getId().equals(employeeId)) {
@@ -348,7 +378,6 @@ public class JobService {
             );
         }
 
-        return savedJob;
     }
 
     @Transactional

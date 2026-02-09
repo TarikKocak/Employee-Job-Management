@@ -31,6 +31,7 @@ public class TamamlananIs {
 
     private Boolean duvarMontaji;
 
+    private String isim;
     private String isAdresi;
     private String tanimi;
     private LocalDate tarih;

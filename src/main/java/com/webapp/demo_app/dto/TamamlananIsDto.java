@@ -16,6 +16,7 @@ public class TamamlananIsDto {
     private Long id;
     private Tur tur;
     private Boolean duvarMontaji;
+    private String isim;
     private String isAdresi;
     private String tanimi;
     private LocalDate tarih;
