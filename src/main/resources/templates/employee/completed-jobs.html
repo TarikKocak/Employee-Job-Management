@@ -99,9 +99,9 @@
         .table tbody td {
             padding: 14px 16px;
             border-bottom: 1px solid #e5e7eb;
-            white-space: normal;
-            word-break: break-word;
-            overflow-wrap: anywhere;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .table tbody tr:last-child td {
@@ -125,8 +125,8 @@
             font-weight: 500;
         }
         /* =========================
-   PREVIEW MODAL
-========================= */
+           PREVIEW MODAL
+        ========================= */
         .preview-overlay {
             position: fixed;
             inset: 0;
@@ -172,29 +172,39 @@
         }
 
         .preview-content {
-            padding: 20px;
-            font-size: 14px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .preview-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: 16px;
+            padding: 10px 0;
             border-bottom: 1px dashed #e5e7eb;
-        }
-
-        .preview-row:last-child {
-            border-bottom: none;
+            align-items: flex-start;
         }
 
         .preview-label {
             font-weight: 700;
-            color: #374151;
+            color: #475569;
         }
 
         .preview-value {
             color: #111827;
+            line-height: 1.5;
+            word-break: break-word;
         }
+
+        .preview-desc .preview-value {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13.5px;
+        }
+
 
         @keyframes scaleIn {
             from {
@@ -294,17 +304,37 @@
 <script>
     function openPreview(row) {
         const content = document.getElementById("previewContent");
-
         const fields = row.dataset;
+
+        const labelMap = {
+            tur: "Tür",
+            duvar: "Duvar Montajı",
+            adres: "İş Adresi",
+            tanimi: "İş Tanımı",
+            tarih: "Tarih",
+            ucret: "Ücret",
+            tahsil: "Ücret Tahsili",
+            sure: "Süre (Saat)",
+            bahsis: "Bahşiş",
+            kart: "Kart Verildi",
+            yorum: "Yorum Kartı",
+            foto: "Foto Atıldı"
+        };
+
+        const valueMap = (key, value) => {
+            if (value === "true") return "Evet";
+            if (value === "false") return "Hayır";
+            return value;
+        };
 
         let html = "";
         for (const key in fields) {
             html += `
-            <div class="preview-row">
-                <div class="preview-label">${key}</div>
-                <div class="preview-value">${fields[key]}</div>
-            </div>
-        `;
+                <div class="preview-row ${key === 'tanimi' ? 'preview-desc' : ''}">
+                    <div class="preview-label">${labelMap[key] ?? key}</div>
+                    <div class="preview-value">${valueMap(key, fields[key])}</div>
+                </div>
+            `;
         }
 
         content.innerHTML = html;

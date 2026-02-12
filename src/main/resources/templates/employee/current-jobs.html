@@ -72,7 +72,7 @@
             width: 100%;
         }
         .table {
-            width: max-content;
+            width: 100%;
             table-layout: fixed;
             min-width: 100%;
             margin: 0 auto;
@@ -106,8 +106,12 @@
         .table tbody td {
             padding: 14px 16px;
             border-bottom: 1px solid #e5e7eb;
-            white-space: nowrap;
+
+            white-space: nowrap;       /* tek satır */
+            overflow: hidden;          /* taşanı gizle */
+            text-overflow: ellipsis;   /* ... */
         }
+
 
         .table tbody tr:last-child td {
             border-bottom: none;
@@ -225,29 +229,40 @@
         }
 
         .preview-content {
-            padding: 20px;
+            padding: 24px;
             font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
         }
 
         .preview-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
+            display: grid;
+            grid-template-columns: 160px 1fr;
+            gap: 16px;
+            padding: 10px 0;
             border-bottom: 1px dashed #e5e7eb;
-        }
-
-        .preview-row:last-child {
-            border-bottom: none;
+            align-items: flex-start;
         }
 
         .preview-label {
             font-weight: 700;
-            color: #374151;
+            color: #475569;
+            text-transform: capitalize;
         }
 
         .preview-value {
             color: #111827;
+            line-height: 1.5;
+            word-break: break-word;
         }
+        .preview-desc .preview-value {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13.5px;
+        }
+
 
         @keyframes scaleIn {
             from {
@@ -357,14 +372,27 @@
 <script>
     function openPreview(row) {
         const content = document.getElementById("previewContent");
-
         const fields = row.dataset;
+
+        const labelMap = {
+            tur: "Tür",
+            duvar: "Duvar Montajı",
+            isim: "İsim",
+            adres: "İş Adresi",
+            tel: "Telefon",
+            tanimi: "İş Tanımı",
+            tarih: "Tarih",
+            baslangic: "Başlangıç Saati",
+            ucret: "Ücret",
+            tahsil: "Ücret Tahsili",
+            sure: "Tahmini Süre (saat)"
+        };
 
         let html = "";
         for (const key in fields) {
             html += `
-            <div class="preview-row">
-                <div class="preview-label">${key}</div>
+            <div class="preview-row ${key === 'tanimi' ? 'preview-desc' : ''}">
+                <div class="preview-label">${labelMap[key] ?? key}</div>
                 <div class="preview-value">${fields[key]}</div>
             </div>
         `;
@@ -373,10 +401,8 @@
         content.innerHTML = html;
         document.getElementById("jobPreviewOverlay").classList.remove("hidden");
     }
+    function closePreview() { document.getElementById("jobPreviewOverlay").classList.add("hidden"); }
 
-    function closePreview() {
-        document.getElementById("jobPreviewOverlay").classList.add("hidden");
-    }
 </script>
 
 </body>

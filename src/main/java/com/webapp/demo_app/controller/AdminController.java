@@ -377,6 +377,7 @@ public class AdminController {
 
         AdminEmployeeUpdateDto dto = new AdminEmployeeUpdateDto();
         dto.setUsername(employee.getUsername());
+        dto.setEmail(employee.getEmail());
         dto.setMinDay(employee.getMinDay());
         dto.setMinHour(employee.getMinHour());
 

@@ -7,6 +7,7 @@ public class AdminEmployeeUpdateDto {
 
     private String username;
     private String password;
+    private String email;
     private Integer minDay;
     private Integer minHour;
 }

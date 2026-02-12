@@ -183,6 +183,7 @@
 <div class="admin-container">
 
     <h1 th:text="'Employee: ' + ${employee.getUsername}"></h1>
+    <p><strong>Email:</strong> <span th:text="${employee.email}"></span></p>
 
     <a th:href="${returnUrl}" class="admin-btn">⬅ Back</a>
 
@@ -215,7 +216,7 @@
                     <td>
                         <div class="job-actions">
                             <a class="action-btn edit"
-                               th:href="@{|/admin/employees/${employee.id}/current-jobs/${job.id}/edit?returnUrl=/admin/employees/${employee.id}|}">
+                               th:href="@{|/admin/employees/${employee.id}/current-jobs/${job.id}/edit?returnUrl=|/admin/employees/${employee.id}|}">
                                 Edit
                             </a>
                             <form th:action="@{|/admin/employees/${employee.id}/current-jobs/${job.id}/delete|}"

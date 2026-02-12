@@ -1,5 +1,6 @@
 package com.webapp.demo_app.controller;
 
+import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.security.SecurityUser;
 import com.webapp.demo_app.service.AdminService;
 import com.webapp.demo_app.service.EmployeeService;
@@ -38,6 +39,11 @@ public class SettingsController {
 
         log.info("Settings page accessed");
 
+        if ("ROLE_EMPLOYEE".equals(user.getRole())) {
+            Employee employee = employeeService.getById(user.getId());
+            model.addAttribute("email", employee.getEmail());
+        }
+
         model.addAttribute("username", user.getUsername());
         return "settings/settings";
     }
@@ -47,36 +53,85 @@ public class SettingsController {
     // ======================
     @PostMapping("/change-password")
     public String changePassword(Authentication authentication,
-                                 @RequestParam String newPassword,
-                                 @RequestParam String confirmPassword,
+                                 @RequestParam(required = false) String newPassword,
+                                 @RequestParam(required = false) String confirmPassword,
+                                 @RequestParam(required = false) String email,
                                  RedirectAttributes redirectAttributes) {
 
         SecurityUser user =
                 (SecurityUser) authentication.getPrincipal();
 
-        log.info("Password change requested");
+        log.info("Settings update requested");
 
-        if (!newPassword.equals(confirmPassword)) {
-            log.warn("Password change failed: passwords do not match");
+        boolean passwordProvided = newPassword != null && !newPassword.isBlank();
+        boolean confirmProvided = confirmPassword != null && !confirmPassword.isBlank();
+        boolean emailProvided = email != null && !email.isBlank();
+
+        if (passwordProvided || confirmProvided) {
+            if (newPassword == null || !newPassword.equals(confirmPassword)) {
+                log.warn("Settings update failed: passwords do not match");
+                redirectAttributes.addFlashAttribute(
+                        "popupError",
+                        "Passwords do not match !"
+                );
+                return "redirect:/settings";
+            }
+
+            if ("ROLE_EMPLOYEE".equals(user.getRole())) {
+                employeeService.updatePassword(user.getId(), newPassword);
+                log.info("Employee password updated");
+            } else if ("ROLE_ADMIN".equals(user.getRole())) {
+                adminService.updatePassword(user.getId(), newPassword);
+                log.info("Admin password updated");
+            }
+        }
+
+        if ("ROLE_EMPLOYEE".equals(user.getRole()) && emailProvided) {
+            employeeService.updateEmail(user.getId(), email);
+            log.info("Employee email updated");
+        }
+
+        if (!passwordProvided && !confirmProvided && !("ROLE_EMPLOYEE".equals(user.getRole()) && emailProvided)){
             redirectAttributes.addFlashAttribute(
                     "popupError",
-                    "Passwords do not match !"
+                    "Please enter at least one value to update !"
             );
             return "redirect:/settings";
         }
 
-        if ("ROLE_EMPLOYEE".equals(user.getRole())) {
-            employeeService.updatePassword(user.getId(), newPassword);
-            log.info("Employee password updated");
-        } else if ("ROLE_ADMIN".equals(user.getRole())) {
-            adminService.updatePassword(user.getId(), newPassword);
-            log.info("Admin password updated");
-
-        }
 
         redirectAttributes.addFlashAttribute(
                 "popupSuccess",
-                "Password updated successfully ✔"
+                "Settings updated successfully ✔"
+        );
+
+        return "redirect:/settings";
+    }
+
+    @PostMapping("/change-email")
+    public String changeEmail(Authentication authentication,
+                              @RequestParam String email,
+                              RedirectAttributes redirectAttributes) {
+
+        SecurityUser user =
+                (SecurityUser) authentication.getPrincipal();
+
+        if (!"ROLE_EMPLOYEE".equals(user.getRole())) {
+            log.warn("Email change denied: user is not an employee");
+            redirectAttributes.addFlashAttribute(
+                    "popupError",
+                    "Only employees can update email !"
+            );
+            return "redirect:/settings";
+        }
+
+        employeeService.updateEmail(user.getId(), email);
+
+        log.info("Employee email updated");
+
+        redirectAttributes.addFlashAttribute(
+                "popupSuccess",
+                "Email updated successfully ✔"
         );
 
         return "redirect:/settings";

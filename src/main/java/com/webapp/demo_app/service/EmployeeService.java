@@ -68,6 +68,13 @@ public class EmployeeService {
     }
 
     @Transactional
+    public void updateEmail(Long employeeId, String email) {
+        Employee employee = getById(employeeId);
+        employee.setEmail(email);
+        employeeRepository.save(employee);
+    }
+
+    @Transactional
     public void delete(Long employeeId) {
         Employee employee = getById(employeeId);
         employeeRepository.delete(employee);
@@ -79,6 +86,7 @@ public class EmployeeService {
         Employee employee = getById(employeeId);
 
         employee.setUsername(dto.getUsername());
+        employee.setEmail(dto.getEmail());
         employee.setMinDay(dto.getMinDay());
         employee.setMinHour(dto.getMinHour());
 

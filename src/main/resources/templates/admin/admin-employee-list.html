@@ -158,6 +158,7 @@
             <tr>
                 <th>ÜNVAN</th>
                 <th>İSİM</th>
+                <th>EMAIL</th>
                 <th>EYLEMLER</th>
             </tr>
             </thead>
@@ -166,6 +167,7 @@
             <tr th:each="emp : ${employees}">
                 <td th:text="${emp.title}"></td>
                 <td th:text="${emp.getUsername}"></td>
+                <td th:text="${emp.email}"></td>
                 <td>
                     <a th:href="@{'/admin/employees/' + ${emp.id} + '?returnUrl=/admin/all-employees'}"
                        class="btn btn-primary">
