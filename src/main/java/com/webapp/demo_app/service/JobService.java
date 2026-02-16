@@ -8,11 +8,15 @@ import com.webapp.demo_app.model.MevcutIs;
 import com.webapp.demo_app.model.TamamlananIs;
 import com.webapp.demo_app.model.enums.Tur;
 import com.webapp.demo_app.model.enums.UcretTahsilTipi;
+import com.webapp.demo_app.notification.JobAssignedNotificationEvent;
+import com.webapp.demo_app.notification.JobDeletedNotificationEvent;
+import com.webapp.demo_app.notification.JobUpdatedNotificationEvent;
 import com.webapp.demo_app.repository.AvailabilitySlotRepository;
 import com.webapp.demo_app.repository.MevcutIsRepository;
 import com.webapp.demo_app.repository.TamamlananIsRepository;
 import com.webapp.demo_app.repository.EmployeeRepository;
 import com.webapp.demo_app.model.Employee;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,17 +35,20 @@ public class JobService {
     private final EmployeeRepository employeeRepository;
     private final AvailabilityService availabilityService;
     private final AvailabilitySlotRepository availabilitySlotRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public JobService(MevcutIsRepository mevcutIsRepository,
                       TamamlananIsRepository tamamlananIsRepository,
                       EmployeeRepository employeeRepository,
                       AvailabilityService availabilityService,
-                      AvailabilitySlotRepository availabilitySlotRepository) {
+                      AvailabilitySlotRepository availabilitySlotRepository,
+                      ApplicationEventPublisher eventPublisher) {
         this.mevcutIsRepository = mevcutIsRepository;
         this.tamamlananIsRepository = tamamlananIsRepository;
         this.employeeRepository = employeeRepository;
         this.availabilityService = availabilityService;
         this.availabilitySlotRepository = availabilitySlotRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     public List<MevcutIsDto> getMevcutIsler(Long employeeId) {
@@ -230,6 +237,15 @@ public class JobService {
                 job.getBaslangicSaati(),
                 job.getTahminiSure()
         );
+        eventPublisher.publishEvent(new JobAssignedNotificationEvent(
+                employee.getUsername(),
+                employee.getEmail(),
+                job.getIsim(),
+                job.getIsAdresi(),
+                job.getTarih(),
+                job.getBaslangicSaati(),
+                job.getTahminiSure()
+        ));
     }
 
     // if selected job type is COWORK, this code piece is necessary
@@ -377,6 +393,16 @@ public class JobService {
                     savedJob.getTahminiSure()
             );
         }
+        eventPublisher.publishEvent(new JobUpdatedNotificationEvent(
+                savedJob.getEmployee().getUsername(),
+                savedJob.getEmployee().getEmail(),
+                savedJob.getIsim(),
+                savedJob.getIsAdresi(),
+                savedJob.getTarih(),
+                savedJob.getBaslangicSaati(),
+                savedJob.getTahminiSure()
+        ));
+
 
     }
 
@@ -387,6 +413,15 @@ public class JobService {
         if (!mevcutIs.getEmployee().getId().equals(employeeId)) {
             throw new IllegalArgumentException("Job does not belong to employee");
         }
+
+        eventPublisher.publishEvent(new JobDeletedNotificationEvent(
+                mevcutIs.getEmployee().getUsername(),
+                mevcutIs.getEmployee().getEmail(),
+                mevcutIs.getIsim(),
+                mevcutIs.getIsAdresi(),
+                mevcutIs.getTarih(),
+                mevcutIs.getBaslangicSaati()
+        ));
 
         if (mevcutIs.getTarih() != null
                 && mevcutIs.getBaslangicSaati() != null

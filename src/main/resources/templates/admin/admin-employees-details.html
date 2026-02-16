@@ -216,7 +216,11 @@
                     <td>
                         <div class="job-actions">
                             <a class="action-btn edit"
-                               th:href="@{|/admin/employees/${employee.id}/current-jobs/${job.id}/edit?returnUrl=|/admin/employees/${employee.id}|}">
+                               th:href="@{/admin/employees/{empId}/current-jobs/{jobId}/edit(
+                                        empId=${employee.id},
+                                        jobId=${job.id},
+                                        returnUrl=${'/admin/employees/' + employee.id}
+                                    )}">
                                 Edit
                             </a>
                             <form th:action="@{|/admin/employees/${employee.id}/current-jobs/${job.id}/delete|}"
