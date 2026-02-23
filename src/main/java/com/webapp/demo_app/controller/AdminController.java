@@ -176,9 +176,10 @@ public class AdminController {
                                Model model) {
         Employee employee = employeeService.getById(id);
 
+
         model.addAttribute("employee", employee);
-        model.addAttribute("currentJobs", employee.getMevcutIsler());
-        model.addAttribute("completedJobs", employee.getTamamlananIsler());
+        model.addAttribute("currentJobs", jobService.getMevcutIsler(id,true));
+        model.addAttribute("completedJobs", jobService.getTamamlananIsler(id, true));
         model.addAttribute("returnUrl", returnUrl);
 
 
@@ -349,7 +350,7 @@ public class AdminController {
                 jobService.getJobOverlapForWeek(week2Monday));
 
         model.addAttribute("jobs",
-                mevcutIsRepository.findAll());
+                mevcutIsRepository.findAllByOrderByTarihAsc());
 
         return "admin/admin-jobs-overview";
     }

@@ -63,6 +63,51 @@
         .btn-secondary:hover {
             background: #d1d5db;
         }
+        /* =========================
+           FILTER BAR
+        ========================= */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .search {
+            position: relative;
+            min-width: 280px;
+            flex: 1;
+            max-width: 420px;
+        }
+
+        .search input {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 0 12px 0 38px;
+            outline: none;
+            background: #ffffff;
+            font-size: 14px;
+        }
+
+        .search input:focus {
+            border-color: rgba(37, 99, 235, 0.45);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        .search .icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            pointer-events: none;
+            font-size: 14px;
+        }
+
 
         /* =========================
            TABLE CARD
@@ -249,9 +294,15 @@
 <div class="container">
     <h1>Tamamlanan İşlerim</h1>
 
-    <a th:href="@{|/employees/${employeeId}/dashboard|}" class="btn btn-secondary">Geri Dön</a>
+    <div class="actions">
+        <a th:href="@{|/employees/${employeeId}/dashboard|}" class="btn btn-secondary">Geri Dön</a>
+        <div class="search">
+            <span class="icon">🔎</span>
+            <input id="searchInput" type="text" placeholder="Tür / adres / tarih ara...">
+        </div>
+    </div>
 
-    <table class="table">
+    <table class="table" id="completedJobsTable">
         <thead>
         <tr>
             <th>Tür</th>
@@ -302,6 +353,20 @@
 </div>
 <script th:src="@{/js/main.js}"></script>
 <script>
+    const searchInput = document.getElementById("searchInput");
+    const completedJobsTable = document.getElementById("completedJobsTable");
+
+    if(searchInput && completedJobsTable){
+        searchInput.addEventListener("keyup", function (){
+           const query = searchInput.value.trim().toLowerCase();
+           const rows = completedJobsTable.querySelectorAll("tbody tr")
+
+            rows.forEach((row) => {
+                const rowText = row.innerText.toLowerCase();
+                row.style.display = rowText.includes(query) ? "" : "none";
+            })
+        });
+    }
     function openPreview(row) {
         const content = document.getElementById("previewContent");
         const fields = row.dataset;

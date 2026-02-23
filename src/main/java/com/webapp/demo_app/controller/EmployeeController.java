@@ -102,7 +102,7 @@ public class EmployeeController {
         log.info("Current jobs viewed");
 
         model.addAttribute("jobs",
-                jobService.getMevcutIsler(employeeId));
+                jobService.getMevcutIsler(employeeId, false));
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("errorMessage", errorMessage);
 
@@ -218,7 +218,7 @@ public class EmployeeController {
         verifyEmployeeOwnership(employeeId, authentication);
 
         model.addAttribute("jobs",
-                jobService.getTamamlananIsler(employeeId));
+                jobService.getTamamlananIsler(employeeId, false));
         model.addAttribute("employeeId", employeeId);
 
         return "employee/completed-jobs";

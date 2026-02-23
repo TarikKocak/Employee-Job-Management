@@ -99,6 +99,30 @@ public class EmailNotificationService {
                 event.employeeEmail());
     }
 
+    public void sendAvailabilityReminderEmail(String employeeName, String employeeEmail){
+        if(!isEnabled()){
+            return;
+        }
+
+        JavaMailSender mailSender = mailSenderProvider.getIfAvailable();
+        if(mailSender==null){
+            log.warn("Email notification is enabled, but no JavaMailSender bean is configured. Skipping email for {}",
+                    employeeEmail);
+            return;
+        }
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(emailProperties.fromAddress());
+        message.setTo(employeeEmail);
+        message.setSubject("Sunday Availability Reminder");
+        message.setText(buildAvailabilityReminderBody(employeeName));
+
+        mailSender.send(message);
+        log.info("Availability reminder email sent to employee={} email={}",
+                employeeName,
+                employeeEmail);
+    }
+
     private String buildBody(JobAssignedNotificationEvent event) {
         return "Hello " + event.employeeName() + ",\n\n"
                 + "A new job has been assigned to you.\n\n"
@@ -131,6 +155,13 @@ public class EmailNotificationService {
                 + "Date: " + event.date() + "\n"
                 + "Start Time: " + event.startTime() + "\n"
                 + "Please check your dashboard for the latest details.\n\n"
+                + "Thanks.";
+    }
+
+    private String buildAvailabilityReminderBody(String employeeName) {
+        return "Hello " + employeeName + ",\n\n"
+                + "This is a reminder that availability submission is open today (Sunday).\n"
+                + "Please submit your availability from the employee dashboard.\n\n"
                 + "Thanks.";
     }
 }

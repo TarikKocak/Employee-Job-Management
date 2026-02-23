@@ -143,6 +143,18 @@
             text-transform: uppercase;
             border-bottom: 1px solid var(--line);
             white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th.sort-active {
+            color: #1f2937;
+        }
+
+        th .sort-indicator {
+            margin-left: 6px;
+            font-size: 11px;
+            color: #9ca3af;
         }
 
         td {
@@ -325,26 +337,26 @@
             <table id="jobsTable">
                 <thead>
                 <tr>
-                    <th>Employee</th>
-                    <th>Tür</th>
-                    <th>Tarih</th>
-                    <th>İsim</th>
-                    <th>Adres</th>
-                    <th>Ücret</th>
-                    <th>Ücret Tipi</th>
-                    <th>Başlanılan Saat</th>
-                    <th>Bitirilen Saat</th>
-                    <th>Süre (saat)</th>
-                    <th>Duvar</th>
-                    <th>Kart</th>
-                    <th>Yorum</th>
-                    <th>Foto</th>
+                    <th data-sortable="true">Employee <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Tür <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Tarih <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">İsim <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Adres <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Ücret <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Ücret Tipi <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Başlanılan Saat <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Bitirilen Saat <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Süre (saat) <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Duvar <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Kart <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Yorum <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Foto <span class="sort-indicator">↕</span></th>
                 </tr>
                 </thead>
 
                 <tbody>
                 <tr th:if="${#lists.isEmpty(completedJobs)}">
-                    <td colspan="12" class="empty">Henüz tamamlanan iş bulunmuyor.</td>
+                    <td colspan="14" class="empty">Henüz tamamlanan iş bulunmuyor.</td>
                 </tr>
 
                 <tr th:each="is : ${completedJobs}">
@@ -353,8 +365,6 @@
                     <!-- LAZY employee: ensure you fetch join in backend if needed -->
                     <td>
                         <div style="font-weight: 800;" th:text="${is.employee.getUsername}">Employee Name</div>
-                        <div class="muted" style="font-size: 12.5px;"
-                             th:text="${'ID: ' + is.employee.id}">ID: 0</div>
                     </td>
 
                     <td th:text="${is.tur}"></td>
@@ -410,7 +420,7 @@
         </div>
     </div>
 
-    <!-- If you want a second back button at bottom -->
+
     <div class="footer-action">
         <a href="/admin/dashboard" class="btn btn-ghost">⬅ Geri Dön</a>
     </div>
@@ -418,19 +428,89 @@
 </div>
 
 <script>
-    // Simple client-side filter (optional)
     const input = document.getElementById("searchInput");
     const table = document.getElementById("jobsTable");
+
     if (input && table) {
         input.addEventListener("keyup", function () {
-            const query = input.value.toLowerCase();
+            const query = input.value.trim().toLowerCase();
             const rows = table.querySelectorAll("tbody tr");
-            rows.forEach(row => {
-                // ignore empty-state row
+            rows.forEach((row) => {
                 if (row.querySelector(".empty")) return;
 
                 const text = row.innerText.toLowerCase();
                 row.style.display = text.includes(query) ? "" : "none";
+            });
+        });
+    }
+    if (table) {
+        const headers = table.querySelectorAll("thead th[data-sortable='true']");
+        let activeSort = { columnIndex: -1, direction: "asc" };
+
+        const parseCellValue = (value) => {
+            const normalized = value.replace(/\s+/g, " ").trim();
+            if (!normalized) return "";
+
+            const numberCandidate = Number(normalized.replace(/\./g, "").replace(",", ".").replace(/[^0-9.-]/g, ""));
+            if (!Number.isNaN(numberCandidate) && /\d/.test(normalized)) {
+                return numberCandidate;
+            }
+
+            const dateCandidate = Date.parse(normalized);
+            if (!Number.isNaN(dateCandidate)) {
+                return dateCandidate;
+            }
+
+            return normalized.toLocaleLowerCase("tr");
+        };
+
+        const compareValues = (a, b) => {
+            if (typeof a === "number" && typeof b === "number") {
+                return a - b;
+            }
+            return String(a).localeCompare(String(b), "tr", { numeric: true, sensitivity: "base" });
+        };
+
+        const updateIndicators = () => {
+            headers.forEach((header, index) => {
+                const indicator = header.querySelector(".sort-indicator");
+                header.classList.remove("sort-active");
+                if (!indicator) return;
+
+                if (index === activeSort.columnIndex) {
+                    header.classList.add("sort-active");
+                    indicator.textContent = activeSort.direction === "asc" ? "↑" : "↓";
+                } else {
+                    indicator.textContent = "↕";
+                }
+            });
+        };
+
+        headers.forEach((header, columnIndex) => {
+            header.addEventListener("click", () => {
+                const tbody = table.querySelector("tbody");
+                if (!tbody) return;
+
+                const rows = Array.from(tbody.querySelectorAll("tr"))
+                    .filter((row) => !row.querySelector(".empty"));
+
+                if (!rows.length) return;
+
+                const direction =
+                    activeSort.columnIndex === columnIndex && activeSort.direction === "asc"
+                        ? "desc"
+                        : "asc";
+
+                rows.sort((rowA, rowB) => {
+                    const valueA = parseCellValue(rowA.cells[columnIndex]?.innerText ?? "");
+                    const valueB = parseCellValue(rowB.cells[columnIndex]?.innerText ?? "");
+                    const result = compareValues(valueA, valueB);
+                    return direction === "asc" ? result : -result;
+                });
+
+                rows.forEach((row) => tbody.appendChild(row));
+                activeSort = { columnIndex, direction };
+                updateIndicators();
             });
         });
     }

@@ -51,14 +51,16 @@ public class JobService {
         this.eventPublisher = eventPublisher;
     }
 
-    public List<MevcutIsDto> getMevcutIsler(Long employeeId) {
-        return mevcutIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId)
+    public List<MevcutIsDto> getMevcutIsler(Long employeeId, boolean isAdmin) {
+        return mevcutIsRepository
+                .findByEmployeeIdOrderByTarihAsc(employeeId)
                 .stream()
-                .map(this::toDto)
+                .map(job -> toDto(job, isAdmin))
                 .toList();
     }
 
-    private MevcutIsDto toDto(MevcutIs job) {
+    private MevcutIsDto toDto(MevcutIs job, boolean isAdmin) {
+
         MevcutIsDto dto = new MevcutIsDto();
 
         dto.setId(job.getId());
@@ -73,25 +75,31 @@ public class JobService {
         dto.setTahminiSure(job.getTahminiSure());
         dto.setUcretTahsilTipi(job.getUcretTahsilTipi());
 
-        if (job.getTur() == Tur.YALNIZ && job.getUcretTahsilTipi() == UcretTahsilTipi.CASH) {
+        if (isAdmin) {
             dto.setUcret(job.getUcret() + "€");
         } else {
-            dto.setUcret("No Info");
+            if (job.getTur() == Tur.YALNIZ &&
+                    job.getUcretTahsilTipi() == UcretTahsilTipi.CASH) {
+
+                dto.setUcret(job.getUcret() + "€");
+            } else {
+                dto.setUcret("No Info");
+            }
         }
 
         return dto;
     }
 
-    //For employees
-    public List<TamamlananIsDto> getTamamlananIsler(Long employeeId) {
 
-        return tamamlananIsRepository.findByEmployeeIdOrderByTarihAsc(employeeId)
+    public List<TamamlananIsDto> getTamamlananIsler(Long employeeId, boolean isAdmin) {
+        return tamamlananIsRepository
+                .findByEmployeeIdOrderByTarihAsc(employeeId)
                 .stream()
-                .map(this::toDto)
+                .map(job -> toDto(job, isAdmin))
                 .toList();
     }
 
-    private TamamlananIsDto toDto(TamamlananIs job) {
+    private TamamlananIsDto toDto(TamamlananIs job, boolean isAdmin) {
 
         TamamlananIsDto dto = new TamamlananIsDto();
 
@@ -111,18 +119,22 @@ public class JobService {
 
         // Ucret(price) visible to employees when Tur and UcretTahsilTipi statements are satisfied
 
-        if (job.getTur() == Tur.YALNIZ &&
-                job.getUcretTahsilTipi() == UcretTahsilTipi.CASH) {
-
+        if (isAdmin) {
             dto.setUcret(job.getUcret() + "€");
         } else {
-            dto.setUcret("No Info");
+            if (job.getTur() == Tur.YALNIZ &&
+                    job.getUcretTahsilTipi() == UcretTahsilTipi.CASH) {
+
+                dto.setUcret(job.getUcret() + "€");
+            } else {
+                dto.setUcret("No Info");
+            }
         }
 
         return dto;
     }
 
-    //For only admins
+
     public List<TamamlananIs> getAllTamamlananIsler() {
         return tamamlananIsRepository.findAllByOrderByTarihAsc();
     }

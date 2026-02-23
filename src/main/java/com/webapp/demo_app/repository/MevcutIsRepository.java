@@ -8,4 +8,5 @@ import java.util.List;
 public interface MevcutIsRepository extends JpaRepository<MevcutIs, Long> {
     //List<MevcutIs> findByEmployeeId(Long employeeId);
     List<MevcutIs> findByEmployeeIdOrderByTarihAsc(Long employeeId);
+    List<MevcutIs> findAllByOrderByTarihAsc();
 }

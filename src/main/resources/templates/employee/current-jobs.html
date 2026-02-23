@@ -336,7 +336,7 @@
                 onclick="openPreview(this)"
                 style="cursor:pointer"
                 th:data-tur="${job.tur}"
-                th:data-duvar="${job.duvarMontaji}"
+                th:data-duvar="${job.duvarMontaji} ? 'Evet' : 'Hayır'"
                 th:data-isim="${job.isim}"
                 th:data-adres="${job.isAdresi}"
                 th:data-tel="${job.telNo}"

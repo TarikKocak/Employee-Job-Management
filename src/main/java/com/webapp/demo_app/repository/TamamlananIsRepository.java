@@ -12,6 +12,5 @@ public interface TamamlananIsRepository extends JpaRepository<TamamlananIs, Long
 
     @EntityGraph(attributePaths = "employee")
     List<TamamlananIs> findAllByOrderByTarihAsc();
-
     List<TamamlananIs> findByEmployeeIdOrderByTarihAsc(Long employeeId);
 }
