@@ -72,6 +72,20 @@
         tbody tr:hover {
             background: #f9fafb;
         }
+        th[data-sortable="true"] {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        th.sort-active {
+            color: #111827;
+        }
+
+        th .sort-indicator {
+            margin-left: 6px;
+            font-size: 11px;
+            color: #9ca3af;
+        }
 
         /* =====================================================
            BUTTONS
@@ -98,6 +112,31 @@
             color: #111827;
             margin-top: 16px;
         }
+
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+            border: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* sol ve sağ grubu ayırır */
+            margin-top: 16px;
+        }
+
+        .modal-actions form {
+            margin: 0;
+        }
+
+        .modal-actions-left,
+        .modal-actions-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
 
         /* =====================================================
            AVAILABILITY GRID
@@ -248,7 +287,7 @@
             <div><strong>Saat:</strong> <span id="p-time"></span></div>
             <div><strong>Tahmini Süre:</strong> <span id="p-sure"></span></div>
             <div><strong>tür:</strong> <span id="p-type"></span></div>
-            <div><strong>Ücret:</strong> ₺<span id="p-fee"></span></div>
+            <div><strong>Ücret:</strong> €<span id="p-fee"></span></div>
         </div>
 
         <div class="modal-section">
@@ -261,7 +300,23 @@
             <p id="p-desc"></p>
         </div>
 
-        <button class="btn btn-secondary" onclick="closeJobPreview()">Close</button>
+        <div class="modal-actions">
+            <!-- LEFT: Close -->
+            <div class="modal-actions-left">
+                <button class="btn btn-secondary" onclick="closeJobPreview()">Close</button>
+            </div>
+
+            <!-- RIGHT: Update + Delete -->
+            <div class="modal-actions-right">
+                <a id="p-edit-link" href="#" class="btn btn-primary">Update</a>
+
+                <form id="p-delete-form" method="post" action="#">
+                    <input type="hidden" name="returnUrl" value="/admin/jobs-overview">
+                    <button type="submit" class="btn btn-danger"
+                            onclick="return confirm('Delete this job?');">Delete</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -279,13 +334,13 @@
         <div class="card">
             <h2>Current Jobs</h2>
 
-            <table>
+            <table id="jobsTable">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Employee</th>
-                    <th>Date</th>
-                    <th>Time</th>
+                    <th data-sortable="true">ID <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Employee <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Date <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Time <span class="sort-indicator">↕</span></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -293,6 +348,7 @@
                     class="job-row"
                     onclick="openJobPreview(this)"
                     th:data-id="${job.id}"
+                    th:data-employee-id="${job.employee.id}"
                     th:data-employee="${job.employee.username}"
                     th:data-isim="${job.isim}"
                     th:data-date="${job.tarih}"
@@ -439,6 +495,11 @@
     }
 
     function openJobPreview(row) {
+
+        const jobId = row.dataset.id;
+        const employeeId = row.dataset.employeeId;
+
+
         document.getElementById("p-id").textContent = row.dataset.id;
         document.getElementById("p-employee").textContent = row.dataset.employee;
         document.getElementById("p-isim").textContent = row.dataset.isim;
@@ -450,9 +511,84 @@
         document.getElementById("p-address").textContent = row.dataset.address || "-";
         document.getElementById("p-desc").textContent = row.dataset.desc || "-";
 
+        document.getElementById("p-edit-link").href =
+            `/admin/employees/${employeeId}/current-jobs/${jobId}/edit?returnUrl=/admin/jobs-overview`;
+
+        document.getElementById("p-delete-form").action =
+            `/admin/employees/${employeeId}/current-jobs/${jobId}/delete`;
+
         document.getElementById("jobPreviewModal").style.display = "flex";
     }
+    const jobsTable = document.getElementById("jobsTable");
+    if (jobsTable) {
+        const headers = jobsTable.querySelectorAll("thead th[data-sortable='true']");
+        let activeSort = { columnIndex: -1, direction: "asc" };
 
+        const parseCellValue = (value) => {
+            const normalized = value.replace(/\s+/g, " ").trim();
+            if (!normalized) return "";
+
+            const numberCandidate = Number(normalized.replace(/\./g, "").replace(",", ".").replace(/[^0-9.-]/g, ""));
+            if (!Number.isNaN(numberCandidate) && /\d/.test(normalized)) {
+                return numberCandidate;
+            }
+
+            const dateCandidate = Date.parse(normalized);
+            if (!Number.isNaN(dateCandidate)) {
+                return dateCandidate;
+            }
+
+            return normalized.toLocaleLowerCase("tr");
+        };
+
+        const compareValues = (a, b) => {
+            if (typeof a === "number" && typeof b === "number") {
+                return a - b;
+            }
+            return String(a).localeCompare(String(b), "tr", { numeric: true, sensitivity: "base" });
+        };
+
+        const updateIndicators = () => {
+            headers.forEach((header, index) => {
+                const indicator = header.querySelector(".sort-indicator");
+                header.classList.remove("sort-active");
+                if (!indicator) return;
+
+                if (index === activeSort.columnIndex) {
+                    header.classList.add("sort-active");
+                    indicator.textContent = activeSort.direction === "asc" ? "↑" : "↓";
+                } else {
+                    indicator.textContent = "↕";
+                }
+            });
+        };
+
+        headers.forEach((header, columnIndex) => {
+            header.addEventListener("click", () => {
+                const tbody = jobsTable.querySelector("tbody");
+                if (!tbody) return;
+
+                const rows = Array.from(tbody.querySelectorAll("tr"));
+                if (!rows.length) return;
+
+                const direction =
+                    activeSort.columnIndex === columnIndex && activeSort.direction === "asc"
+                        ? "desc"
+                        : "asc";
+
+                rows.sort((rowA, rowB) => {
+                    const valueA = parseCellValue(rowA.cells[columnIndex]?.innerText ?? "");
+                    const valueB = parseCellValue(rowB.cells[columnIndex]?.innerText ?? "");
+                    const result = compareValues(valueA, valueB);
+                    return direction === "asc" ? result : -result;
+                });
+
+                rows.forEach((row) => tbody.appendChild(row));
+                activeSort = { columnIndex, direction };
+                updateIndicators();
+            });
+        });
+    }
     function closeJobPreview(e) {
         if (!e || e.target.id === "jobPreviewModal") {
             document.getElementById("jobPreviewModal").style.display = "none";

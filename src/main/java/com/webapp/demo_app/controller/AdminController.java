@@ -6,10 +6,7 @@ import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import com.webapp.demo_app.model.enums.Tur;
 import com.webapp.demo_app.model.enums.UcretTahsilTipi;
 import com.webapp.demo_app.repository.MevcutIsRepository;
-import com.webapp.demo_app.service.AvailabilityService;
-import com.webapp.demo_app.service.EmployeeService;
-import com.webapp.demo_app.service.JobService;
-import com.webapp.demo_app.service.SystemSettingsService;
+import com.webapp.demo_app.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,27 +27,61 @@ public class AdminController {
     private final AvailabilityService availabilityService;
     private final MevcutIsRepository mevcutIsRepository;
     private final SystemSettingsService systemSettingsService;
+    private final AdminDashboardStatsService adminDashboardStatsService;
 
     public AdminController(EmployeeService employeeService,
                            JobService jobService,
                            AvailabilityService availabilityService,
                            MevcutIsRepository mevcutIsRepository,
-                           SystemSettingsService systemSettingsService) {
+                           SystemSettingsService systemSettingsService,
+                           AdminDashboardStatsService adminDashboardStatsService) {
         this.employeeService = employeeService;
         this.jobService = jobService;
         this.availabilityService = availabilityService;
         this.mevcutIsRepository=mevcutIsRepository;
         this.systemSettingsService = systemSettingsService;
+        this.adminDashboardStatsService = adminDashboardStatsService;
     }
 
     // Admin dashboard
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
+    public String dashboard(@RequestParam(required = false) List<Long> employeeIds,
+                            Model model) {
         boolean sundayOnlyEnabled =
                 systemSettingsService.isAvailabilitySundayOnlyEnabled();
 
+        List<Employee> allEmployees = employeeService.getAll();
+
+        List<Long> finalEmployeeIds;
+
+        if (employeeIds == null || employeeIds.isEmpty()) {
+            finalEmployeeIds = allEmployees.stream()
+                    .map(Employee::getId)
+                    .toList();
+        } else {
+            finalEmployeeIds = employeeIds;
+        }
+
+        List<Employee> selectedEmployees = allEmployees.stream()
+                .filter(employee -> finalEmployeeIds.contains(employee.getId()))
+                .toList();
+
+        var employeeStats = adminDashboardStatsService.buildEmployeeStats(selectedEmployees);
+
+        model.addAttribute("allEmployees", allEmployees);
+        model.addAttribute("selectedEmployeeIds", employeeIds);
+        model.addAttribute("employeeStats", employeeStats);
+        model.addAttribute("chartEmployeeLabels",
+                employeeStats.stream().map(stat -> stat.getEmployeeName()).toList());
+        model.addAttribute("chartMonthlyIncomeValues",
+                employeeStats.stream().map(stat -> stat.getMonthlyIncome()).toList());
+        model.addAttribute("chartWeeklyWorkHourValues",
+                employeeStats.stream().map(stat -> stat.getWeeklyWorkHours()).toList());
+        model.addAttribute("chartMonthlyWorkHourValues",
+                employeeStats.stream().map(stat -> stat.getMonthlyWorkHours()).toList());
+
         model.addAttribute("availabilitySundayOnly", sundayOnlyEnabled);
-        log.info("Admin dashboard accessed");
+        //log.info("Admin dashboard accessed");
         return "admin/admin-dashboard";
     }
 
