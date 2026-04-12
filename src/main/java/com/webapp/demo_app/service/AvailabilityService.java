@@ -212,7 +212,7 @@ public class AvailabilityService {
 
     // Hour row (7..16)
     public List<Integer> getHours() {
-        return IntStream.rangeClosed(7, 16)
+        return IntStream.rangeClosed(8, 18)
                 .boxed()
                 .collect(Collectors.toList());
     }
@@ -445,7 +445,7 @@ public class AvailabilityService {
                 int maxBlock = 0;
                 int current = 0;
 
-                for (int hour = 7; hour <= 16; hour++) {
+                for (int hour = 8; hour <= 18; hour++) {
                     String key = emp.getId() + "_" + d + "_" + hour;
 
                     if (slotIndex.getOrDefault(key, 0) == 1) {

@@ -300,13 +300,17 @@
         <h2>İş Önizleme</h2>
 
         <ul class="preview-list">
-            <li>
+            <li th:if="${!isMaster}">
                 <strong>Başlangıç</strong>
                 <span class="preview-value" id="pStart"></span>
             </li>
-            <li>
+            <li th:if="${!isMaster}">
                 <strong>Bitiş</strong>
                 <span class="preview-value" id="pEnd"></span>
+            </li>
+            <li th:if="${isMaster}">
+                <strong>Süre (Saat)</strong>
+                <span class="preview-value" id="pSure"></span>
             </li>
             <li>
                 <strong>Bahşiş</strong>
@@ -349,7 +353,7 @@
           method="post"
           class="form">
 
-        <div class="form-group">
+        <div class="form-group" th:if="${!isMaster}">
             <label for="asilBaslanilanSaat">Asıl Başlanılan Saat</label>
             <input type="time"
                    id="asilBaslanilanSaat"
@@ -358,7 +362,7 @@
                    required>
         </div>
 
-        <div class="form-group">
+        <div class="form-group" th:if="${!isMaster}">
             <label for="bitisSaati">Bitiş Saati</label>
             <input type="time"
                    id="bitisSaati"
@@ -366,6 +370,12 @@
                    th:value="${job.bitisSaati}"
                    required>
         </div>
+        <div class="form-group" th:if="${isMaster}">
+            <label for="sure">Süre (Saat)</label>
+            <input type="number" id="sure" name="sure"
+                   min="0.1" step="0.1" th:value="${job.sure}" required>
+        </div>
+
 
         <div class="form-group">
             <label for="bahsis">Bahşiş</label>
@@ -447,8 +457,18 @@
     }
 
     function fillPreview() {
-        setValue("pStart", document.getElementById("asilBaslanilanSaat").value);
-        setValue("pEnd", document.getElementById("bitisSaati").value);
+        const startInput = document.getElementById("asilBaslanilanSaat");
+        const endInput = document.getElementById("bitisSaati");
+        const sureInput = document.getElementById("sure");
+
+        if (startInput && endInput) {
+            setValue("pStart", startInput.value);
+            setValue("pEnd", endInput.value);
+        }
+        if (sureInput) {
+            setValue("pSure", sureInput.value);
+        }
+
         setValue("pBahsis", document.getElementById("bahsis").value);
 
         setValue(

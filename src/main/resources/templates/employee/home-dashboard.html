@@ -128,9 +128,10 @@
         </h1>
 
         <div class="button-group">
+            <a th:if="${isMaster}" th:href="@{|/employees/${employeeId}/assign-job|}" class="btn">Job Assign (Self Assign)</a>
             <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn">Mevcut İşlerim</a>
             <a th:href="@{|/employees/${employeeId}/completed-jobs|}" class="btn">Tamamlanan İşlerim</a>
-            <a th:href="@{|/employees/${employeeId}/availability|}" class="btn">Availability</a>
+            <a th:if="${!isMaster}" th:href="@{|/employees/${employeeId}/availability|}" class="btn">Availability</a>
         </div>
     </div>
 </div>

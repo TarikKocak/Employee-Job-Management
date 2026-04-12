@@ -16,6 +16,7 @@ import com.webapp.demo_app.repository.MevcutIsRepository;
 import com.webapp.demo_app.repository.TamamlananIsRepository;
 import com.webapp.demo_app.repository.EmployeeRepository;
 import com.webapp.demo_app.model.Employee;
+import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,22 +150,36 @@ public class JobService {
             Long jobId,
             LocalTime asilBaslanilanSaat,
             LocalTime bitisSaati,
+            Double sure,
             Integer bahsis,
             Boolean kartVerildi,
             Boolean yorumKartiVerildi,
             Boolean fotoAtildi
     ) {
         MevcutIs mevcutIs = getMevcutIsById(jobId);
+        EmployeeeTitle title = mevcutIs.getEmployee().getTitle();
 
-        if (bitisSaati.isBefore(asilBaslanilanSaat)) {
-            throw new IllegalArgumentException("Bitiş saati başlangıç saatinden önce olamaz");
+        if (title == EmployeeeTitle.MASTER) {
+            if (sure == null || sure <= 0) {
+                throw new IllegalArgumentException("Süre 0'dan büyük olmalıdır");
+            }
+            mevcutIs.setAsilBaslanilanSaat(null);
+            mevcutIs.setBitisSaati(null);
+            mevcutIs.setSure(sure);
+        } else {
+            if (asilBaslanilanSaat == null || bitisSaati == null) {
+                throw new IllegalArgumentException("Başlangıç ve bitiş saatleri zorunludur");
+            }
+            if (bitisSaati.isBefore(asilBaslanilanSaat)) {
+                throw new IllegalArgumentException("Bitiş saati başlangıç saatinden önce olamaz");
+            }
+            double sureSaat = Duration
+                    .between(asilBaslanilanSaat, bitisSaati)
+                    .toMinutes() / 60.0;
+            mevcutIs.setAsilBaslanilanSaat(asilBaslanilanSaat);
+            mevcutIs.setBitisSaati(bitisSaati);
+            mevcutIs.setSure(sureSaat);
         }
-        double sureSaat = Duration
-                .between(asilBaslanilanSaat, bitisSaati)
-                .toMinutes() / 60.0;
-        mevcutIs.setAsilBaslanilanSaat(asilBaslanilanSaat);
-        mevcutIs.setBitisSaati(bitisSaati);
-        mevcutIs.setSure(sureSaat);
 
         mevcutIs.setBahsis(bahsis);
         mevcutIs.setKartVerildi(kartVerildi);
@@ -184,17 +199,31 @@ public class JobService {
 
         // check for write-only fields whether they are filled
 
-        if (mevcutIs.getAsilBaslanilanSaat() == null ||
-                mevcutIs.getBitisSaati() == null ||
-                mevcutIs.getSure() == null ||
-                mevcutIs.getBahsis() == null ||
-                mevcutIs.getKartVerildi() == null ||
-                mevcutIs.getYorumKartiVerildi() == null ||
-                mevcutIs.getFotoAtildi() == null) {
+        boolean isMaster = mevcutIs.getEmployee().getTitle() == EmployeeeTitle.MASTER;
 
-            throw new IncompleteJobException(
-                    "Lütfen işin başlangıç ve bitiş saatleri dahil tüm alanları doldurunuz."
-            );
+        if (isMaster) {
+            if (mevcutIs.getSure() == null ||
+                    mevcutIs.getBahsis() == null ||
+                    mevcutIs.getKartVerildi() == null ||
+                    mevcutIs.getYorumKartiVerildi() == null ||
+                    mevcutIs.getFotoAtildi() == null) {
+                throw new IncompleteJobException(
+                        "Lütfen süre ve diğer gerekli alanları doldurunuz."
+                );
+            }
+        } else {
+            if (mevcutIs.getAsilBaslanilanSaat() == null ||
+                    mevcutIs.getBitisSaati() == null ||
+                    mevcutIs.getSure() == null ||
+                    mevcutIs.getBahsis() == null ||
+                    mevcutIs.getKartVerildi() == null ||
+                    mevcutIs.getYorumKartiVerildi() == null ||
+                    mevcutIs.getFotoAtildi() == null) {
+
+                throw new IncompleteJobException(
+                        "Lütfen işin başlangıç ve bitiş saatleri dahil tüm alanları doldurunuz."
+                );
+            }
         }
 
         // Create data for TamamlananIs

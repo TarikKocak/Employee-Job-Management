@@ -5,6 +5,9 @@ import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.MevcutIs;
 import com.webapp.demo_app.security.SecurityUser;
 import com.webapp.demo_app.service.*;
+import com.webapp.demo_app.model.enums.EmployeeeTitle;
+import com.webapp.demo_app.model.enums.Tur;
+import com.webapp.demo_app.model.enums.UcretTahsilTipi;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -82,8 +85,12 @@ public class EmployeeController {
         log.info("Employee dashboard accessed");
 
         Employee employee = employeeService.getById(employeeId);
+        boolean isMaster = employee.getTitle() == EmployeeeTitle.MASTER;
+
         model.addAttribute("employeeName", employee.getUsername());
         model.addAttribute("employeeId", employeeId);
+        model.addAttribute("isMaster", isMaster);
+
 
         return "employee/home-dashboard";
     }
@@ -126,6 +133,7 @@ public class EmployeeController {
 
         model.addAttribute("job", job);
         model.addAttribute("employeeId", employeeId);
+        model.addAttribute("isMaster", job.getEmployee().getTitle() == EmployeeeTitle.MASTER);
 
         return "employee/edit-current-job";
     }
@@ -136,8 +144,9 @@ public class EmployeeController {
             @PathVariable Long employeeId,
             @PathVariable Long jobId,
             Authentication authentication,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime asilBaslanilanSaat,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime bitisSaati,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime asilBaslanilanSaat,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime bitisSaati,
+            @RequestParam(required = false) Double sure,
             @RequestParam Integer bahsis,
             @RequestParam Boolean kartVerildi,
             @RequestParam Boolean yorumKartiVerildi,
@@ -149,41 +158,13 @@ public class EmployeeController {
                 jobId,
                 asilBaslanilanSaat,
                 bitisSaati,
+                sure,
                 bahsis,
                 kartVerildi,
                 yorumKartiVerildi,
                 fotoAtildi
         );
     }
-
-    /*
-    @PostMapping("/{employeeId}/current-jobs/{jobId}/edit")
-    public String saveCurrentJob(@PathVariable Long employeeId,
-                                 @PathVariable Long jobId,
-                                 Authentication authentication,
-                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime asilBaslanilanSaat,
-                                 @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime bitisSaati,
-                                 @RequestParam Integer bahsis,
-                                 @RequestParam Boolean kartVerildi,
-                                 @RequestParam Boolean yorumKartiVerildi,
-                                 @RequestParam Boolean fotoAtildi) {
-
-        verifyEmployeeOwnership(employeeId, authentication);
-
-        log.info("Current job edited jobId={}", jobId);
-
-        jobService.updateWriteOnlyFields(
-                jobId,
-                asilBaslanilanSaat,
-                bitisSaati,
-                bahsis,
-                kartVerildi,
-                yorumKartiVerildi,
-                fotoAtildi
-        );
-
-        return "redirect:/employees/" + employeeId + "/current-jobs";
-    }*/
 
     @PostMapping("/{employeeId}/current-jobs/{jobId}/submit")
     public String submitJob(@PathVariable Long employeeId,
@@ -233,8 +214,12 @@ public class EmployeeController {
                                Model model) {
 
         verifyEmployeeOwnership(employeeId, authentication);
-
         Employee employee = employeeService.getById(employeeId);
+
+        if (employee.getTitle() == EmployeeeTitle.MASTER) {
+            return "redirect:/employees/" + employeeId + "/dashboard";
+        }
+
         LocalDate week1 = availabilityService.getNextWeekMonday();
         LocalDate week2 = week1.plusWeeks(1);
 
@@ -279,6 +264,12 @@ public class EmployeeController {
 
         verifyEmployeeOwnership(employeeId, authentication);
 
+        Employee employee = employeeService.getById(employeeId);
+        if (employee.getTitle() == EmployeeeTitle.MASTER) {
+            return ResponseEntity.badRequest()
+                    .body("MASTER employee type cannot submit availability.");
+        }
+
         log.info("Availability submission requested");
 
 
@@ -309,5 +300,45 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Unexpected error.");
         }
+    }
+
+    @GetMapping("/{employeeId}/assign-job")
+    public String showSelfAssignJob(@PathVariable Long employeeId,
+                                    Authentication authentication,
+                                    Model model) {
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        Employee employee = employeeService.getById(employeeId);
+        if (employee.getTitle() != EmployeeeTitle.MASTER) {
+            throw new AccessDeniedException("Only MASTER can self-assign jobs.");
+        }
+
+        MevcutIs job = new MevcutIs();
+        job.setEmployee(employee);
+
+        model.addAttribute("employee", employee);
+        model.addAttribute("job", job);
+        model.addAttribute("turler", Tur.values());
+        model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
+
+        return "employee/assign-job";
+    }
+
+    @PostMapping("/{employeeId}/assign-job")
+    public String selfAssignJob(@PathVariable Long employeeId,
+                                Authentication authentication,
+                                @ModelAttribute("job") MevcutIs job) {
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        Employee employee = employeeService.getById(employeeId);
+        if (employee.getTitle() != EmployeeeTitle.MASTER) {
+            throw new AccessDeniedException("Only MASTER can self-assign jobs.");
+        }
+        if (job.getTur() == Tur.COWORK) {
+            throw new IllegalStateException("MASTER self-assign does not support COWORK jobs.");
+        }
+
+        jobService.assignJobToEmployee(employeeId, job);
+        return "redirect:/employees/" + employeeId + "/current-jobs";
     }
 }
