@@ -5,6 +5,7 @@ import com.webapp.demo_app.model.Employee;
 import com.webapp.demo_app.model.MevcutIs;
 import com.webapp.demo_app.security.SecurityUser;
 import com.webapp.demo_app.service.*;
+import com.webapp.demo_app.dto.AdminDashboardEmployeeStatDto;
 import com.webapp.demo_app.model.enums.EmployeeeTitle;
 import com.webapp.demo_app.model.enums.Tur;
 import com.webapp.demo_app.model.enums.UcretTahsilTipi;
@@ -35,17 +36,20 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final AvailabilityPolicyService policyService;
     private final SystemSettingsService systemSettingsService;
+    private final AdminDashboardStatsService adminDashboardStatsService;
 
     public EmployeeController(JobService jobService,
                               AvailabilityService availabilityService,
                               EmployeeService employeeService,
                               AvailabilityPolicyService policyService,
-                              SystemSettingsService systemSettingsService) {
+                              SystemSettingsService systemSettingsService,
+                              AdminDashboardStatsService adminDashboardStatsService) {
         this.jobService = jobService;
         this.availabilityService = availabilityService;
         this.employeeService = employeeService;
         this.policyService = policyService;
         this.systemSettingsService = systemSettingsService;
+        this.adminDashboardStatsService = adminDashboardStatsService;
     }
 
     // ======================
@@ -91,6 +95,17 @@ public class EmployeeController {
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("isMaster", isMaster);
 
+        if (isMaster) {
+            List<AdminDashboardEmployeeStatDto> employeeStats =
+                    adminDashboardStatsService.buildEmployeeStats(List.of(employee));
+
+            model.addAttribute("masterChartEmployeeLabels",
+                    employeeStats.stream().map(AdminDashboardEmployeeStatDto::getEmployeeName).toList());
+            model.addAttribute("masterChartWeeklyWorkHourValues",
+                    employeeStats.stream().map(AdminDashboardEmployeeStatDto::getWeeklyWorkHours).toList());
+            model.addAttribute("masterChartMonthlyWorkHourValues",
+                    employeeStats.stream().map(AdminDashboardEmployeeStatDto::getMonthlyWorkHours).toList());
+        }
 
         return "employee/home-dashboard";
     }
