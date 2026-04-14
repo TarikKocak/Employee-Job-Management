@@ -123,9 +123,11 @@ public class EmployeeController {
 
         log.info("Current jobs viewed");
 
+        Employee employee = employeeService.getById(employeeId);
         model.addAttribute("jobs",
                 jobService.getMevcutIsler(employeeId, false));
         model.addAttribute("employeeId", employeeId);
+        model.addAttribute("isMaster",employee.getTitle()==EmployeeeTitle.MASTER);
         model.addAttribute("errorMessage", errorMessage);
 
         return "employee/current-jobs";
@@ -200,6 +202,23 @@ public class EmployeeController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
+        return "redirect:/employees/" + employeeId + "/current-jobs";
+    }
+
+    @PostMapping("/{employeeId}/current-jobs/{jobId}/delete")
+    public String deleteCurrentJob(@PathVariable Long employeeId,
+                                   @PathVariable Long jobId,
+                                   Authentication authentication){
+
+        verifyEmployeeOwnership(employeeId,authentication);
+
+        Employee employee = employeeService.getById(employeeId);
+
+        if(employee.getTitle()!=EmployeeeTitle.MASTER){
+            throw new AccessDeniedException("Cannot delete current jobs for this authenticated user");
+        }
+
+        jobService.deleteCurrentJob(employeeId,jobId);
         return "redirect:/employees/" + employeeId + "/current-jobs";
     }
 

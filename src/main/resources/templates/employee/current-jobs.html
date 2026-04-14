@@ -107,9 +107,15 @@
             padding: 14px 16px;
             border-bottom: 1px solid #e5e7eb;
 
-            white-space: nowrap;       /* tek satır */
-            overflow: hidden;          /* taşanı gizle */
-            text-overflow: ellipsis;   /* ... */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .table tbody td:last-child {
+            overflow: visible;
+            text-overflow: clip;
+            white-space: nowrap;
         }
 
 
@@ -125,10 +131,17 @@
         /* =========================
            ACTION COLUMN (CURRENT JOBS)
         ========================= */
+        .table th:last-child,
+        .table td:last-child {
+            width: 190px;
+            min-width: 190px;
+        }
+
         .table td:last-child {
             display: flex;
             gap: 10px;
             align-items: center;
+            justify-content: flex-start;
         }
 
         /* =========================
@@ -161,6 +174,16 @@
         .btn-success:hover {
             transform: translateY(-1px);
             box-shadow: 0 10px 22px rgba(34,197,94,0.45);
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .btn-danger:hover {
+            background: #fecaca;
         }
         /* =========================
            ALERT MESSAGE
@@ -359,8 +382,16 @@
                 <td th:text="${job.tahminiSure}"></td>
                 <td>
                     <a th:href="@{|/employees/${employeeId}/current-jobs/${job.id}/edit|}"
+                       onclick="event.stopPropagation();"
                        class="btn btn-small">Edit</a>
 
+                    <form th:if="${isMaster}"
+                          th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/delete|}"
+                          method="post"
+                          onsubmit="event.stopPropagation(); return confirm('Delete this job?');"
+                          style="display:inline;">
+                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                    </form>
 
                 </td>
             </tr>
