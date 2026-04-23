@@ -76,8 +76,8 @@
         }
 
         .dashboard-layout.master-layout {
-            display: grid;
-            grid-template-columns: minmax(300px, 360px) 1fr;
+            display: grid; /* ✅ THIS IS THE KEY */
+            grid-template-columns: 300px 1fr;
             gap: 20px;
             align-items: start;
             text-align: left;
@@ -87,7 +87,16 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            margin-bottom: 22px;
+        }
+        .actions-panel {
+            position: sticky;
+            top: 20px;
+        }
+        .charts-panel {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #e5e7eb;
+            padding: 14px;
         }
 
         .dashboard-layout:not(.master-layout) .button-group {
@@ -103,9 +112,26 @@
             padding: 16px;
         }
 
+        .chart-box canvas {
+            width: 100% !important;
+            height: 280px !important;
+        }
+
+        .master-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
         .chart-box h3 {
             margin-bottom: 10px;
             font-size: 18px;
+        }
+
+        .master-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
         }
 
         /* =========================
@@ -144,6 +170,10 @@
             .dashboard-layout.master-layout {
                 grid-template-columns: 1fr;
             }
+
+            .master-charts-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 480px) {
@@ -168,46 +198,86 @@
             <span th:text="${employeeName}">Employee</span>
         </h1>
         <div th:classappend="${isMaster} ? ' master-layout' : ''" class="dashboard-layout">
-            <div class="button-group">
-                <a th:if="${isMaster}" th:href="@{|/employees/${employeeId}/assign-job|}" class="btn">Job Assign (Self Assign)</a>
-                <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn">Mevcut İşlerim</a>
-                <a th:href="@{|/employees/${employeeId}/completed-jobs|}" class="btn">Tamamlanan İşlerim</a>
-                <a th:if="${!isMaster}" th:href="@{|/employees/${employeeId}/availability|}" class="btn">Availability</a>
+            <div th:classappend="${isMaster} ? 'actions-panel' : ''">
+                <div class="button-group">
+                    <a th:if="${isMaster}" th:href="@{|/employees/${employeeId}/assign-job|}" class="btn">Job Assign (Self Assign)</a>
+                    <a th:href="@{|/employees/${employeeId}/current-jobs|}" class="btn">Mevcut İşlerim</a>
+                    <a th:href="@{|/employees/${employeeId}/completed-jobs|}" class="btn">Tamamlanan İşlerim</a>
+                    <a th:if="${!isMaster}" th:href="@{|/employees/${employeeId}/availability|}" class="btn">Availability</a>
+                </div>
             </div>
 
-            <div class="chart-box" th:if="${isMaster}">
-                <h3>Employee Çalışma Süresi</h3>
-                <canvas id="masterWorkHoursBarChart"></canvas>
+
+            <div class="charts-panel" th:if="${isMaster}">
+                <div class="master-charts-grid">
+                    <div class="chart-box">
+                        <h3>Gelirim</h3>
+                        <canvas id="masterIncomeBarChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>Çalışma Sürem</h3>
+                        <canvas id="masterWorkHoursBarChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
-    const masterChartLabels = /*[[${masterChartEmployeeLabels}]]*/ [];
-    const masterWeeklyWorkHourValues = /*[[${masterChartWeeklyWorkHourValues}]]*/ [];
-    const masterMonthlyWorkHourValues = /*[[${masterChartMonthlyWorkHourValues}]]*/ [];
+    const masterIncomeLabels = ['Haftalık', 'Aylık'];
+    const masterIncomeValues = [
+        /*[[${masterWeeklyIncome}]]*/ 0,
+        /*[[${masterMonthlyIncome}]]*/ 0
+    ];
 
-    if (masterChartLabels.length > 0 && document.getElementById('masterWorkHoursBarChart')) {
-        new Chart(document.getElementById('masterWorkHoursBarChart'), {
+    const masterWorkHourLabels = ['Haftalık', 'Aylık'];
+    const masterWorkHourValues = [
+        /*[[${masterWeeklyWorkHours}]]*/ 0,
+        /*[[${masterMonthlyWorkHours}]]*/ 0
+    ];
+
+    if (document.getElementById('masterIncomeBarChart')) {
+        new Chart(document.getElementById('masterIncomeBarChart'), {
             type: 'bar',
             data: {
-                labels: masterChartLabels,
+                labels: masterIncomeLabels,
                 datasets: [
                     {
-                        label: 'Haftalık Çalışma Saati',
-                        data: masterWeeklyWorkHourValues,
-                        backgroundColor: '#60a5fa'
-                    },
-                    {
-                        label: 'Aylık Çalışma Saati',
-                        data: masterMonthlyWorkHourValues,
-                        backgroundColor: '#34d399'
+                        label: 'Gelir (€)',
+                        data: masterIncomeValues,
+                        backgroundColor: ['#fbbf24', '#f97316']
                     }
                 ]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    if (document.getElementById('masterWorkHoursBarChart')) {
+        new Chart(document.getElementById('masterWorkHoursBarChart'), {
+            type: 'bar',
+            data: {
+                labels: masterWorkHourLabels,
+                datasets: [
+                    {
+                        label: 'Çalışma Saati',
+                        data: masterWorkHourValues,
+                        backgroundColor: ['#60a5fa', '#34d399']
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 scales: {
                     y: {
                         beginAtZero: true

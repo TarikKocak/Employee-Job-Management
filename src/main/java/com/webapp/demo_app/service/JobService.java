@@ -258,6 +258,7 @@ public class JobService {
     public void assignJobToEmployee(Long employeeId, MevcutIs job) {
 
         Employee employee = employeeRepository.findById(employeeId).orElseThrow();
+        validateTurForEmployee(employee, job.getTur());
 
         job.setId(null);
 
@@ -392,6 +393,8 @@ public class JobService {
             throw new IllegalArgumentException("Job does not belong to employee");
         }
 
+        validateTurForEmployee(mevcutIs.getEmployee(), updatedJob.getTur());
+
         LocalDate oldDate = mevcutIs.getTarih();
         LocalTime oldStart = mevcutIs.getBaslangicSaati();
         Double oldDuration = mevcutIs.getTahminiSure();
@@ -446,6 +449,18 @@ public class JobService {
 
 
     }
+
+    private void validateTurForEmployee(Employee employee,Tur tur){
+        if(tur==null){
+            throw new IllegalArgumentException("job type is requered");
+        }
+        if (!Tur.allowedForTitle(employee.getTitle()).contains(tur)) {
+            throw new IllegalArgumentException(
+                    "Job type " + tur + " is not allowed for employee title " + employee.getTitle()
+            );
+        }
+    }
+
 
     @Transactional
     public void deleteCurrentJob(Long employeeId, Long jobId) {

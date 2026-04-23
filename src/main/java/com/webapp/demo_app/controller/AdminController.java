@@ -254,7 +254,7 @@ public class AdminController {
 
         model.addAttribute("employee", employee);
         model.addAttribute("job", job);
-        model.addAttribute("turler", Tur.values());
+        model.addAttribute("turler", Tur.allowedForTitle(employee.getTitle()));
         model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
 
 
@@ -320,7 +320,7 @@ public class AdminController {
         model.addAttribute("job", job);
         model.addAttribute("employeeId", employeeId);
         model.addAttribute("returnUrl", resolvedReturnUrl);
-        model.addAttribute("turler", Tur.values());
+        model.addAttribute("turler", Tur.allowedForTitle(job.getEmployee().getTitle()));
         model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
 
         return "admin/admin-edit-current-job";

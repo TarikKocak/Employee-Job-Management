@@ -99,12 +99,14 @@ public class EmployeeController {
             List<AdminDashboardEmployeeStatDto> employeeStats =
                     adminDashboardStatsService.buildEmployeeStats(List.of(employee));
 
-            model.addAttribute("masterChartEmployeeLabels",
-                    employeeStats.stream().map(AdminDashboardEmployeeStatDto::getEmployeeName).toList());
-            model.addAttribute("masterChartWeeklyWorkHourValues",
-                    employeeStats.stream().map(AdminDashboardEmployeeStatDto::getWeeklyWorkHours).toList());
-            model.addAttribute("masterChartMonthlyWorkHourValues",
-                    employeeStats.stream().map(AdminDashboardEmployeeStatDto::getMonthlyWorkHours).toList());
+            AdminDashboardEmployeeStatDto stat = employeeStats.isEmpty()
+                    ? new AdminDashboardEmployeeStatDto(employee.getId(), employee.getUsername(), 0, 0, 0, 0)
+                    : employeeStats.get(0);
+
+            model.addAttribute("masterWeeklyIncome", stat.getWeeklyIncome());
+            model.addAttribute("masterMonthlyIncome", stat.getMonthlyIncome());
+            model.addAttribute("masterWeeklyWorkHours", stat.getWeeklyWorkHours());
+            model.addAttribute("masterMonthlyWorkHours", stat.getMonthlyWorkHours());
         }
 
         return "employee/home-dashboard";
@@ -352,7 +354,7 @@ public class EmployeeController {
 
         model.addAttribute("employee", employee);
         model.addAttribute("job", job);
-        model.addAttribute("turler", Tur.values());
+        model.addAttribute("turler", Tur.allowedForTitle(employee.getTitle()));
         model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
 
         return "employee/assign-job";
