@@ -185,6 +185,63 @@
         .btn-danger:hover {
             background: #fecaca;
         }
+
+        .settings-trigger {
+            width: 36px;
+            height: 36px;
+            border-radius: 999px;
+            border: 1px solid #d1d5db;
+            background: #ffffff;
+            color: #374151;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .settings-trigger:hover {
+            background: #f3f4f6;
+        }
+
+        .settings-popup {
+            position: fixed;
+            min-width: 140px;
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+            padding: 6px;
+            display: none;
+            z-index: 12000;
+        }
+
+        .settings-popup.show {
+            display: block;
+        }
+
+        .settings-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            text-align: left;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #111827;
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .settings-item:hover {
+            background: #f3f4f6;
+        }
+
+        .settings-item-danger {
+            color: #b91c1c;
+        }
         /* =========================
            ALERT MESSAGE
         ========================= */
@@ -385,13 +442,12 @@
                        onclick="event.stopPropagation();"
                        class="btn btn-small">Edit</a>
 
-                    <form th:if="${isMaster}"
-                          th:action="@{|/employees/${employeeId}/current-jobs/${job.id}/delete|}"
-                          method="post"
-                          onsubmit="event.stopPropagation(); return confirm('Delete this job?');"
-                          style="display:inline;">
-                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
-                    </form>
+                    <button th:if="${isMaster}"
+                            type="button"
+                            class="settings-trigger"
+                            th:data-update-url="@{|/employees/${employeeId}/current-jobs/${job.id}/update|}"
+                            th:data-delete-url="@{|/employees/${employeeId}/current-jobs/${job.id}/delete|}"
+                            onclick="openSettingsPopup(event, this)">⚙</button>
 
                 </td>
             </tr>
@@ -399,8 +455,16 @@
         </table>
     </div>
 </div>
+<div id="settingsPopup" class="settings-popup" onclick="event.stopPropagation();">
+    <a id="settingsUpdateLink" href="#" class="settings-item">Update</a>
+    <form id="settingsDeleteForm" action="#" method="post" onsubmit="return confirm('Delete this job?');">
+        <button type="submit" class="settings-item settings-item-danger">Delete</button>
+    </form>
+</div>
 <script th:src="@{/js/main.js}"></script>
 <script>
+    let activeSettingsTrigger = null;
+
     function openPreview(row) {
         const content = document.getElementById("previewContent");
         const fields = row.dataset;
@@ -431,8 +495,54 @@
 
         content.innerHTML = html;
         document.getElementById("jobPreviewOverlay").classList.remove("hidden");
+        closeSettingsPopup();
     }
     function closePreview() { document.getElementById("jobPreviewOverlay").classList.add("hidden"); }
+    function openSettingsPopup(event, button) {
+        event.stopPropagation();
+
+        const popup = document.getElementById("settingsPopup");
+        const updateLink = document.getElementById("settingsUpdateLink");
+        const deleteForm = document.getElementById("settingsDeleteForm");
+
+        if (popup.classList.contains("show") && activeSettingsTrigger === button) {
+            closeSettingsPopup();
+            return;
+        }
+
+        activeSettingsTrigger = button;
+        updateLink.href = button.dataset.updateUrl;
+        deleteForm.action = button.dataset.deleteUrl;
+
+        popup.classList.add("show");
+
+        const triggerRect = button.getBoundingClientRect();
+        const popupRect = popup.getBoundingClientRect();
+        const spacing = 8;
+
+        let left = triggerRect.right - popupRect.width;
+        left = Math.max(8, Math.min(left, window.innerWidth - popupRect.width - 8));
+
+        let top = triggerRect.bottom + spacing;
+        if (top + popupRect.height > window.innerHeight - 8) {
+            top = triggerRect.top - popupRect.height - spacing;
+        }
+
+        popup.style.left = `${left}px`;
+        popup.style.top = `${Math.max(8, top)}px`;
+    }
+
+    function closeSettingsPopup() {
+        document.getElementById("settingsPopup").classList.remove("show");
+        activeSettingsTrigger = null;
+    }
+
+    document.addEventListener("click", () => {
+        closeSettingsPopup();
+    });
+
+    window.addEventListener("resize", closeSettingsPopup);
+    window.addEventListener("scroll", closeSettingsPopup, true);
 
 </script>
 

@@ -224,6 +224,47 @@ public class EmployeeController {
         return "redirect:/employees/" + employeeId + "/current-jobs";
     }
 
+    @GetMapping("/{employeeId}/current-jobs/{jobId}/update")
+    public String updateCurrentJobForm(@PathVariable Long employeeId,
+                                       @PathVariable Long jobId,
+                                       Authentication authentication,
+                                       Model model){
+
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        Employee employee = employeeService.getById(employeeId);
+        if(employee.getTitle()!= EmployeeeTitle.MASTER){
+            throw new AccessDeniedException("You have no permission to update the job details");
+        }
+
+        MevcutIs job = jobService.getMevcutIsById(jobId);
+        if(!job.getEmployee().getId().equals(employeeId)){
+            throw new AccessDeniedException("Unauthorized job access");
+        }
+        model.addAttribute("job",job);
+        model.addAttribute("employeeId", employeeId);
+        model.addAttribute("turler", Tur.allowedForTitle(employee.getTitle()));
+        model.addAttribute("ucretTipleri", UcretTahsilTipi.values());
+
+        return "employee/update-current-job";
+    }
+
+    @PostMapping("/{employeeId}/current-jobs/{jobId}/update")
+    public String updateCurrentJob(@PathVariable Long employeeId,
+                                   @PathVariable Long jobId,
+                                   Authentication authentication,
+                                   @ModelAttribute("job") MevcutIs job){
+        verifyEmployeeOwnership(employeeId, authentication);
+
+        Employee employee = employeeService.getById(employeeId);
+        if (employee.getTitle() != EmployeeeTitle.MASTER) {
+            throw new AccessDeniedException("Only MASTER employee type can update assigned job details.");
+        }
+
+        jobService.updateCurrentJobInfo(employeeId, jobId, job);
+        return "redirect:/employees/" + employeeId + "/current-jobs";
+    }
+
     // ======================
     // COMPLETED JOBS
     // ======================

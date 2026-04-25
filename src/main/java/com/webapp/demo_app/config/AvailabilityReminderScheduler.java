@@ -7,22 +7,31 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AvailabilityReminderScheduler {
 
+    private static final ZoneId BERLIN_ZONE = ZoneId.of("Europe/Berlin");
+    private static final DateTimeFormatter LOG_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm z");
+
     private final EmployeeService employeeService;
     private final EmailNotificationService emailNotificationService;
 
-    @Scheduled(cron = "0 0 10 ? * SUN")
+    @Scheduled(cron = "0 0 10 ? * SUN", zone = "Europe/Berlin")
     public void sendMorningsundayAvailabiltyReminder(){
         sendSundayAvailabilityReminderEmails("10:00");
     }
 
-    @Scheduled(cron = "0 30 23 ? * SUN")
+    @Scheduled(cron = "0 30 22 ? * SUN", zone = "Europe/Berlin")
     public void sendLateSundayAvailabilityReminder() {
-        sendSundayAvailabilityReminderEmails("23:30");
+        sendSundayAvailabilityReminderEmails("22:30");
     }
 
     private void sendSundayAvailabilityReminderEmails(String triggerTime) {
@@ -43,7 +52,9 @@ public class AvailabilityReminderScheduler {
             }
         }
 
-        log.info("Sunday availability reminder run completed at {}. Sent emails count={}",
+        String munichRunTime = ZonedDateTime.now(BERLIN_ZONE).format(LOG_TIME_FORMATTER);
+        log.info("Sunday availability reminder run completed at {} Munich time (trigger {}). Sent emails count={}",
+                munichRunTime,
                 triggerTime,
                 sentCount);
     }
