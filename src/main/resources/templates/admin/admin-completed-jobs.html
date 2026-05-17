@@ -164,6 +164,15 @@
             vertical-align: middle;
         }
 
+        .cell-preview {
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+        .cell-preview.address { max-width: 150px; }
+
         tbody tr:hover {
             background: #f9fafb;
         }
@@ -284,6 +293,89 @@
             flex-wrap: wrap;
         }
 
+        .pagination-bar {
+            margin-top: 14px;
+            padding: 14px 16px;
+            border-top: 1px solid var(--line);
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-left,
+        .pagination-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        #jobsPageSize {
+            height: 36px;
+            padding: 0 34px 0 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            outline: none;
+        }
+
+        #jobsPageSize:focus {
+            border-color: rgba(37, 99, 235, 0.35);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+        }
+
+        #jobsPageInfo {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 700;
+            min-width: 110px;
+            text-align: center;
+        }
+
+        .btn-page {
+            min-width: 96px;
+        }
+
+        .btn-page:disabled {
+            opacity: .45;
+            cursor: not-allowed;
+        }
+        .preview-overlay {
+            position: fixed; inset: 0; z-index: 1200;
+            background: rgba(15, 23, 42, 0.55);
+            display: flex; align-items: center; justify-content: center;
+            padding: 18px;
+        }
+        .preview-overlay.hidden { display: none; }
+        .preview-modal {
+            width: min(760px, 100%); background: #fff; border-radius: 16px;
+            box-shadow: 0 24px 52px rgba(15, 23, 42, .24); overflow: hidden;
+        }
+        .preview-header {
+            padding: 14px 18px; border-bottom: 1px solid var(--line);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .preview-content {
+            padding: 16px 18px 18px; display: grid;
+            grid-template-columns: 1fr 1fr; gap: 10px 14px;
+        }
+        .preview-row { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px 12px; }
+        .preview-row.full { grid-column: 1 / -1; }
+        .preview-label { color: var(--muted); font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+        .preview-value { color: var(--text); font-size: 14px; font-weight: 600; word-break: break-word; white-space: pre-wrap; }
+
         /* =========================
            FOOTER ACTION
         ========================= */
@@ -328,17 +420,6 @@
                 <span class="icon">🔎</span>
                 <input id="searchInput" type="text" placeholder="İsim / adres / tür ara...">
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
-                <label for="jobsPageSize">Visible:</label>
-                <select id="jobsPageSize">
-                    <option value="20" selected>20</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                </select>
-                <button type="button" class="btn btn-secondary" id="jobsPrevBtn">Prev</button>
-                <span id="jobsPageInfo">Page 1 / 1</span>
-                <button type="button" class="btn btn-secondary" id="jobsNextBtn">Next</button>
-            </div>
             <a href="/admin/dashboard" class="btn btn-secondary">⬅ Geri Dön</a>
         </div>
     </div>
@@ -355,8 +436,8 @@
                     <th data-sortable="true">Adres <span class="sort-indicator">↕</span></th>
                     <th data-sortable="true">Ücret <span class="sort-indicator">↕</span></th>
                     <th data-sortable="true">Ücret Tipi <span class="sort-indicator">↕</span></th>
-                    <th data-sortable="true">Başlanılan Saat <span class="sort-indicator">↕</span></th>
-                    <th data-sortable="true">Bitirilen Saat <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Baş. Saat <span class="sort-indicator">↕</span></th>
+                    <th data-sortable="true">Bit. Saat <span class="sort-indicator">↕</span></th>
                     <th data-sortable="true">Süre (saat) <span class="sort-indicator">↕</span></th>
                     <th data-sortable="true">Duvar <span class="sort-indicator">↕</span></th>
                     <th data-sortable="true">Kart <span class="sort-indicator">↕</span></th>
@@ -370,7 +451,21 @@
                     <td colspan="14" class="empty">Henüz tamamlanan iş bulunmuyor.</td>
                 </tr>
 
-                <tr th:each="is : ${completedJobs}">
+                <tr th:each="is : ${completedJobs}" class="job-row"
+                    th:data-employee="${is.employee.getUsername}"
+                    th:data-tur="${is.tur}"
+                    th:data-tarih="${#temporals.format(is.tarih, 'dd.MM.yyyy')}"
+                    th:data-isim="${is.isim}"
+                    th:data-adres="${is.isAdresi}"
+                    th:data-ucret="${is.ucret}"
+                    th:data-ucrettipi="${is.ucretTahsilTipi != null ? (is.ucretTahsilTipi.name() == 'CASH' ? 'Nakit' : 'Banka') : 'Belirtilmemiş'}"
+                    th:data-baslangic="${is.asilBaslanilanSaat}"
+                    th:data-bitis="${is.bitisSaati}"
+                    th:data-sure="${#numbers.formatDecimal(is.sure, 1, 2)}"
+                    th:data-duvar="${is.duvarMontaji ? 'VAR' : 'YOK'}"
+                    th:data-kart="${is.kartVerildi ? 'VERİLDİ' : 'YOK'}"
+                    th:data-yorum="${is.yorumKartiVerildi ? 'VERİLDİ' : 'YOK'}"
+                    th:data-foto="${is.fotoAtildi ? 'ATILDI' : 'YOK'}">
 
 
                     <!-- LAZY employee: ensure you fetch join in backend if needed -->
@@ -380,8 +475,8 @@
 
                     <td th:text="${is.tur}"></td>
                     <td th:text="${#temporals.format(is.tarih, 'dd.MM.yyyy')}"></td>
-                    <td th:text="${is.isim}"></td>
-                    <td th:text="${is.isAdresi}"></td>
+                    <td><span class="cell-preview" th:title="${is.isim}" th:text="${is.isim}"></span></td>
+                    <td><span class="cell-preview address" th:title="${is.isAdresi}" th:text="${is.isAdresi}"></span></td>
 
                     <td class="money" th:text="${is.ucret}"></td>
                     <td>
@@ -429,6 +524,21 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination-bar">
+            <div class="pagination-left">
+                <span class="pagination-label">Rows per page</span>
+                <select id="jobsPageSize" aria-label="Rows per page">
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+            <div class="pagination-right">
+                <button type="button" class="btn btn-secondary btn-page" id="jobsPrevBtn">← Previous</button>
+                <span id="jobsPageInfo">Page 1 / 1</span>
+                <button type="button" class="btn btn-secondary btn-page" id="jobsNextBtn">Next →</button>
+            </div>
+        </div>
     </div>
 
 
@@ -436,6 +546,15 @@
         <a href="/admin/dashboard" class="btn btn-ghost">⬅ Geri Dön</a>
     </div>
 
+</div>
+<div id="jobPreviewOverlay" class="preview-overlay hidden">
+    <div class="preview-modal">
+        <div class="preview-header">
+            <h3 style="margin:0;">İş Önizleme</h3>
+            <button type="button" class="btn btn-ghost" onclick="closeJobPreview()">Kapat</button>
+        </div>
+        <div id="jobPreviewContent" class="preview-content"></div>
+    </div>
 </div>
 
 <script>
@@ -513,6 +632,36 @@
         });
     }
     if (table) {
+        const previewOverlay = document.getElementById("jobPreviewOverlay");
+        const previewContent = document.getElementById("jobPreviewContent");
+        const previewFields = [
+            ["employee", "Çalışan"], ["tur", "Tür"], ["tarih", "Tarih"], ["isim", "İsim"],
+            ["adres", "Adres"], ["ucret", "Ücret"], ["ucrettipi", "Ücret Tipi"], ["baslangic", "Başlangıç"],
+            ["bitis", "Bitiş"], ["sure", "Süre (saat)"], ["duvar", "Duvar"], ["kart", "Kart"],
+            ["yorum", "Yorum"], ["foto", "Foto"]
+        ];
+        const openJobPreview = (row) => {
+            if (!previewOverlay || !previewContent) return;
+            previewContent.innerHTML = previewFields.map(([key, label]) => {
+                const isFull = key === "adres";
+                const value = row.dataset[key] || "-";
+                return `<div class="preview-row ${isFull ? "full" : ""}">
+                    <div class="preview-label">${label}</div>
+                    <div class="preview-value">${value}</div>
+                </div>`;
+            }).join("");
+            previewOverlay.classList.remove("hidden");
+        };
+        window.closeJobPreview = () => previewOverlay?.classList.add("hidden");
+        previewOverlay?.addEventListener("click", (e) => {
+            if (e.target === previewOverlay) closeJobPreview();
+        });
+        table.querySelectorAll("tbody tr.job-row").forEach((row) => {
+            row.style.cursor = "pointer";
+            row.title = "Detay için tıklayın";
+            row.addEventListener("click", () => openJobPreview(row));
+        });
+
         const headers = table.querySelectorAll("thead th[data-sortable='true']");
         let activeSort = { columnIndex: -1, direction: "asc" };
 
