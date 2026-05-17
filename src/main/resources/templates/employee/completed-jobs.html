@@ -300,6 +300,17 @@
             <span class="icon">🔎</span>
             <input id="searchInput" type="text" placeholder="Tür / adres / tarih ara...">
         </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <label for="jobsPageSize">Visible:</label>
+            <select id="jobsPageSize">
+                <option value="20" selected>20</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+            </select>
+            <button type="button" class="btn btn-small" id="jobsPrevBtn">Prev</button>
+            <span id="jobsPageInfo">Page 1 / 1</span>
+            <button type="button" class="btn btn-small" id="jobsNextBtn">Next</button>
+        </div>
     </div>
 
     <table class="table" id="completedJobsTable">
@@ -327,7 +338,7 @@
             th:data-duvar="${job.duvarMontaji}"
             th:data-adres="${job.isAdresi}"
             th:data-tanimi="${job.tanimi}"
-            th:data-tarih="${job.tarih}"
+            th:data-tarih="${#temporals.format(job.tarih, 'dd.MM.yyyy')}"
             th:data-ucret="${job.ucret}"
             th:data-tahsil="${job.ucretTahsilTipi}"
             th:data-sure="${job.sure}"
@@ -339,7 +350,7 @@
             <td th:text="${job.duvarMontaji} ? 'Evet' : 'Hayır'"></td>
             <td th:text="${job.isAdresi}"></td>
             <td th:text="${job.tanimi}"></td>
-            <td th:text="${job.tarih}"></td>
+            <td th:text="${#temporals.format(job.tarih, 'dd.MM.yyyy')}"></td>
             <td th:text="${job.ucret}"></td>
             <td th:text="${job.ucretTahsilTipi}"></td>
             <td th:text="${#numbers.formatDecimal(job.sure, 1, 2)}"></td>
@@ -355,18 +366,75 @@
 <script>
     const searchInput = document.getElementById("searchInput");
     const completedJobsTable = document.getElementById("completedJobsTable");
+    const jobsPageSizeSelect = document.getElementById("jobsPageSize");
+    const jobsPrevBtn = document.getElementById("jobsPrevBtn");
+    const jobsNextBtn = document.getElementById("jobsNextBtn");
+    const jobsPageInfo = document.getElementById("jobsPageInfo");
+    let jobsCurrentPage = 1;
+    const getJobsPageSize = () => Number(jobsPageSizeSelect?.value || 20);
+
+    const renderJobsPage = () => {
+        if (!completedJobsTable) return;
+        const tbody = completedJobsTable.querySelector("tbody");
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const filteredRows = rows.filter((row) => row.dataset.matchesSearch !== "false");
+        const pageSize = getJobsPageSize();
+        const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+        jobsCurrentPage = Math.min(jobsCurrentPage, totalPages);
+
+        const start = (jobsCurrentPage - 1) * pageSize;
+        const end = start + pageSize;
+
+        rows.forEach((row) => {
+            row.style.display = "none";
+        });
+        filteredRows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? "" : "none";
+        });
+
+        if (jobsPageInfo) jobsPageInfo.textContent = `Page ${jobsCurrentPage} / ${totalPages}`;
+        if (jobsPrevBtn) jobsPrevBtn.disabled = jobsCurrentPage <= 1;
+        if (jobsNextBtn) jobsNextBtn.disabled = jobsCurrentPage >= totalPages;
+    };
+
+    const applySearchFilter = () => {
+        if (!completedJobsTable) return;
+        const query = (searchInput?.value || "").trim().toLowerCase();
+        const rows = completedJobsTable.querySelectorAll("tbody tr");
+        rows.forEach((row) => {
+            const rowText = row.innerText.toLowerCase();
+            row.dataset.matchesSearch = rowText.includes(query) ? "true" : "false";
+        });
+        jobsCurrentPage = 1;
+        renderJobsPage();
+    };
 
     if(searchInput && completedJobsTable){
-        searchInput.addEventListener("keyup", function (){
-           const query = searchInput.value.trim().toLowerCase();
-           const rows = completedJobsTable.querySelectorAll("tbody tr")
-
-            rows.forEach((row) => {
-                const rowText = row.innerText.toLowerCase();
-                row.style.display = rowText.includes(query) ? "" : "none";
-            })
+        searchInput.addEventListener("keyup", applySearchFilter);
+    }
+    if (jobsPrevBtn) {
+        jobsPrevBtn.addEventListener("click", () => {
+            if (jobsCurrentPage > 1) {
+                jobsCurrentPage--;
+                renderJobsPage();
+            }
         });
     }
+    if (jobsNextBtn) {
+        jobsNextBtn.addEventListener("click", () => {
+            jobsCurrentPage++;
+            renderJobsPage();
+        });
+    }
+    if (jobsPageSizeSelect) {
+        jobsPageSizeSelect.addEventListener("change", () => {
+            jobsCurrentPage = 1;
+            renderJobsPage();
+        });
+    }
+
     function openPreview(row) {
         const content = document.getElementById("previewContent");
         const fields = row.dataset;
@@ -409,6 +477,7 @@
     function closePreview() {
         document.getElementById("jobPreviewOverlay").classList.add("hidden");
     }
+    applySearchFilter();
 </script>
 
 </body>

@@ -334,6 +334,18 @@
         <div class="card">
             <h2>Current Jobs</h2>
 
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                <label for="jobsPageSize">Visible:</label>
+                <select id="jobsPageSize">
+                    <option value="20" selected>20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                </select>
+                <button type="button" class="btn btn-secondary" id="jobsPrevBtn">Prev</button>
+                <span id="jobsPageInfo">Page 1 / 1</span>
+                <button type="button" class="btn btn-secondary" id="jobsNextBtn">Next</button>
+            </div>
+
             <table id="jobsTable">
                 <thead>
                 <tr>
@@ -351,7 +363,7 @@
                     th:data-employee-id="${job.employee.id}"
                     th:data-employee="${job.employee.username}"
                     th:data-isim="${job.isim}"
-                    th:data-date="${job.tarih}"
+                    th:data-date="${#temporals.format(job.tarih, 'dd.MM.yyyy')}"
                     th:data-time="${job.baslangicSaati}"
                     th:data-tahmini-sure="${job.tahminiSure}"
                     th:data-address="${job.isAdresi}"
@@ -360,7 +372,7 @@
                     th:data-type="${job.tur}">
                     <td th:text="${job.id}"></td>
                     <td th:text="${job.employee.username}"></td>
-                    <td th:text="${job.tarih}"></td>
+                    <td th:text="${#temporals.format(job.tarih, 'dd.MM.yyyy')}"></td>
                     <td th:text="${job.baslangicSaati}"></td>
                 </tr>
                 </tbody>
@@ -520,6 +532,55 @@
         document.getElementById("jobPreviewModal").style.display = "flex";
     }
     const jobsTable = document.getElementById("jobsTable");
+    const jobsPageSizeSelect = document.getElementById("jobsPageSize");
+    const jobsPrevBtn = document.getElementById("jobsPrevBtn");
+    const jobsNextBtn = document.getElementById("jobsNextBtn");
+    const jobsPageInfo = document.getElementById("jobsPageInfo");
+    let jobsCurrentPage = 1;
+    const getJobsPageSize = () => Number(jobsPageSizeSelect?.value || 20);
+
+    const renderJobsPage = () => {
+        if (!jobsTable) return;
+        const tbody = jobsTable.querySelector("tbody");
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const pageSize = getJobsPageSize();
+        const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+        jobsCurrentPage = Math.min(jobsCurrentPage, totalPages);
+
+        const start = (jobsCurrentPage - 1) * pageSize;
+        const end = start + pageSize;
+        rows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? "" : "none";
+        });
+
+        if (jobsPageInfo) jobsPageInfo.textContent = `Page ${jobsCurrentPage} / ${totalPages}`;
+        if (jobsPrevBtn) jobsPrevBtn.disabled = jobsCurrentPage <= 1;
+        if (jobsNextBtn) jobsNextBtn.disabled = jobsCurrentPage >= totalPages;
+    };
+
+    if (jobsPrevBtn) {
+        jobsPrevBtn.addEventListener("click", () => {
+            if (jobsCurrentPage > 1) {
+                jobsCurrentPage--;
+                renderJobsPage();
+            }
+        });
+    }
+    if (jobsNextBtn) {
+        jobsNextBtn.addEventListener("click", () => {
+            jobsCurrentPage++;
+            renderJobsPage();
+        });
+    }
+    if (jobsPageSizeSelect) {
+        jobsPageSizeSelect.addEventListener("change", () => {
+            jobsCurrentPage = 1;
+            renderJobsPage();
+        });
+    }
+
     if (jobsTable) {
         const headers = jobsTable.querySelectorAll("thead th[data-sortable='true']");
         let activeSort = { columnIndex: -1, direction: "asc" };
@@ -586,9 +647,11 @@
                 rows.forEach((row) => tbody.appendChild(row));
                 activeSort = { columnIndex, direction };
                 updateIndicators();
+                renderJobsPage();
             });
         });
     }
+    renderJobsPage();
     function closeJobPreview(e) {
         if (!e || e.target.id === "jobPreviewModal") {
             document.getElementById("jobPreviewModal").style.display = "none";

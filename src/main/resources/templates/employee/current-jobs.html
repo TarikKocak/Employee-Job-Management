@@ -393,6 +393,18 @@
          class="alert"
          th:text="${errorMessage}">
     </div>
+    <div style="display:flex; gap:10px; align-items:center; justify-content:flex-end; margin-bottom:10px;">
+        <label for="jobsPageSize">Visible:</label>
+        <select id="jobsPageSize">
+            <option value="20" selected>20</option>
+            <option value="30">30</option>
+            <option value="50">50</option>
+        </select>
+        <button type="button" class="btn btn-small" id="jobsPrevBtn">Prev</button>
+        <span id="jobsPageInfo">Page 1 / 1</span>
+        <button type="button" class="btn btn-small" id="jobsNextBtn">Next</button>
+    </div>
+
     <div class="table-center">
         <table class="table">
             <thead>
@@ -421,7 +433,7 @@
                 th:data-adres="${job.isAdresi}"
                 th:data-tel="${job.telNo}"
                 th:data-tanimi="${job.isTanimi}"
-                th:data-tarih="${job.tarih}"
+                th:data-tarih="${#temporals.format(job.tarih, 'dd.MM.yyyy')}"
                 th:data-baslangic="${job.baslangicSaati}"
                 th:data-ucret="${job.ucret}"
                 th:data-tahsil="${job.ucretTahsilTipi}"
@@ -432,7 +444,7 @@
                 <td th:text="${job.isAdresi}"></td>
                 <td th:text="${job.telNo}"></td>
                 <td th:text="${job.isTanimi}"></td>
-                <td th:text="${job.tarih}"></td>
+                <td th:text="${#temporals.format(job.tarih, 'dd.MM.yyyy')}"></td>
                 <td th:text="${job.baslangicSaati}"></td>
                 <td th:text="${job.ucret}"></td>
                 <td th:text="${job.ucretTahsilTipi}"></td>
@@ -464,6 +476,56 @@
 <script th:src="@{/js/main.js}"></script>
 <script>
     let activeSettingsTrigger = null;
+    const jobsTable = document.querySelector(".table-center .table");
+    const jobsPageSizeSelect = document.getElementById("jobsPageSize");
+    const jobsPrevBtn = document.getElementById("jobsPrevBtn");
+    const jobsNextBtn = document.getElementById("jobsNextBtn");
+    const jobsPageInfo = document.getElementById("jobsPageInfo");
+    let jobsCurrentPage = 1;
+    const getJobsPageSize = () => Number(jobsPageSizeSelect?.value || 20);
+
+    function renderJobsPage() {
+        if (!jobsTable) return;
+        const tbody = jobsTable.querySelector("tbody");
+        if (!tbody) return;
+
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        const pageSize = getJobsPageSize();
+        const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+        jobsCurrentPage = Math.min(jobsCurrentPage, totalPages);
+
+        const start = (jobsCurrentPage - 1) * pageSize;
+        const end = start + pageSize;
+
+        rows.forEach((row, index) => {
+            row.style.display = index >= start && index < end ? "" : "none";
+        });
+
+        if (jobsPageInfo) jobsPageInfo.textContent = `Page ${jobsCurrentPage} / ${totalPages}`;
+        if (jobsPrevBtn) jobsPrevBtn.disabled = jobsCurrentPage <= 1;
+        if (jobsNextBtn) jobsNextBtn.disabled = jobsCurrentPage >= totalPages;
+    }
+
+    if (jobsPrevBtn) {
+        jobsPrevBtn.addEventListener("click", () => {
+            if (jobsCurrentPage > 1) {
+                jobsCurrentPage--;
+                renderJobsPage();
+            }
+        });
+    }
+    if (jobsNextBtn) {
+        jobsNextBtn.addEventListener("click", () => {
+            jobsCurrentPage++;
+            renderJobsPage();
+        });
+    }
+    if (jobsPageSizeSelect) {
+        jobsPageSizeSelect.addEventListener("change", () => {
+            jobsCurrentPage = 1;
+            renderJobsPage();
+        });
+    }
 
     function openPreview(row) {
         const content = document.getElementById("previewContent");
@@ -543,7 +605,7 @@
 
     window.addEventListener("resize", closeSettingsPopup);
     window.addEventListener("scroll", closeSettingsPopup, true);
-
+    renderJobsPage();
 </script>
 
 </body>
